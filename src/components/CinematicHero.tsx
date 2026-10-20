@@ -84,7 +84,24 @@ function FlyHero() {
     // ---- auto-play state ----
     // "idle" until conditions are met, "playing" while it runs, "done" once finished or stopped.
     let auto: "idle" | "playing" | "done" = "idle";
-    let autoY = 0, autoStart = 0, lastT = 0;
+    let autoY = 0, autoStart = 0, lastT = 0, peek = -1, peekFinal = false;
+    // How far past the hero to stop: the next section's top padding plus ~1.5 lines of its
+    // heading (≈1–2 lines visible on phones and desktops). Its fade-in is triggered too,
+    // because a sliver this small is below the reveal threshold.
+    const peekPx = (hero: HTMLElement) => {
+      const next = hero.nextElementSibling as HTMLElement | null;
+      if (!next) return 0;
+      const vh = window.innerHeight;
+      const head = next.querySelector<HTMLElement>("h1, h2, h3, p");
+      let px = Math.min(vh * 0.15, 120);
+      if (head) {
+        const cs = getComputedStyle(head);
+        const lh = parseFloat(cs.lineHeight) || parseFloat(cs.fontSize) * 1.15 || 40;
+        px = head.getBoundingClientRect().top - next.getBoundingClientRect().top + lh * 1.6;
+      }
+      next.querySelector(".reveal")?.setAttribute("data-in", "");
+      return Math.round(Math.max(60, Math.min(px, vh * 0.38)));
+    };
     const startedAt = performance.now();
     const conn = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection;
     if (window.location.hash || window.scrollY > 10 || conn?.saveData) auto = "done";
@@ -173,17 +190,25 @@ function FlyHero() {
         }
         if (auto === "playing" && lenis) {
           const start = el.offsetTop, end = start + total;
+          // Overshoot past the last frame so the next section peeks in (a cue that the page continues).
+          // Measured close to the end so fonts and layout are settled.
+          if (peek < 0 || (!peekFinal && autoY > end - total * 0.15)) {
+            peek = peekPx(el);
+            if (autoY > end - total * 0.15) peekFinal = true;
+          }
+          const finalY = end + peek;
           const dt = Math.min(0.05, (t - lastT) / 1000);
           lastT = t;
           const r = Math.min(1, (t - autoStart) / 1000 / RAMP_SECONDS);
           const rampIn = r * r * (3 - 2 * r);
-          const slowOut = Math.min(1, Math.max(0.18, (end - autoY) / (total * 0.08)));
+          const slowOut = Math.min(1, Math.max(0.12, (finalY - autoY) / (total * 0.08)));
           let ny = autoY + (total / AUTOPLAY_SECONDS[dir]) * rampIn * slowOut * dt;
-          const limitY = start + ((loadedUpTo() - 1) / (FRAMES - 1)) * total; // wait for frames
-          ny = Math.min(ny, Math.max(autoY, limitY), end);
+          const upTo = loadedUpTo(); // wait for frames; once all are in, allow the peek overshoot
+          const limitY = upTo >= FRAMES ? finalY : start + ((upTo - 1) / (FRAMES - 1)) * total;
+          ny = Math.min(ny, Math.max(autoY, limitY), finalY);
           autoY = ny;
           lenis.scrollTo(autoY, { immediate: true, force: true });
-          if (autoY >= end - 0.5) stopAuto();
+          if (autoY >= finalY - 0.5) stopAuto();
         }
 
         const y = lenis ? lenis.scroll : window.scrollY;

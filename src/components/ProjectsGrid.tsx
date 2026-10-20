@@ -1,6 +1,6 @@
-import front from "@/assets/angon-front.jpg.asset.json";
-import side from "@/assets/angon-side.jpg.asset.json";
-import aerial from "@/assets/angon-aerial.jpg.asset.json";
+const front = { url: "/images/angon-front.jpg" };
+const side = { url: "/images/angon-side.jpg" };
+const aerial = { url: "/images/angon-aerial.jpg" };
 import { useState } from "react";
 import { Link } from "@tanstack/react-router";
 

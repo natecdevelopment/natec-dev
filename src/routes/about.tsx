@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { PageHero } from "@/components/SiteChrome";
 import { values } from "@/lib/site";
-import side from "@/assets/angon-side.jpg.asset.json";
+const side = { url: "/images/angon-side.jpg" };
 
 export const Route = createFileRoute("/about")({
   head: () => ({

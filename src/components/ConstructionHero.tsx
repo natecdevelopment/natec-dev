@@ -106,7 +106,6 @@ export function ConstructionHero() {
             </div>
           )}
         </div>
-      </div>
         {p < 0.03 && <div className="absolute bottom-6 left-1/2 -translate-x-1/2 animate-bounce text-xs uppercase tracking-[0.3em] opacity-60">Scroll to build ↓</div>}
       </div>
     </section>

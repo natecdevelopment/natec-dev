@@ -126,3 +126,9 @@
   h1, h2, h3 { font-family: var(--font-display); letter-spacing: -0.02em; }
   html { scroll-behavior: smooth; }
 }
+
+@keyframes floor-tick {
+  from { transform: translateY(6px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+.floor-tick { animation: floor-tick 250ms ease-out; }

@@ -158,10 +158,10 @@ export function ConstructionHero() {
     <section ref={sectionRef} className="relative bg-ink text-ink-foreground" style={{ height: "500vh" }}>
       <div className="sticky top-0 h-[100svh] overflow-hidden md:flex md:items-center">
         <canvas ref={canvasRef} className="absolute inset-0 h-full w-full" aria-hidden />
-        <div className="mx-auto w-full max-w-7xl px-4 pt-20 md:relative md:px-5 md:pt-16">
+        <div className="absolute inset-0 mx-auto w-full max-w-7xl px-4 pt-20 md:relative md:inset-auto md:px-5 md:pt-16">
           <div className="max-w-md">
             <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-caution md:text-xs" style={shadow}>Natec Development Ltd. · Est. 2023</p>
-            <h1 className="mt-2 font-semibold leading-[1.05] md:mt-4 md:text-6xl" style={{ ...shadow, fontSize: undefined }}>
+            <h1 className="mt-2 font-semibold leading-[1.05] md:mt-4 md:text-6xl" style={shadow}>
               <span className="block text-[clamp(2rem,9vw,2.75rem)] md:text-6xl">
                 From bare land to <em className="text-caution">lasting homes</em>.
               </span>

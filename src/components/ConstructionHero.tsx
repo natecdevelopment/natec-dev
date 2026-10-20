@@ -130,7 +130,7 @@ export function ConstructionHero() {
     return () => { alive = false; cancelAnimationFrame(raf); };
   }, []);
 
-  const s = STAGES[stage];
+  const s = STAGES[stage] ?? STAGES[0]!;
 
   return (
     <section ref={sectionRef} className="relative bg-ink text-ink-foreground" style={{ height: "500vh" }}>

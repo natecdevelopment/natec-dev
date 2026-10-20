@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ConstructionHero } from "@/components/ConstructionHero";
+import { CinematicHero } from "@/components/CinematicHero";
 import { FeaturedProject, OngoingProjects } from "@/components/ProjectsGrid";
 import { services } from "@/lib/site";
 
@@ -18,7 +18,7 @@ export const Route = createFileRoute("/")({
 function Index() {
   return (
     <>
-      <ConstructionHero />
+      <CinematicHero />
       <section className="mx-auto max-w-7xl px-5 py-20">
         <div className="grid gap-10 md:grid-cols-2">
           <div>

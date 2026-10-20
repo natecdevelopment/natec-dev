@@ -11,7 +11,7 @@ function Eyebrow({ children, dark }: { children: React.ReactNode; dark?: boolean
 }
 
 /* ---------- 1. Intro + numbers ---------- */
-function CountUp({ to, suffix = "" }: { to: number; suffix?: string }) {
+function CountUp({ to, suffix = "" }: { to: number; suffix?: string | undefined }) {
   const ref = useRef<HTMLSpanElement>(null);
   useEffect(() => {
     const el = ref.current;

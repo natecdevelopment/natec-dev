@@ -1,3 +1,4 @@
+import { UnderConstruction } from "@/components/UnderConstruction";
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { z } from "zod";
@@ -15,7 +16,7 @@ export const Route = createFileRoute("/contact")({
       { property: "og:description", content: "Let's discuss your land, design or construction project." },
     ],
   }),
-  component: Contact,
+  component: () => <UnderConstruction title="Contact" />,
 });
 
 const schema = z.object({
@@ -28,7 +29,7 @@ const schema = z.object({
 
 const field = "w-full border border-input bg-background px-4 py-3 text-sm outline-none focus:border-primary";
 
-function Contact() {
+export function ContactPage() {
   const [status, setStatus] = useState<"idle" | "sending" | "done" | "error">("idle");
   const [error, setError] = useState("");
 

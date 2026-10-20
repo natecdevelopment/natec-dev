@@ -1,3 +1,4 @@
+import { UnderConstruction } from "@/components/UnderConstruction";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { PageHero } from "@/components/SiteChrome";
 import { services } from "@/lib/site";
@@ -11,10 +12,10 @@ export const Route = createFileRoute("/services")({
       { property: "og:description", content: "Nine services covering every stage of real estate development." },
     ],
   }),
-  component: Services,
+  component: () => <UnderConstruction title="Services" />,
 });
 
-function Services() {
+export function ServicesPage() {
   return (
     <>
       <PageHero eyebrow="Our services" title="Support at every stage of development." intro="From the first look at a plot of land to managing the finished property." />

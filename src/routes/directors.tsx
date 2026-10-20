@@ -1,3 +1,4 @@
+import { UnderConstruction } from "@/components/UnderConstruction";
 import { createFileRoute } from "@tanstack/react-router";
 import { Mail, Phone } from "lucide-react";
 import { PageHero } from "@/components/SiteChrome";
@@ -12,10 +13,10 @@ export const Route = createFileRoute("/directors")({
       { property: "og:description", content: "The people guiding Natec Development Ltd." },
     ],
   }),
-  component: Directors,
+  component: () => <UnderConstruction title="Directors" />,
 });
 
-function Directors() {
+export function DirectorsPage() {
   return (
     <>
       <PageHero eyebrow="Leadership" title="Board of Directors" />

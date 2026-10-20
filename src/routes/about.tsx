@@ -1,3 +1,4 @@
+import { UnderConstruction } from "@/components/UnderConstruction";
 import { createFileRoute } from "@tanstack/react-router";
 import { PageHero } from "@/components/SiteChrome";
 import { values } from "@/lib/site";
@@ -12,10 +13,10 @@ export const Route = createFileRoute("/about")({
       { property: "og:description", content: "Our mission, vision and the values behind every Natec project." },
     ],
   }),
-  component: About,
+  component: () => <UnderConstruction title="About" />,
 });
 
-function About() {
+export function AboutPage() {
   return (
     <>
       <PageHero eyebrow="About us" title="A growing developer rooted in Sreepur, Gazipur." intro="Natec Development Ltd. was established in 2023 and works across every stage of property development." />

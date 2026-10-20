@@ -383,7 +383,7 @@ function Worker({ def, prog, seed }: { def: WorkerDef; prog: Prog; seed: number 
     root.current!.visible = show;
     if (!show) return;
     let y = def.pos[1];
-    if (def.level === "top") y = topOf(v) - 0.4 + 0.4 + (builtOf(v) >= 1 ? 0 : 0);
+    if (def.level === "top") y = 0.4 + Math.floor(Math.min(FLOORS, builtOf(v))) * FH;
     if (def.level === "facade") y = 0.4 + Math.min(FLOORS - 1, Math.floor(facOf(v))) * FH + FH + 0.04;
     let x = def.pos[0], rotY = def.rot ?? 0;
     const walking = def.task === "walk" || def.task === "carry";

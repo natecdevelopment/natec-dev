@@ -7,7 +7,7 @@ export const Route = createFileRoute("/projects")({
   head: () => ({
     meta: [
       { title: "Projects — Natec Development Ltd." },
-      { name: "description", content: "Shobuj Angon (completed), Shobuj Aloy (50%), Shobuj Digonto (20%) and two projects launching in 2027." },
+      { name: "description", content: "Shobuj Angon (completed), Shobuj Aloy (50%), Shobuj Digonto (20%) and two upcoming projects." },
       { property: "og:title", content: "Natec Development Projects" },
       { property: "og:description", content: "Completed, ongoing and upcoming residential projects in Gazipur." },
     ],
@@ -22,7 +22,7 @@ export function ProjectsPage() {
       <section className="mx-auto max-w-7xl px-5 py-20">
         <h2 className="mb-8 text-sm font-bold uppercase tracking-[0.3em] text-accent">Completed</h2>
         <FeaturedProject />
-        <h2 className="mb-8 mt-20 text-sm font-bold uppercase tracking-[0.3em] text-accent">Ongoing &amp; upcoming</h2>
+        <h2 className="mb-8 mt-20 text-sm font-bold uppercase tracking-[0.3em] text-accent">Ongoing</h2>
         <OngoingProjects />
       </section>
     </>

@@ -170,7 +170,7 @@ function Scaffold({ prog }: { prog: Prog }) {
   useFrame(() => {
     const v = prog.value;
     const fin = finOf(v);
-    root.current!.visible = builtOf(v) > 0.05 && fin < 0.4;
+    root.current!.visible = builtOf(v) > 0.05 && fin < 0.12;
     poles.current!.scale.y = topOf(v) + 1;
     const b = builtOf(v);
     planks.current!.children.forEach((c, i) => (c.visible = i < Math.floor(b + 0.03)));
@@ -506,7 +506,7 @@ function Rig({ prog }: { prog: Prog }) {
     prog.value += (prog.target - prog.value) * (1 - Math.exp(-5 * Math.min(dt, 0.05)));
     const v = prog.value, t = clock.elapsedTime;
     const narrow = window.innerWidth < 768;
-    camera.position.set(-16 - v * 3 + Math.sin(t * 0.1) * 0.5, 5 + v * 7, (narrow ? 34 : 24) + v * 6);
+    camera.position.set(-9 - v * 3 + Math.sin(t * 0.1) * 0.5, 5 + v * 7, (narrow ? 34 : 24) + v * 6);
     camera.lookAt(narrow ? 3 : -2.5, 2.5 + v * 5, 0);
   });
   return null;

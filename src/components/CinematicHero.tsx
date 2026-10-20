@@ -53,19 +53,61 @@ export function CinematicHero() {
   return reduced ? <StaticHero /> : <FlyHero />;
 }
 
+// Auto-play: on load the film plays itself to the last frame unless the visitor takes over.
+const AUTOPLAY_SECONDS = { d: 16, m: 14 }; // time for the whole hero at full speed
+const AUTOPLAY_DELAY_MS = 1200; // let the drifting clouds breathe first
+const RAMP_SECONDS = 1.4; // ease in at the start
+const CLOUD_FADE_FRAMES = 14; // drifting clouds fade out over the first frames
+
 function FlyHero() {
   const sectionRef = useRef<HTMLElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const progressRef = useRef<HTMLDivElement>(null);
   const brightRef = useRef<HTMLDivElement>(null);
   const hintRef = useRef<HTMLDivElement>(null);
+  const cloudsRef = useRef<HTMLDivElement>(null);
   const [chapter, setChapter] = useState(0);
+  const [autoplaying, setAutoplaying] = useState(false);
 
   useEffect(() => {
     const dir = window.matchMedia("(max-width: 767px)").matches ? "m" : "d";
     const bitmaps: (ImageBitmap | undefined)[] = new Array(FRAMES + 1);
     let alive = true, raf = 0, lastDrawn = -1, lastChapter = 0, lastBright = false, dirty = true;
-    let lenis: { raf: (t: number) => void; destroy: () => void; scroll: number } | null = null;
+    let lastCloud = -1;
+    let lenis: {
+      raf: (t: number) => void;
+      destroy: () => void;
+      scroll: number;
+      scrollTo: (target: number, opts?: { immediate?: boolean; force?: boolean }) => void;
+    } | null = null;
+
+    // ---- auto-play state ----
+    // "idle" until conditions are met, "playing" while it runs, "done" once finished or stopped.
+    let auto: "idle" | "playing" | "done" = "idle";
+    let autoY = 0, autoStart = 0, lastT = 0;
+    const startedAt = performance.now();
+    const conn = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection;
+    if (window.location.hash || window.scrollY > 10 || conn?.saveData) auto = "done";
+    const stopAuto = () => {
+      if (auto === "done") return;
+      auto = "done";
+      if (alive) setAutoplaying(false);
+      removeStopListeners();
+    };
+    const onKey = (e: KeyboardEvent) => { if (!e.metaKey && !e.ctrlKey) stopAuto(); };
+    const stopEvents = ["wheel", "touchstart", "pointerdown", "mousedown"] as const;
+    stopEvents.forEach((ev) => window.addEventListener(ev, stopAuto, { passive: true }));
+    window.addEventListener("keydown", onKey);
+    function removeStopListeners() {
+      stopEvents.forEach((ev) => window.removeEventListener(ev, stopAuto));
+      window.removeEventListener("keydown", onKey);
+    }
+    // highest frame such that every frame up to it is decoded (auto-play never outruns loading)
+    const loadedUpTo = () => {
+      let i = 1;
+      while (i <= FRAMES && bitmaps[i]) i++;
+      return i - 1;
+    };
     const canvas = canvasRef.current!;
     const ctx = canvas.getContext("2d", { alpha: false })!;
 
@@ -123,6 +165,27 @@ function FlyHero() {
       const el = sectionRef.current;
       if (el) {
         const total = el.offsetHeight - window.innerHeight;
+
+        // ---- auto-play ----
+        if (auto === "idle" && lenis && t - startedAt > AUTOPLAY_DELAY_MS && loadedUpTo() >= 12) {
+          if (lenis.scroll > 10) stopAuto();
+          else { auto = "playing"; autoY = lenis.scroll; autoStart = lastT = t; setAutoplaying(true); }
+        }
+        if (auto === "playing" && lenis) {
+          const start = el.offsetTop, end = start + total;
+          const dt = Math.min(0.05, (t - lastT) / 1000);
+          lastT = t;
+          const r = Math.min(1, (t - autoStart) / 1000 / RAMP_SECONDS);
+          const rampIn = r * r * (3 - 2 * r);
+          const slowOut = Math.min(1, Math.max(0.18, (end - autoY) / (total * 0.08)));
+          let ny = autoY + (total / AUTOPLAY_SECONDS[dir]) * rampIn * slowOut * dt;
+          const limitY = start + ((loadedUpTo() - 1) / (FRAMES - 1)) * total; // wait for frames
+          ny = Math.min(ny, Math.max(autoY, limitY), end);
+          autoY = ny;
+          lenis.scrollTo(autoY, { immediate: true, force: true });
+          if (autoY >= end - 0.5) stopAuto();
+        }
+
         const y = lenis ? lenis.scroll : window.scrollY;
         const p = Math.max(0, Math.min(1, (y - el.offsetTop) / (total || 1)));
         const idx = Math.round(p * (FRAMES - 1));
@@ -139,13 +202,20 @@ function FlyHero() {
           lastBright = bright;
           if (brightRef.current) brightRef.current.style.opacity = bright ? "0.2" : "0";
         }
-        if (hintRef.current) hintRef.current.style.opacity = frame <= 20 ? "1" : "0";
+        if (hintRef.current) hintRef.current.style.opacity = frame <= 20 || auto === "playing" ? "1" : "0";
+        const cloud = Math.round(Math.max(0, 1 - (frame - 1) / CLOUD_FADE_FRAMES) * 100) / 100;
+        if (cloud !== lastCloud && cloudsRef.current) {
+          lastCloud = cloud;
+          cloudsRef.current.style.opacity = String(cloud);
+          cloudsRef.current.style.visibility = cloud > 0 ? "visible" : "hidden";
+        }
       }
       raf = requestAnimationFrame(tick);
     };
     raf = requestAnimationFrame(tick);
     return () => {
       alive = false; cancelAnimationFrame(raf); lenis?.destroy();
+      removeStopListeners();
       window.removeEventListener("resize", sizeCanvas);
       bitmaps.forEach((b) => b?.close());
     };
@@ -155,6 +225,12 @@ function FlyHero() {
     <section id="hero" ref={sectionRef} className="relative h-[400vh] bg-navy-deep md:h-[450vh]">
       <div className="sticky top-0 h-[100svh] w-full overflow-hidden text-white">
         <canvas ref={canvasRef} aria-hidden className="absolute inset-0 block h-full w-full" style={{ contain: "strict" }} />
+
+        {/* Drifting clouds over the opening frames (fade out as the film starts) */}
+        <div ref={cloudsRef} aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
+          <div className="cloud-layer cloud-far" style={{ backgroundImage: "url(/hero-natec/clouds-far.webp)" }} />
+          <div className="cloud-layer cloud-near" style={{ backgroundImage: "url(/hero-natec/clouds-near.webp)" }} />
+        </div>
 
         {/* Mobile gradients */}
         <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 h-[120px] md:hidden" style={{ background: "linear-gradient(to bottom, rgba(4,26,56,0.45), transparent)" }} />
@@ -181,9 +257,16 @@ function FlyHero() {
           </div>
         ))}
 
-        <div ref={hintRef} className="absolute bottom-5 left-1/2 hidden -translate-x-1/2 flex-col items-center gap-2 transition-opacity duration-500 md:flex">
-          <span className="eyebrow !text-[10px] text-white/80">Scroll to explore</span>
-          <span className="block h-10 w-px overflow-hidden bg-white/20"><span className="scroll-hint-line block h-full w-full bg-white" /></span>
+        <div
+          ref={hintRef}
+          className={`absolute left-1/2 -translate-x-1/2 flex-col items-center gap-2 transition-opacity duration-500 ${
+            autoplaying ? "flex bottom-[calc(20px+env(safe-area-inset-bottom))]" : "hidden bottom-5 md:flex"
+          }`}
+        >
+          <span className="eyebrow whitespace-nowrap !text-[10px] text-white/80">
+            {autoplaying ? "Scroll or tap to take control" : "Scroll to explore"}
+          </span>
+          {!autoplaying && <span className="block h-10 w-px overflow-hidden bg-white/20"><span className="scroll-hint-line block h-full w-full bg-white" /></span>}
         </div>
       </div>
     </section>

@@ -181,7 +181,16 @@
 .chapter[data-on] { opacity: 1; visibility: visible; transform: none; }
 @keyframes scroll-hint { 0% { transform: scaleY(0); transform-origin: top; } 50% { transform: scaleY(1); transform-origin: top; } 51% { transform-origin: bottom; } 100% { transform: scaleY(0); transform-origin: bottom; } }
 .scroll-hint-line { animation: scroll-hint 2s ease-in-out infinite; }
+/* Hero: two seamless cloud strips drifting at different speeds (parallax). Each strip is
+   two tiles wide and slides left by exactly one tile, so the loop is invisible. */
+@keyframes cloud-drift { from { transform: translate3d(0, 0, 0); } to { transform: translate3d(-50%, 0, 0); } }
+/* tile = 1600×720 image scaled to the stage height → width 222.22svh; the strip is two tiles */
+.cloud-layer { position: absolute; top: 0; left: 0; height: 100%; width: 444.44vh; width: 444.44svh; background-repeat: repeat-x; background-size: auto 100%; will-change: transform; }
+.cloud-far { opacity: .8; animation: cloud-drift 90s linear infinite; }
+.cloud-near { opacity: .9; animation: cloud-drift 48s linear infinite; }
+@media (max-width: 767px) { .cloud-far { animation-duration: 70s; } .cloud-near { animation-duration: 38s; } }
 @media (prefers-reduced-motion: reduce) {
   .reveal { opacity: 1; transform: none; transition: none; }
   .scroll-hint-line { animation: none; }
+  .cloud-layer { animation: none; }
 }

@@ -53,7 +53,7 @@ const M = {
 
 function B({ p, s, m, r }: { p: V3; s: V3; m: THREE.Material; r?: V3 }) {
   return (
-    <mesh position={p} rotation={r} material={m} castShadow receiveShadow>
+    <mesh position={p} rotation={r ?? [0, 0, 0]} material={m} castShadow receiveShadow>
       <boxGeometry args={s} />
     </mesh>
   );
@@ -252,7 +252,7 @@ function Crane({ prog }: { prog: Prog }) {
     const tx = -6 - Math.sin(t * 0.5) * 3.5;
     trolley.current!.position.x = tx;
     const drop = Math.max(1.2, H - (topOf(v) + 2.2) + Math.sin(t * 0.7) * 0.8);
-    trolley.current!.children[1].position.y = -drop;
+    trolley.current!.children[1]!.position.y = -drop;
     cable.current!.scale.y = drop;
     cable.current!.position.y = -drop / 2;
   });

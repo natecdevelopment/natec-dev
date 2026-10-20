@@ -260,7 +260,7 @@ function Crane({ prog }: { prog: Prog }) {
   return (
     <group ref={root} position={[BX + 9, 0, -3]}>
       <B p={[0, 0.3, 0]} s={[2.2, 0.6, 2.2]} m={M.concreteDark} />
-      {[[-0.5, -0.5], [0.5, -0.5], [-0.5, 0.5], [0.5, 0.5]].map(([x, z]) => <B key={`${x}${z}`} p={[x, H / 2, z]} s={[0.12, H, 0.12]} m={M.yellow} />)}
+      {([[-0.5, -0.5], [0.5, -0.5], [-0.5, 0.5], [0.5, 0.5]] as [number, number][]).map(([x, z]) => <B key={`${x}${z}`} p={[x, H / 2, z]} s={[0.12, H, 0.12]} m={M.yellow} />)}
       {braces.map((_, k) => {
         const y0 = 0.6 + k * 1.4, y1 = y0 + 1.4;
         return (

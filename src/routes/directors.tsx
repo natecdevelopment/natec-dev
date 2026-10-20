@@ -13,7 +13,7 @@ export const Route = createFileRoute("/directors")({
       { property: "og:description", content: "The people guiding Natec Development Ltd." },
     ],
   }),
-  component: () => <UnderConstruction title="Directors" />,
+  component: () => <UnderConstruction title="Directors" real={DirectorsPage} />,
 });
 
 export function DirectorsPage() {

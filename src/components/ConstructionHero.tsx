@@ -126,7 +126,7 @@ export function ConstructionHero() {
 
     if (reduced) {
       load(FRAMES).then(() => { if (!alive) return; resize(); draw(FRAMES); });
-      updateUI(FRAMES);
+      updateUI(1);
       const onR = () => { resize(); if (loaded[FRAMES]) draw(FRAMES); };
       window.addEventListener("resize", onR);
       return () => { alive = false; window.removeEventListener("resize", onR); };
@@ -147,7 +147,7 @@ export function ConstructionHero() {
         const target = Math.min(FRAMES, 1 + Math.floor(p * (FRAMES - 1) + 0.5));
         const f = loaded[target] ? target : nearest(target);
         if (f > 0 && f !== lastFrame) { draw(f); lastFrame = f; }
-        updateUI(target);
+        updateUI(p);
       }
       raf = requestAnimationFrame(tick);
     };

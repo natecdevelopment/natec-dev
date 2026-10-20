@@ -4,7 +4,7 @@ import { Menu, X, Phone, Mail, MapPin } from "lucide-react";
 import { company } from "@/lib/site";
 
 export const logo = { url: "/brand/natec-logo.png" };
-const whiteLogo: React.CSSProperties = { filter: "brightness(0) invert(1)" };
+const whiteLogoUrl = "/brand/natec-logo-white.png";
 
 const nav = [
   { to: "/", label: "Home" },
@@ -53,7 +53,7 @@ export function Header() {
     >
       <div className="container-x flex h-16 items-center justify-between md:h-[72px]">
         <Link to="/" className="flex items-center gap-3" onClick={() => setOpen(false)}>
-          <img src={logo.url} alt="Natec Development Ltd. logo" width={44} height={44} className="h-10 w-auto md:h-11" style={whiteLogo} />
+          <img src={whiteLogoUrl} alt="Natec Development Ltd. logo" width={44} height={44} className="h-10 w-auto md:h-11" />
           <span className="font-label text-[11px] leading-tight tracking-[0.22em]">
             NATEC<span className="block text-[9px] opacity-80">DEVELOPMENT LTD.</span>
           </span>
@@ -95,7 +95,7 @@ export function Footer() {
     <footer className="bg-navy-deep text-white">
       <div className="container-x grid gap-12 py-16 md:grid-cols-[1.4fr_1fr_1.4fr] md:py-20">
         <div>
-          <img src={logo.url} alt="Natec Development Ltd. logo" width={80} height={80} loading="lazy" className="h-20 w-auto" style={whiteLogo} />
+          <img src={whiteLogoUrl} alt="Natec Development Ltd. logo" width={80} height={80} loading="lazy" className="h-20 w-auto" />
           <p className="mt-5 max-w-xs text-sm text-muted-dark">Well-planned homes in Sreepur, Gazipur — built floor by floor since 2023.</p>
           <div className="mt-6 flex gap-3">
             <a href={company.facebook} target="_blank" rel="noreferrer" aria-label="Facebook" className="flex h-10 w-10 items-center justify-center rounded-full border border-line-dark hover:bg-white hover:text-navy"><FacebookIcon /></a>

@@ -12,7 +12,7 @@ export const Route = createFileRoute("/services")({
       { property: "og:description", content: "Nine services covering every stage of real estate development." },
     ],
   }),
-  component: () => <UnderConstruction title="Services" />,
+  component: () => <UnderConstruction title="Services" real={ServicesPage} />,
 });
 
 export function ServicesPage() {

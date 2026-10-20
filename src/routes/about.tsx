@@ -13,7 +13,7 @@ export const Route = createFileRoute("/about")({
       { property: "og:description", content: "Our mission, vision and the values behind every Natec project." },
     ],
   }),
-  component: () => <UnderConstruction title="About" />,
+  component: () => <UnderConstruction title="About" real={AboutPage} />,
 });
 
 export function AboutPage() {

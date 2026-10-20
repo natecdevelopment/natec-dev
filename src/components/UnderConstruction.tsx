@@ -1,6 +1,17 @@
+import { useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
 
-export function UnderConstruction({ title }: { title: string }) {
+// True only when the site is open inside the Lovable editor (preview iframe on lovable.dev).
+function isInLovableEditor() {
+  if (window.self === window.top) return false;
+  const origins = Array.from(window.location.ancestorOrigins ?? []);
+  return [...origins, document.referrer].some((o) => /(^|\.|\/\/)lovable\.dev/.test(o));
+}
+
+export function UnderConstruction({ title, real: Real }: { title: string; real?: React.ComponentType }) {
+  const [editor, setEditor] = useState(false);
+  useEffect(() => setEditor(isInLovableEditor()), []);
+  if (editor && Real) return <Real />;
   return (
     <section className="bg-ink text-ink-foreground">
       <div className="mx-auto flex min-h-[70vh] max-w-3xl flex-col items-center justify-center px-5 py-24 text-center">

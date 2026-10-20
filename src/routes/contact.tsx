@@ -16,7 +16,7 @@ export const Route = createFileRoute("/contact")({
       { property: "og:description", content: "Let's discuss your land, design or construction project." },
     ],
   }),
-  component: () => <UnderConstruction title="Contact" />,
+  component: () => <UnderConstruction title="Contact" real={ContactPage} />,
 });
 
 const schema = z.object({

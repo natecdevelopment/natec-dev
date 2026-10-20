@@ -11,11 +11,11 @@ export function FeaturedProject() {
   return (
     <div className="grid gap-8 md:grid-cols-[1.3fr_1fr]">
       <div>
-        <img src={gallery[i]} alt="Shobuj Angon 3D render" className="aspect-square w-full object-cover" />
+        <img loading="lazy" src={gallery[i]} alt="Shobuj Angon 3D render" className="aspect-square w-full object-cover" />
         <div className="mt-3 grid grid-cols-3 gap-3">
           {gallery.map((g, n) => (
             <button key={g} onClick={() => setI(n)} className={`border-2 ${n === i ? "border-accent" : "border-transparent opacity-70"}`}>
-              <img src={g} alt={`Shobuj Angon view ${n + 1}`} className="aspect-square w-full object-cover" />
+              <img loading="lazy" src={g} alt={`Shobuj Angon view ${n + 1}`} className="aspect-square w-full object-cover" />
             </button>
           ))}
         </div>

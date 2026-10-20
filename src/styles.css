@@ -171,7 +171,9 @@
 @utility container-x { margin-inline: auto; width: 100%; max-width: 1240px; padding-inline: 20px; @media (min-width: 768px) { padding-inline: 32px; } }
 
 /* Desktop layout also applies to phones held in landscape. */
-@custom-variant desk (@media (min-width: 768px), (orientation: landscape));
+@custom-variant desk {
+  @media not all and (max-width: 767px) and (orientation: portrait) { @slot; }
+}
 
 .reveal { opacity: 0; transform: translateY(24px); transition: opacity .8s ease, transform .8s ease; }
 .reveal[data-in] { opacity: 1; transform: none; }

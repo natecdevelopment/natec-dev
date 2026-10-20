@@ -8,3 +8,6 @@
 > Commits you push to the connected branch sync back to Lovable and show up in
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
+
+- Company facts (contacts, services, directors) live in src/lib/site.ts; pages read from it so details stay consistent.
+- Contact inquiries are inserted from the browser into contact_submissions (anon insert-only RLS); no one can read them publicly.

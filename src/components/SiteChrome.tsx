@@ -48,7 +48,7 @@ export function Header() {
   return (
     <header
       className={`fixed inset-x-0 top-0 z-50 text-white transition-colors duration-300 ${
-        solid ? "bg-navy/90 backdrop-blur-md" : "bg-navy-deep desk:bg-transparent"
+        solid ? "bg-navy" : "bg-transparent"
       }`}
     >
       <div className="container-x flex h-16 items-center justify-between md:h-[72px]">

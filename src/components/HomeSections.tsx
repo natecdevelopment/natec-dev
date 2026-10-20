@@ -5,6 +5,7 @@ import { company, directors } from "@/lib/site";
 import { Reveal, WhatsAppIcon } from "@/components/SiteChrome";
 import { InquiryForm } from "@/components/InquiryForm";
 import { frameSrc } from "@/components/CinematicHero";
+import { PROJECTS, SoldOut, UpcomingCards, WA_UPCOMING } from "@/components/ProjectsGrid";
 
 function Eyebrow({ children, dark }: { children: React.ReactNode; dark?: boolean }) {
   return <p className={`eyebrow ${dark ? "text-muted-dark" : "text-brand-red"}`}>{children}</p>;
@@ -72,13 +73,6 @@ export function Intro() {
 }
 
 /* ---------- 2. Projects ---------- */
-const PROJECTS = [
-  { name: "Shobuj Angon", img: "/images/angon-front.jpg", badge: "Completed", meta: "2023 – 2026 · Gazipur" },
-  { name: "Shobuj Aloy", img: frameSrc("d", 120), badge: "Ongoing", meta: "Gazipur", pct: 50 },
-  { name: "Shobuj Digonto", img: "/images/angon-side.jpg", badge: "Ongoing", meta: "Near Pepsi Gate, Gazipur", pct: 20 },
-  { name: "Coming in 2027", img: "/images/angon-aerial.jpg", badge: "Upcoming", meta: "Two new projects" },
-];
-
 export function ProjectsShowcase() {
   return (
     <section className="section-pad bg-navy-deep text-white">
@@ -87,31 +81,35 @@ export function ProjectsShowcase() {
           <div>
             <Eyebrow dark>Our projects</Eyebrow>
             <h2 className="mt-3">Homes taking shape <em className="accent-dark">across Gazipur.</em></h2>
+            <p className="mt-4 text-lg text-muted-dark">75 homes delivered or under construction — all sold.</p>
           </div>
           <Link to="/projects" className="btn btn-ghost-dark">All projects</Link>
         </Reveal>
-        <div className="grid gap-6 md:grid-cols-2">
+        <div className="grid gap-6 md:grid-cols-3">
           {PROJECTS.map((p) => (
             <Reveal key={p.name}>
-              <Link to="/projects" className="group relative block overflow-hidden rounded-2xl">
-                <img src={p.img} alt={`${p.name} by Natec Development`} loading="lazy" width={1200} height={900} className="aspect-[4/3] w-full object-cover transition-transform duration-700 group-hover:scale-105" />
+              <div className="group relative block overflow-hidden rounded-2xl">
+                <img src={p.gallery[0]} alt={`${p.name} by Natec Development`} loading="lazy" width={1200} height={900} className="aspect-[4/5] w-full object-cover transition-transform duration-700 group-hover:scale-105" />
                 <div className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(4,26,56,0.92) 0%, rgba(4,26,56,0.35) 45%, transparent 70%)" }} />
-                <span className={`eyebrow absolute left-5 top-5 rounded-full px-3 py-1.5 !text-[10px] ${p.badge === "Completed" ? "bg-white text-navy" : p.badge === "Ongoing" ? "bg-brand-red text-white" : "border border-white/60 bg-navy-deep/40 text-white"}`}>{p.badge}</span>
-                <div className="absolute inset-x-0 bottom-0 p-6 md:p-8">
-                  <h3 className="!text-3xl md:!text-4xl">{p.name}</h3>
-                  <p className="mt-1 text-sm text-muted-dark">{p.meta}</p>
-                  {p.pct && (
-                    <div className="mt-4 max-w-sm">
-                      <div className="flex justify-between text-xs"><span className="eyebrow !text-[10px]">Construction</span><span className="num">{p.pct}%</span></div>
-                      <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-white/20"><div className="h-full rounded-full bg-brand-red" style={{ width: `${p.pct}%` }} /></div>
-                    </div>
-                  )}
-                  <span className="mt-4 inline-flex items-center gap-2 text-sm font-semibold opacity-0 transition-opacity duration-300 group-hover:opacity-100 group-focus-visible:opacity-100">View details <ArrowRight className="h-4 w-4" /></span>
+                <span className={`eyebrow absolute left-5 top-5 rounded-full px-3 py-1.5 !text-[10px] ${p.status === "Completed" ? "bg-success text-white" : "bg-white text-navy"}`}>{p.status}</span>
+                <SoldOut className="absolute right-5 top-5" />
+                <div className="absolute inset-x-0 bottom-0 p-6">
+                  <p className="eyebrow !text-[10px] text-white/70">{p.no}</p>
+                  <h3 className="!text-3xl">{p.name}</h3>
+                  <p className="mt-1 text-sm text-muted-dark">{p.address}</p>
+                  <p className="text-sm text-muted-dark">{p.type} · {p.flats} flats</p>
+                  <div className="mt-4">
+                    <div className="flex justify-between text-xs"><span className="eyebrow !text-[10px]">Construction</span><span className="num">{p.pct}%</span></div>
+                    <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-white/20"><div className="h-full rounded-full bg-brand-red" style={{ width: `${p.pct}%` }} /></div>
+                  </div>
+                  <a href={WA_UPCOMING} target="_blank" rel="noreferrer" className="mt-4 inline-flex items-center gap-2 text-sm font-semibold underline-offset-4 hover:underline">Register interest for upcoming projects <ArrowRight className="h-4 w-4" /></a>
                 </div>
-              </Link>
+              </div>
             </Reveal>
           ))}
         </div>
+        <h3 className="eyebrow mb-6 mt-16 !text-[13px] text-muted-dark">Upcoming projects</h3>
+        <UpcomingCards dark />
       </div>
     </section>
   );
@@ -186,7 +184,7 @@ export function WhyNatec() {
         </Reveal>
         <div className="grid gap-5 md:grid-cols-3">
           <Reveal className="relative min-h-[420px] overflow-hidden rounded-2xl md:row-span-2">
-            <img src={frameSrc("d", 90)} alt="Rooftop garden view of a Natec building" loading="lazy" width={1920} height={1080} className="absolute inset-0 h-full w-full object-cover" />
+            <img src={frameSrc("d", 53)} alt="Rooftop garden view of a Natec building" loading="lazy" width={1920} height={1080} className="absolute inset-0 h-full w-full object-cover" />
             <div className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(4,26,56,0.85), transparent 60%)" }} />
             <div className="absolute inset-x-0 bottom-0 p-7 text-white">
               <span className="mb-4 block h-2 w-2 rounded-full bg-brand-red" />
@@ -315,7 +313,7 @@ export function Board() {
 export function ContactCTA() {
   return (
     <section className="relative overflow-hidden text-white">
-      <img src={frameSrc("d", 335)} alt="" aria-hidden loading="lazy" width={1920} height={1080} className="absolute inset-0 h-full w-full object-cover" />
+      <img src={frameSrc("d", 197)} alt="" aria-hidden loading="lazy" width={1920} height={1080} className="absolute inset-0 h-full w-full object-cover" />
       <div className="absolute inset-0 bg-navy-deep/65" />
       <div className="section-pad relative">
         <div className="container-x grid items-center gap-12 md:grid-cols-[1fr_1.15fr]">

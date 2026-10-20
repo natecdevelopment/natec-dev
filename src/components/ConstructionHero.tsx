@@ -13,10 +13,12 @@ const STAGES = [
   { name: "Handover Ready", short: "Handover", note: "Shobuj Angon — completed" },
 ];
 
-export const stageForFrame = (f: number) => (f <= 12 ? 0 : f <= 30 ? 1 : f <= 120 ? 2 : f <= 132 ? 3 : 4);
-export const floorForFrame = (f: number) =>
-  f <= 30 ? 0 : f <= 120 ? Math.min(FLOORS, Math.floor((f - 31) / 10) + 1) : FLOORS;
-export const progressForFrame = (f: number) => Math.round((f / FRAMES) * 100);
+// All UI is synced to scroll progress p (0–1).
+export const stageForP = (p: number) => (p < 0.12 ? 0 : p < 0.3 ? 1 : p < 0.82 ? 2 : p < 0.9 ? 3 : 4);
+export const floorForP = (p: number) =>
+  p < 0.3 ? 0 : p < 0.82 ? Math.min(FLOORS, Math.floor(((p - 0.3) / 0.52) * FLOORS) + 1) : FLOORS;
+export const progressForP = (p: number) =>
+  Math.round(p < 0.82 ? p * 100 : p < 0.9 ? 82 + ((p - 0.82) / 0.08) * 13 : 100);
 const frameSrc = (dir: string, i: number) => `/hero/${dir}/${String(i).padStart(4, "0")}.webp`;
 
 const glass: React.CSSProperties = {
@@ -90,12 +92,13 @@ export function ConstructionHero() {
       }
     };
 
-    const updateUI = (f: number) => {
-      if (f === lastUIFrame) return;
-      lastUIFrame = f;
-      const st = stageForFrame(f);
-      const fl = floorForFrame(f);
-      const pct = progressForFrame(f);
+    const updateUI = (p: number) => {
+      const key = Math.round(p * 1000);
+      if (key === lastUIFrame) return;
+      lastUIFrame = key;
+      const st = stageForP(p);
+      const fl = floorForP(p);
+      const pct = progressForP(p);
       const floorEl = floorRef.current!;
       floorEl.textContent = `${String(fl).padStart(2, "0")}/${FLOORS}`;
       if (fl !== lastFloor) {
@@ -123,7 +126,7 @@ export function ConstructionHero() {
 
     if (reduced) {
       load(FRAMES).then(() => { if (!alive) return; resize(); draw(FRAMES); });
-      updateUI(FRAMES);
+      updateUI(1);
       const onR = () => { resize(); if (loaded[FRAMES]) draw(FRAMES); };
       window.addEventListener("resize", onR);
       return () => { alive = false; window.removeEventListener("resize", onR); };
@@ -144,7 +147,7 @@ export function ConstructionHero() {
         const target = Math.min(FRAMES, 1 + Math.floor(p * (FRAMES - 1) + 0.5));
         const f = loaded[target] ? target : nearest(target);
         if (f > 0 && f !== lastFrame) { draw(f); lastFrame = f; }
-        updateUI(target);
+        updateUI(p);
       }
       raf = requestAnimationFrame(tick);
     };

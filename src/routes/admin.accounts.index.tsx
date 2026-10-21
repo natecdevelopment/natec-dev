@@ -293,6 +293,7 @@ function Clients() {
         <label className="relative min-w-[220px] flex-1"><Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" /><input value={term} onChange={(e) => setTerm(e.target.value)} placeholder="Search name, phone, flat" aria-label="Search clients" className="admin-input !pl-9" /></label>
         <select value={proj} onChange={(e) => setProj(e.target.value)} aria-label="Project" className="admin-input !w-auto"><option value="">All projects</option>{q.data?.projects.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}</select>
         <select value={status} onChange={(e) => setStatus(e.target.value)} aria-label="Status" className="admin-input !w-auto"><option value="">All statuses</option><option value="active">Active</option><option value="completed">Completed</option><option value="cancelled">Cancelled</option></select>
+        <label className="inline-flex items-center gap-2 text-sm text-navy"><input type="checkbox" checked={hideDemo} onChange={(e) => setHideDemo(e.target.checked)} /> Hide demo clients</label>
       </div>
       {q.isLoading ? <ListSkeleton /> : !rows.length ? <Empty title="No clients yet"><Link to="/admin/accounts/new" search={{}} className="btn btn-primary !py-2"><Plus className="h-4 w-4" /> Add client</Link></Empty> : (
         <Card className="!p-0 overflow-hidden">
@@ -305,7 +306,7 @@ function Clients() {
               return (
                 <li key={c.id} className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-4 py-3 text-sm hover:bg-ivory lg:grid-cols-[1.4fr_1fr_1.2fr_70px_1fr_1fr_1fr_110px_200px]">
                   <Link to="/admin/accounts/$id" params={{ id: c.id }} className="grid min-w-0 gap-1 lg:col-span-8 lg:grid-cols-subgrid lg:items-center">
-                    <span className="min-w-0 truncate font-semibold text-navy">{c.full_name}{overdue && <span className="ml-2 rounded-full bg-brand-red px-2 py-0.5 text-[10px] text-white">Overdue</span>}{c.status !== "active" && <span className="ml-2 text-xs text-muted-foreground">({c.status})</span>}
+                    <span className="min-w-0 truncate font-semibold text-navy">{c.full_name}{c.is_demo && <span className="ml-2 rounded-full bg-amber-400 px-2 py-0.5 text-[10px] font-bold text-amber-950">DEMO</span>}{overdue && <span className="ml-2 rounded-full bg-brand-red px-2 py-0.5 text-[10px] text-white">Overdue</span>}{c.status !== "active" && <span className="ml-2 text-xs text-muted-foreground">({c.status})</span>}
                       <span className="block truncate text-xs font-normal text-muted-foreground">{c.profile_id ? `@${q.data?.users.find((x) => x.id === c.profile_id)?.username ?? "login"}` : "No login"}</span></span>
                     <span className="text-muted-foreground">{c.phone || muted}</span>
                     <span className="truncate text-muted-foreground">{p?.name ?? muted}</span>

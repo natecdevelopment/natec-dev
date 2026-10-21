@@ -3,6 +3,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { LayoutDashboard, Inbox, Film, Building2, Sparkles, Image as ImageIcon, ExternalLink, LogOut, Menu, X, Loader2, HardHat, Users } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { signInAny } from "@/lib/login-client";
 
 export const Route = createFileRoute("/admin")({
   ssr: false,
@@ -83,19 +84,19 @@ function AdminLogin() {
     const f = new FormData(e.currentTarget);
     const email = String(f.get("email") || "").trim();
     const password = String(f.get("password") || "");
-    if (!email || !password) return void setError("Enter your email and password.");
+    if (!email || !password) return void setError("Enter your email or username and password.");
     setBusy(true);
     setError("");
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    const error = await signInAny(email, password);
     setBusy(false);
-    if (error) setError(error.message === "Email not confirmed" ? "Please confirm your email address first (check your inbox)." : "Incorrect email or password.");
+    if (error) setError(error);
   }
   return (
     <Centered>
       <p className="eyebrow text-brand-red">Admin</p>
       <h1 className="mt-2 !text-3xl text-navy">Sign in</h1>
       <form onSubmit={onSubmit} className="mt-6 space-y-3 text-left">
-        <label className="block text-sm font-medium text-navy">Email<input name="email" type="email" autoComplete="email" className="admin-input mt-1" /></label>
+        <label className="block text-sm font-medium text-navy">Email or username<input name="email" type="text" autoComplete="username" className="admin-input mt-1" /></label>
         <label className="block text-sm font-medium text-navy">Password<input name="password" type="password" autoComplete="current-password" className="admin-input mt-1" /></label>
         {error && <p role="alert" className="text-sm text-brand-red">{error}</p>}
         <button disabled={busy} className="btn btn-primary !mt-5 w-full disabled:opacity-60">{busy ? "Signing in…" : "Sign in"}</button>

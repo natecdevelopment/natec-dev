@@ -8,7 +8,7 @@ import { normalizeBdPhone } from "@/components/InquiryForm";
 import { passwordScore } from "@/lib/money";
 import { safeNext } from "@/lib/account";
 import { signInAny } from "@/lib/login-client";
-import { parseLoginId, suggestUsername, USERNAME_RE } from "@/lib/login-id";
+import { suggestUsername, USERNAME_RE } from "@/lib/login-id";
 import { EASE, Field, SubmitButton, type SubmitState } from "./AuthFields";
 
 type Mode = "login" | "register";

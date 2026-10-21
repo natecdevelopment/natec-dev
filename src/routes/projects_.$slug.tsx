@@ -149,7 +149,7 @@ function ProjectPage() {
 
       {facts.length > 0 && (
         <section aria-label="Key facts" className="border-b border-border bg-white">
-          <dl className="container-x grid grid-cols-2 gap-x-6 gap-y-6 py-8 sm:grid-cols-3 lg:grid-cols-6">
+          <dl className="container-x grid grid-cols-2 gap-x-6 gap-y-6 py-8 sm:grid-cols-3 lg:grid-cols-4">
             {facts.map((f) => (
               <div key={f.label} className="flex gap-3">
                 <f.icon className="mt-1 h-5 w-5 shrink-0 text-brand-red" aria-hidden />

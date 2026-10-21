@@ -38,7 +38,7 @@ function Forgot() {
           <p>Please contact Natec to reset your password.</p>
           <div className="mt-4 grid gap-3 sm:grid-cols-2">
             <a href={company.whatsappLink} target="_blank" rel="noopener noreferrer" className="btn btn-primary"><MessageCircle className="h-4 w-4" /> WhatsApp</a>
-            <a href={company.phoneLink} className="btn btn-outline"><Phone className="h-4 w-4" /> Call {company.phone}</a>
+            <a href={company.phoneLink} className="btn btn-ghost-light"><Phone className="h-4 w-4" /> Call {company.phone}</a>
           </div>
         </div>
       ) : sent ? <p role="status" className="text-navy">If an account exists, a reset link is on its way to its email. Check your inbox.</p> : (

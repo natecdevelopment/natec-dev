@@ -24,3 +24,4 @@
 - /login and /register are children of the _authpage pathless layout so the animated screen persists across the switch.
 - Account deletion runs only in the deleteAccount server function (admin-checked, service role loaded in-handler); admin actions are logged to public.admin_audit_log.
 - Client edits save through the admin_save_client DB function (one transaction, is_admin-checked, audit-logged); payment changes re-apply via admin_reallocate_payments — so partial saves can't happen.
+- Login (site + /admin) goes through signInWithIdentifier in src/lib/login.functions.ts: email/phone/username resolved and password checked on the server, rate-limited via public.login_attempts, so the browser never learns another account's email.

@@ -3,6 +3,7 @@ import { Building2, Home, MapPin } from "lucide-react";
 import { WhatsAppIcon } from "@/components/SiteChrome";
 import { waMessage } from "@/components/ProjectsGrid";
 import type { ProjectWithMedia } from "@/lib/projects-data";
+import { SaveHeart } from "@/components/SaveHeart";
 import { isListed } from "@/lib/construction-data";
 
 export function StatusBadge({ p, className = "" }: { p: ProjectWithMedia; className?: string }) {
@@ -28,6 +29,7 @@ export function ProjectCard({ p }: { p: ProjectWithMedia }) {
           <img loading="lazy" src={p.cover.public_url} alt={p.cover.alt_text || `${p.name} by Natec Development`} width={p.cover.width ?? 800} height={p.cover.height ?? 600} className="aspect-[4/3] w-full object-cover transition duration-700 group-hover:scale-105" />
         ) : <div className="aspect-[4/3] w-full bg-navy" />}
         <div className="absolute left-4 top-4 flex flex-wrap gap-2"><StatusBadge p={p} /><SoldOutBadge p={p} /></div>
+        <SaveHeart projectId={p.id} name={p.name} className="absolute right-3 top-3" />
       </div>
       <div className="flex flex-1 flex-col p-6">
         {p.project_no && <p className="eyebrow !text-[11px] text-brand-red">{p.project_no}</p>}

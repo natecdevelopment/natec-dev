@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { SITE_URL } from "@/lib/site";
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
 import { ArrowLeft, ArrowRight, CalendarCheck, Clock, Gauge, MapPin, Phone } from "lucide-react";
@@ -12,7 +13,7 @@ import { publicProjectsQuery, type MediaRow, type ProjectWithMedia } from "@/lib
 import { averagePct, CATEGORIES, CATEGORY_SHORT, constructionQuery, isListed, monthYear, type Category, type ItemRow, type UpdateWithPhotos } from "@/lib/construction-data";
 import { company } from "@/lib/site";
 
-const SITE = "https://natec-dev.lovable.app";
+const SITE = SITE_URL;
 const abs = (u?: string | null) => (!u ? null : /^https?:/.test(u) ? u : `${SITE}${u.startsWith("/") ? "" : "/"}${u}`);
 
 export const Route = createFileRoute("/construction-status_/$slug")({

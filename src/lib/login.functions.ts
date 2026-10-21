@@ -1,5 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
-import { getRequest } from "@tanstack/react-start/server";
+import { SITE_URL } from "./site";
 import { createClient } from "@supabase/supabase-js";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { parseLoginId, isSyntheticEmail, LOGIN_FAIL, LOGIN_LIMIT } from "@/lib/login-id";
@@ -72,8 +72,7 @@ export const requestPasswordReset = createServerFn({ method: "POST" })
     if (await limited(`reset:${key}`, true)) return { status: "limited" as const };
     if (!email) return { status: "sent" as const };
     if (isSyntheticEmail(email)) return { status: "no_email" as const };
-    const origin = new URL(getRequest().url).origin;
-    const { error } = await publicClient().auth.resetPasswordForEmail(email, { redirectTo: `${origin}/reset-password` });
+    const { error } = await publicClient().auth.resetPasswordForEmail(email, { redirectTo: `${SITE_URL}/reset-password` });
     if (error) console.error("reset", error.message);
     return { status: error ? ("error" as const) : ("sent" as const) };
   });

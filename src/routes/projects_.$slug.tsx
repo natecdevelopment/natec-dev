@@ -1,4 +1,5 @@
 import { UnderConstruction } from "@/components/UnderConstruction";
+import { SITE_URL } from "@/lib/site";
 import { useState } from "react";
 import { createFileRoute, notFound, Link } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
@@ -13,7 +14,7 @@ import { isListed } from "@/lib/construction-data";
 import { sanitizeHtml } from "@/lib/sanitize";
 import { company } from "@/lib/site";
 
-const SITE = "https://natec-dev.lovable.app";
+const SITE = SITE_URL;
 const abs = (u?: string | null) => (!u ? null : /^https?:/.test(u) ? u : `${SITE}${u.startsWith("/") ? "" : "/"}${u}`);
 const plain = (html: string) => html.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
 

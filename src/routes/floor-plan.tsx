@@ -1,4 +1,5 @@
 import { UnderConstruction } from "@/components/UnderConstruction";
+import { SITE_URL } from "@/lib/site";
 import { useRef, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
@@ -10,7 +11,7 @@ import { waMessage } from "@/components/ProjectsGrid";
 import { publicProjectsQuery } from "@/lib/projects-data";
 import { supabase } from "@/integrations/supabase/client";
 
-const SITE = "https://natec-dev.lovable.app";
+const SITE = SITE_URL;
 const TITLE = "Apartment Floor Plans | Natec Development, Gazipur";
 const DESC = "Sample Natec apartment floor plans in Rajendrapur, Sreepur, Gazipur: 3D and 2D views, bright rooms, cross-ventilation and a private balcony.";
 const WA_VISIT = waMessage("Hi Natec, I'd like to book a site visit at Rajendrapur Bazar.");

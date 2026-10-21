@@ -1,4 +1,5 @@
 import { UnderConstruction } from "@/components/UnderConstruction";
+import { SITE_URL } from "@/lib/site";
 import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
@@ -8,7 +9,7 @@ import { mapEmbed, waMessage } from "@/components/ProjectsGrid";
 import { publicProjectsQuery } from "@/lib/projects-data";
 import { company } from "@/lib/site";
 
-const SITE = "https://natec-dev.lovable.app";
+const SITE = SITE_URL;
 const TITLE = "Location — Rajendrapur Bazar, Sreepur, Gazipur | Natec Development";
 const DESC = "Natec Development's office and projects at Rajendrapur Bazar, Sreepur, Gazipur — near the Dhaka–Mymensingh Highway. Map, directions and nearby places.";
 const OFFICE_Q = "Vai Vai Market, Rajendrapur Bazar, Sreepur, Gazipur";

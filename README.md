@@ -2,7 +2,7 @@
 
 Premium real estate company website for Natec Development Ltd. — homes in Sreepur, Gazipur, Bangladesh.
 
-**Live app**: https://natec-dev.lovable.app
+**Live site**: https://natecdev.com
 
 ## Development
 

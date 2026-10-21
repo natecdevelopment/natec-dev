@@ -1,4 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
+import { SITE_URL } from "./site";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 /** Admin-only: email an invite so the client can set a password; their login links to the client record on confirmation. */
@@ -18,7 +19,7 @@ export const inviteClient = createServerFn({ method: "POST" })
     if (!client.email) throw new Error("Add an email address to this client first.");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { error: invErr } = await supabaseAdmin.auth.admin.inviteUserByEmail(client.email, {
-      redirectTo: `${data.origin}/reset-password`,
+      redirectTo: `${SITE_URL}/reset-password`,
       data: { full_name: client.full_name },
     });
     if (invErr) {

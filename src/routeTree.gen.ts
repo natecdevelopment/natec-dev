@@ -15,16 +15,21 @@ import { Route as AuthpageRouteImport } from './routes/_authpage'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as ConstructionSitemapDotxmlRouteImport } from './routes/construction-sitemap[.]xml'
 import { Route as ConstructionStatusRouteImport } from './routes/construction-status'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as DirectorsRouteImport } from './routes/directors'
 import { Route as FloorPlanRouteImport } from './routes/floor-plan'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as LocationRouteImport } from './routes/location'
+import { Route as PageSitemapDotxmlRouteImport } from './routes/page-sitemap[.]xml'
 import { Route as PrivacyRouteImport } from './routes/privacy'
+import { Route as ProjectSitemapDotxmlRouteImport } from './routes/project-sitemap[.]xml'
 import { Route as ProjectsRouteImport } from './routes/projects'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as ServicesRouteImport } from './routes/services'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as Sitemap_indexDotxmlRouteImport } from './routes/sitemap_index[.]xml'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as AuthenticatedAccountRouteImport } from './routes/_authenticated/account'
 import { Route as AuthpageLoginRouteImport } from './routes/_authpage.login'
@@ -75,6 +80,12 @@ const AuthRoute = AuthRouteImport.update({
   path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ConstructionSitemapDotxmlRoute =
+  ConstructionSitemapDotxmlRouteImport.update({
+    id: '/construction-sitemap.xml',
+    path: '/construction-sitemap.xml',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ConstructionStatusRoute = ConstructionStatusRouteImport.update({
   id: '/construction-status',
   path: '/construction-status',
@@ -105,9 +116,19 @@ const LocationRoute = LocationRouteImport.update({
   path: '/location',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PageSitemapDotxmlRoute = PageSitemapDotxmlRouteImport.update({
+  id: '/page-sitemap.xml',
+  path: '/page-sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PrivacyRoute = PrivacyRouteImport.update({
   id: '/privacy',
   path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProjectSitemapDotxmlRoute = ProjectSitemapDotxmlRouteImport.update({
+  id: '/project-sitemap.xml',
+  path: '/project-sitemap.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ProjectsRoute = ProjectsRouteImport.update({
@@ -123,6 +144,16 @@ const ResetPasswordRoute = ResetPasswordRouteImport.update({
 const ServicesRoute = ServicesRouteImport.update({
   id: '/services',
   path: '/services',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const Sitemap_indexDotxmlRoute = Sitemap_indexDotxmlRouteImport.update({
+  id: '/sitemap_index.xml',
+  path: '/sitemap_index.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
 const TermsRoute = TermsRouteImport.update({
@@ -238,16 +269,21 @@ export interface FileRoutesByFullPath {
   '/about': typeof AboutRoute
   '/admin': typeof AdminRouteWithChildren
   '/auth': typeof AuthRoute
+  '/construction-sitemap.xml': typeof ConstructionSitemapDotxmlRoute
   '/construction-status': typeof ConstructionStatusRoute
   '/contact': typeof ContactRoute
   '/directors': typeof DirectorsRoute
   '/floor-plan': typeof FloorPlanRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/location': typeof LocationRoute
+  '/page-sitemap.xml': typeof PageSitemapDotxmlRoute
   '/privacy': typeof PrivacyRoute
+  '/project-sitemap.xml': typeof ProjectSitemapDotxmlRoute
   '/projects': typeof ProjectsRoute
   '/reset-password': typeof ResetPasswordRoute
   '/services': typeof ServicesRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/sitemap_index.xml': typeof Sitemap_indexDotxmlRoute
   '/terms': typeof TermsRoute
   '/account': typeof AuthenticatedAccountRoute
   '/login': typeof AuthpageLoginRoute
@@ -274,16 +310,21 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/auth': typeof AuthRoute
+  '/construction-sitemap.xml': typeof ConstructionSitemapDotxmlRoute
   '/construction-status': typeof ConstructionStatusRoute
   '/contact': typeof ContactRoute
   '/directors': typeof DirectorsRoute
   '/floor-plan': typeof FloorPlanRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/location': typeof LocationRoute
+  '/page-sitemap.xml': typeof PageSitemapDotxmlRoute
   '/privacy': typeof PrivacyRoute
+  '/project-sitemap.xml': typeof ProjectSitemapDotxmlRoute
   '/projects': typeof ProjectsRoute
   '/reset-password': typeof ResetPasswordRoute
   '/services': typeof ServicesRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/sitemap_index.xml': typeof Sitemap_indexDotxmlRoute
   '/terms': typeof TermsRoute
   '/account': typeof AuthenticatedAccountRoute
   '/login': typeof AuthpageLoginRoute
@@ -314,16 +355,21 @@ export interface FileRoutesById {
   '/about': typeof AboutRoute
   '/admin': typeof AdminRouteWithChildren
   '/auth': typeof AuthRoute
+  '/construction-sitemap.xml': typeof ConstructionSitemapDotxmlRoute
   '/construction-status': typeof ConstructionStatusRoute
   '/contact': typeof ContactRoute
   '/directors': typeof DirectorsRoute
   '/floor-plan': typeof FloorPlanRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/location': typeof LocationRoute
+  '/page-sitemap.xml': typeof PageSitemapDotxmlRoute
   '/privacy': typeof PrivacyRoute
+  '/project-sitemap.xml': typeof ProjectSitemapDotxmlRoute
   '/projects': typeof ProjectsRoute
   '/reset-password': typeof ResetPasswordRoute
   '/services': typeof ServicesRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/sitemap_index.xml': typeof Sitemap_indexDotxmlRoute
   '/terms': typeof TermsRoute
   '/_authenticated/account': typeof AuthenticatedAccountRoute
   '/_authpage/login': typeof AuthpageLoginRoute
@@ -353,16 +399,21 @@ export interface FileRouteTypes {
     | '/about'
     | '/admin'
     | '/auth'
+    | '/construction-sitemap.xml'
     | '/construction-status'
     | '/contact'
     | '/directors'
     | '/floor-plan'
     | '/forgot-password'
     | '/location'
+    | '/page-sitemap.xml'
     | '/privacy'
+    | '/project-sitemap.xml'
     | '/projects'
     | '/reset-password'
     | '/services'
+    | '/sitemap.xml'
+    | '/sitemap_index.xml'
     | '/terms'
     | '/account'
     | '/login'
@@ -389,16 +440,21 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/auth'
+    | '/construction-sitemap.xml'
     | '/construction-status'
     | '/contact'
     | '/directors'
     | '/floor-plan'
     | '/forgot-password'
     | '/location'
+    | '/page-sitemap.xml'
     | '/privacy'
+    | '/project-sitemap.xml'
     | '/projects'
     | '/reset-password'
     | '/services'
+    | '/sitemap.xml'
+    | '/sitemap_index.xml'
     | '/terms'
     | '/account'
     | '/login'
@@ -428,16 +484,21 @@ export interface FileRouteTypes {
     | '/about'
     | '/admin'
     | '/auth'
+    | '/construction-sitemap.xml'
     | '/construction-status'
     | '/contact'
     | '/directors'
     | '/floor-plan'
     | '/forgot-password'
     | '/location'
+    | '/page-sitemap.xml'
     | '/privacy'
+    | '/project-sitemap.xml'
     | '/projects'
     | '/reset-password'
     | '/services'
+    | '/sitemap.xml'
+    | '/sitemap_index.xml'
     | '/terms'
     | '/_authenticated/account'
     | '/_authpage/login'
@@ -468,16 +529,21 @@ export interface RootRouteChildren {
   AboutRoute: typeof AboutRoute
   AdminRoute: typeof AdminRouteWithChildren
   AuthRoute: typeof AuthRoute
+  ConstructionSitemapDotxmlRoute: typeof ConstructionSitemapDotxmlRoute
   ConstructionStatusRoute: typeof ConstructionStatusRoute
   ContactRoute: typeof ContactRoute
   DirectorsRoute: typeof DirectorsRoute
   FloorPlanRoute: typeof FloorPlanRoute
   ForgotPasswordRoute: typeof ForgotPasswordRoute
   LocationRoute: typeof LocationRoute
+  PageSitemapDotxmlRoute: typeof PageSitemapDotxmlRoute
   PrivacyRoute: typeof PrivacyRoute
+  ProjectSitemapDotxmlRoute: typeof ProjectSitemapDotxmlRoute
   ProjectsRoute: typeof ProjectsRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   ServicesRoute: typeof ServicesRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  Sitemap_indexDotxmlRoute: typeof Sitemap_indexDotxmlRoute
   TermsRoute: typeof TermsRoute
   ConstructionStatusSlugRoute: typeof ConstructionStatusSlugRoute
   ProjectsSlugRoute: typeof ProjectsSlugRoute
@@ -527,6 +593,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/construction-sitemap.xml': {
+      id: '/construction-sitemap.xml'
+      path: '/construction-sitemap.xml'
+      fullPath: '/construction-sitemap.xml'
+      preLoaderRoute: typeof ConstructionSitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/construction-status': {
       id: '/construction-status'
       path: '/construction-status'
@@ -569,11 +642,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LocationRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/page-sitemap.xml': {
+      id: '/page-sitemap.xml'
+      path: '/page-sitemap.xml'
+      fullPath: '/page-sitemap.xml'
+      preLoaderRoute: typeof PageSitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/privacy': {
       id: '/privacy'
       path: '/privacy'
       fullPath: '/privacy'
       preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/project-sitemap.xml': {
+      id: '/project-sitemap.xml'
+      path: '/project-sitemap.xml'
+      fullPath: '/project-sitemap.xml'
+      preLoaderRoute: typeof ProjectSitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/projects': {
@@ -595,6 +682,20 @@ declare module '@tanstack/react-router' {
       path: '/services'
       fullPath: '/services'
       preLoaderRoute: typeof ServicesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap_index.xml': {
+      id: '/sitemap_index.xml'
+      path: '/sitemap_index.xml'
+      fullPath: '/sitemap_index.xml'
+      preLoaderRoute: typeof Sitemap_indexDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/terms': {
@@ -817,16 +918,21 @@ const rootRouteChildren: RootRouteChildren = {
   AboutRoute: AboutRoute,
   AdminRoute: AdminRouteWithChildren,
   AuthRoute: AuthRoute,
+  ConstructionSitemapDotxmlRoute: ConstructionSitemapDotxmlRoute,
   ConstructionStatusRoute: ConstructionStatusRoute,
   ContactRoute: ContactRoute,
   DirectorsRoute: DirectorsRoute,
   FloorPlanRoute: FloorPlanRoute,
   ForgotPasswordRoute: ForgotPasswordRoute,
   LocationRoute: LocationRoute,
+  PageSitemapDotxmlRoute: PageSitemapDotxmlRoute,
   PrivacyRoute: PrivacyRoute,
+  ProjectSitemapDotxmlRoute: ProjectSitemapDotxmlRoute,
   ProjectsRoute: ProjectsRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   ServicesRoute: ServicesRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
+  Sitemap_indexDotxmlRoute: Sitemap_indexDotxmlRoute,
   TermsRoute: TermsRoute,
   ConstructionStatusSlugRoute: ConstructionStatusSlugRoute,
   ProjectsSlugRoute: ProjectsSlugRoute,

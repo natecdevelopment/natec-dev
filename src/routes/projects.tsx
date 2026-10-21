@@ -1,4 +1,5 @@
 import { UnderConstruction } from "@/components/UnderConstruction";
+import { SITE_URL } from "@/lib/site";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { PageHero, Reveal, WhatsAppIcon } from "@/components/SiteChrome";
@@ -6,7 +7,7 @@ import { ProjectCard } from "@/components/ProjectCard";
 import { waMessage, WA_UPCOMING } from "@/components/ProjectsGrid";
 import { publicProjectsQuery, type ProjectWithMedia } from "@/lib/projects-data";
 
-const SITE = "https://natec-dev.lovable.app";
+const SITE = SITE_URL;
 const TABS = ["all", "completed", "ongoing", "upcoming"] as const;
 type Tab = (typeof TABS)[number];
 const TITLE = "Residential Projects in Gazipur | Natec Development Ltd.";

@@ -1,3 +1,6 @@
+/** Live website address (Lovable custom domain). Used for canonical URLs, sitemaps, share links and email links. */
+export const SITE_URL = "https://natecdev.com";
+
 export const company = {
   name: "Natec Development Ltd.",
   founded: 2023,

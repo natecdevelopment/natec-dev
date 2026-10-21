@@ -1,7 +1,9 @@
 /** Pure helpers for creating client portal logins (usernames, temp passwords, share text). */
 import { USERNAME_RE } from "@/lib/login-id";
 
-export const PORTAL_LOGIN_URL = "https://natec-dev.pages.dev/login";
+import { SITE_URL } from "./site";
+
+export const PORTAL_LOGIN_URL = `${SITE_URL}/login`;
 export const INTERNAL_EMAIL_DOMAIN = "clients.natecdev.com";
 export const internalEmail = (username: string) => `${username}@${INTERNAL_EMAIL_DOMAIN}`;
 

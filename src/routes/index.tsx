@@ -1,10 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { SITE_URL } from "@/lib/site";
 import { publicProjectsQuery, publicVideosQuery } from "@/lib/projects-data";
 import { CinematicHero } from "@/components/CinematicHero";
 import { Intro, ProjectsShowcase, VideosSection, FloorPlan, WhyNatec, HowWeBuild, BuyingSteps, Location, Board, Faq, FAQS, ContactCTA } from "@/components/HomeSections";
 import { company } from "@/lib/site";
 
-const SITE = "https://natec-dev.lovable.app";
+const SITE = SITE_URL;
 const TITLE = "Natec Development Ltd. | Apartments & Flats in Rajendrapur, Sreepur, Gazipur";
 const DESC = "Real estate developer in Rajendrapur, Sreepur, Gazipur. 75 homes built and sold. Register for upcoming apartment projects in Gazipur.";
 const OG_IMAGE = `${SITE}/hero-natec/d/0070.webp`;

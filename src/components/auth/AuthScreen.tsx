@@ -1,4 +1,5 @@
 import { company } from "@/lib/site";
+import { SITE_URL } from "@/lib/site";
 import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
@@ -239,7 +240,7 @@ function RegisterForm({ next }: { next?: string | undefined }) {
       setErrs({ ...(!uOk ? { username: "This username is taken." } : {}), ...(!pOk ? { phone: "An account with this phone number already exists. Try logging in." } : {}) });
       return;
     }
-    const { error } = await supabase.auth.signUp({ email, password, options: { emailRedirectTo: `${window.location.origin}/login`, data: { full_name: name.slice(0, 120), phone, username: uname } } });
+    const { error } = await supabase.auth.signUp({ email, password, options: { emailRedirectTo: `${SITE_URL}/login`, data: { full_name: name.slice(0, 120), phone, username: uname } } });
     if (error) { setState("idle"); setErrs({ email: /registered|exists/i.test(error.message) ? "An account with this email already exists. Try logging in." : error.message }); return; }
     setState("success");
     setTimeout(() => setSent(email), 700);

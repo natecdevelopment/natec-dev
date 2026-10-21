@@ -1,8 +1,20 @@
-User-agent: Googlebot
+# robots.txt for https://natecdev.com
+# Natec Development Ltd. — real estate developer, Rajendrapur, Sreepur, Gazipur
+
+User-agent: *
 Allow: /
 Disallow: /admin
+Disallow: /admin/
+Disallow: /account
+Disallow: /account/
+Disallow: /auth/
+Disallow: /forgot-password
+Disallow: /reset-password
+Disallow: /*?*token=
+Disallow: /*?*code=
 
-User-agent: Bingbot
+# Social previews may read any public page
+User-agent: facebookexternalhit
 Allow: /
 Disallow: /admin
 
@@ -10,10 +22,4 @@ User-agent: Twitterbot
 Allow: /
 Disallow: /admin
 
-User-agent: facebookexternalhit
-Allow: /
-Disallow: /admin
-
-User-agent: *
-Allow: /
-Disallow: /admin
+Sitemap: https://natecdev.com/sitemap_index.xml

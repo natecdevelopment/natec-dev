@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { SITE_URL } from "@/lib/site";
 import { useEffect, useRef, useState } from "react";
 import {
   ShieldCheck, Award, Lightbulb, Leaf, HeartHandshake, Briefcase,
@@ -8,7 +9,7 @@ import {
 import { Reveal, WhatsAppIcon } from "@/components/SiteChrome";
 import { company, values, services, directors } from "@/lib/site";
 
-const URL = "https://natec-dev.lovable.app/about";
+const URL = `${SITE_URL}/about`;
 const TITLE = "About Natec Development Ltd. | Real Estate Developer in Gazipur";
 const DESC = "Natec Development Ltd., established 2023 in Rajendrapur, Sreepur, Gazipur. Our story, mission, values, leadership and the 75 homes we have built and sold.";
 const WA_VISIT = `${company.whatsappLink}?text=${encodeURIComponent("Hi Natec, I'd like to book a site visit.")}`;
@@ -32,7 +33,7 @@ export const Route = createFileRoute("/about")({
           "@context": "https://schema.org",
           "@type": "BreadcrumbList",
           itemListElement: [
-            { "@type": "ListItem", position: 1, name: "Home", item: "https://natec-dev.lovable.app/" },
+            { "@type": "ListItem", position: 1, name: "Home", item: `${SITE_URL}/` },
             { "@type": "ListItem", position: 2, name: "About", item: URL },
           ],
         }),
@@ -43,8 +44,8 @@ export const Route = createFileRoute("/about")({
           "@context": "https://schema.org",
           "@type": "Organization",
           name: company.name,
-          url: "https://natec-dev.lovable.app/",
-          logo: "https://natec-dev.lovable.app/brand/natec-logo-transparent.png",
+          url: `${SITE_URL}/`,
+          logo: `${SITE_URL}/brand/natec-logo-transparent.png`,
           foundingDate: "2023",
           founders: directors.map((d) => ({ "@type": "Person", name: d.name, jobTitle: d.role })),
           address: {

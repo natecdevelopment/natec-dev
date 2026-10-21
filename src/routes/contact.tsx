@@ -1,4 +1,5 @@
 import { UnderConstruction } from "@/components/UnderConstruction";
+import { SITE_URL } from "@/lib/site";
 import { createFileRoute } from "@tanstack/react-router";
 import { MapPin, Phone, Mail, Clock, Navigation, PhoneCall, CalendarCheck, FileText } from "lucide-react";
 import { PageHero, Reveal, WhatsAppIcon } from "@/components/SiteChrome";
@@ -7,7 +8,7 @@ import { FAQS } from "@/components/HomeSections";
 import { mapEmbed } from "@/components/ProjectsGrid";
 import { company } from "@/lib/site";
 
-const SITE = "https://natec-dev.lovable.app";
+const SITE = SITE_URL;
 const TITLE = "Contact Natec Development Ltd. | Rajendrapur, Sreepur, Gazipur";
 const DESC = "Call, WhatsApp or visit Natec Development at Rajendrapur Bazar, Sreepur, Gazipur. Send an inquiry about our projects or book a site visit.";
 const OFFICE_Q = "Vai Vai Market, Rajendrapur Bazar, Sreepur, Gazipur";

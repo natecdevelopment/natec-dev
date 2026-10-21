@@ -1,4 +1,5 @@
 import { useRef, useState } from "react";
+import { SITE_URL } from "@/lib/site";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { ArrowRight, Phone } from "lucide-react";
@@ -8,7 +9,7 @@ import { publicProjectsQuery, type ProjectWithMedia } from "@/lib/projects-data"
 import { isListed, monthYear } from "@/lib/construction-data";
 import { company } from "@/lib/site";
 
-const SITE = "https://natec-dev.lovable.app";
+const SITE = SITE_URL;
 const TITLE = "Construction Status | Natec Development Ltd., Gazipur";
 const DESC = "Live construction progress of Natec Development's residential projects in Rajendrapur, Sreepur, Gazipur — work-by-work updates and site photos.";
 

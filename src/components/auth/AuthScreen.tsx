@@ -34,7 +34,15 @@ export function AuthScreen({ mode, next }: { mode: Mode; next?: string | undefin
   const target = safeNext(next);
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => { if (data.user) navigate({ to: target as "/account", replace: true }); });
+    const go = () => supabase.auth.getUser().then(({ data }) => {
+      if (!data.user) return;
+      const saved = sessionStorage.getItem("natec-oauth-next");
+      sessionStorage.removeItem("natec-oauth-next");
+      navigate({ to: (saved ? safeNext(saved) : target) as "/account", replace: true });
+    });
+    go();
+    const { data: sub } = supabase.auth.onAuthStateChange((e) => { if (e === "SIGNED_IN") go(); });
+    return () => sub.subscription.unsubscribe();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

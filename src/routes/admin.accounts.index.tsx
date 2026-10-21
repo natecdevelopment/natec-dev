@@ -114,9 +114,9 @@ function General() {
           <div className="hidden lg:block" data-lenis-prevent>
             <table className="w-full table-fixed text-sm">
               <colgroup>
-                <col className="w-10" /><col className="w-[18%]" /><col className="w-[22%]" /><col className="w-[12%]" /><col className="w-[9%]" /><col className="w-[9%]" /><col className="w-[7%]" /><col className="w-[9%]" /><col className="w-[196px]" />
+                <col className="w-10" /><col className="w-[44%]" /><col className="w-[56%]" /><col className="w-[124px]" /><col className="w-[104px]" /><col className="w-[104px]" /><col className="w-[76px]" /><col className="w-[100px]" /><col className="w-[204px]" />
               </colgroup>
-              <thead className="border-b border-border text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+              <thead className="whitespace-nowrap border-b border-border text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                 <tr>
                   <th className="px-3 py-3"><input type="checkbox" aria-label="Select all on this page" checked={deletable.length > 0 && deletable.every((a) => picked.has(a.id))} onChange={(e) => setPicked(e.target.checked ? new Set([...picked, ...deletable.map((a) => a.id)]) : new Set([...picked].filter((id) => !deletable.some((a) => a.id === id))))} /></th>
                   <th className="px-3 py-3">Name</th><th className="px-3 py-3">Email</th><th className="px-3 py-3">Phone</th><th className="px-3 py-3">Joined</th><th className="px-3 py-3">Last seen</th><th className="px-3 py-3">Verified</th><th className="px-3 py-3">Status</th><th className="px-3 py-3 text-right">Actions</th>

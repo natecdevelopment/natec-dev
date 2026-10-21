@@ -43,6 +43,13 @@
       "when": 1792567278923,
       "tag": "0005_customer_accounts",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1792569146737,
+      "tag": "0006_profiles_guard_trusted",
+      "breakpoints": true
     }
   ]
 }

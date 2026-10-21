@@ -7,6 +7,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { normalizeBdPhone } from "@/components/InquiryForm";
 import { passwordScore } from "@/lib/money";
 import { safeNext } from "@/lib/account";
+import { signInAny } from "@/lib/login-client";
+import { suggestUsername, USERNAME_RE } from "@/lib/login-id";
 import { EASE, Field, SubmitButton, type SubmitState } from "./AuthFields";
 
 type Mode = "login" | "register";
@@ -32,10 +34,19 @@ export function AuthScreen({ mode, next }: { mode: Mode; next?: string | undefin
   const [leaving, setLeaving] = useState(false);
   const navigate = useNavigate();
   const target = safeNext(next);
+  const [mustChange, setMustChange] = useState(false);
+
+  async function needsNewPassword() {
+    const { data } = await supabase.auth.getUser();
+    if (!data.user) return null;
+    const { data: p } = await supabase.from("profiles").select("must_change_password").eq("id", data.user.id).maybeSingle();
+    return !!p?.must_change_password;
+  }
 
   useEffect(() => {
-    const go = () => supabase.auth.getUser().then(({ data }) => {
-      if (!data.user) return;
+    const go = () => needsNewPassword().then((must) => {
+      if (must === null) return;
+      if (must) return setMustChange(true);
       navigate({ to: target as "/account", replace: true });
     });
     go();
@@ -51,12 +62,14 @@ export function AuthScreen({ mode, next }: { mode: Mode; next?: string | undefin
       const { data } = await supabase.auth.getUser();
       if (data.user) await supabase.from("saved_projects").upsert({ user_id: data.user.id, project_id: pending });
     }
+    if (await needsNewPassword()) return setMustChange(true);
     setLeaving(true);
     setTimeout(() => navigate({ to: target as "/account" }), reduce ? 150 : 450);
   }
 
   const dur = reduce ? 0.15 : 0.7;
-  const form = mode === "login" ? <LoginForm key="login" onDone={finish} next={next} /> : <RegisterForm key="register" next={next} />;
+  const form = mustChange ? <SetPasswordForm key="setpw" onDone={() => { setMustChange(false); setLeaving(true); setTimeout(() => navigate({ to: target as "/account" }), reduce ? 150 : 450); }} />
+    : mode === "login" ? <LoginForm key="login" onDone={finish} next={next} /> : <RegisterForm key="register" next={next} />;
 
   return (
     <section className="relative bg-ivory pb-14 pt-6 lg:min-h-[calc(100svh-72px)]">
@@ -153,19 +166,15 @@ function LoginForm({ onDone, next }: { onDone: () => void; next?: string | undef
   async function submit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const f = new FormData(e.currentTarget);
-    const email = String(f.get("email") || "").trim(), password = String(f.get("password") || "");
+    const identifier = String(f.get("identifier") || "").trim(), password = String(f.get("password") || "");
     const er: Record<string, string> = {};
-    if (!/^\S+@\S+\.\S+$/.test(email)) er["email"] = "Enter a valid email address.";
+    if (!identifier) er["identifier"] = "Enter your email, phone or username.";
     if (!password) er["password"] = "Enter your password.";
     setErrs(er); setShake((s) => s + 1);
     if (Object.keys(er).length) return;
     setState("loading");
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) {
-      setState("idle");
-      setErrs({ password: error.message === "Email not confirmed" ? "Please confirm your email first — check your inbox." : "Incorrect email or password." });
-      return;
-    }
+    const error = await signInAny(identifier, password);
+    if (error) { setState("idle"); setErrs({ password: error }); return; }
     if (f.get("remember")) localStorage.removeItem("natec-temp-session");
     else { localStorage.setItem("natec-temp-session", "1"); sessionStorage.setItem("natec-alive", "1"); }
     setState("success");
@@ -176,7 +185,7 @@ function LoginForm({ onDone, next }: { onDone: () => void; next?: string | undef
       <Stagger>
         {[
           <div key="h"><p className="eyebrow text-brand-red">Login</p><h1 className="mt-2 !text-4xl text-navy">Sign in to your account</h1></div>,
-          <Field key="e" label="Email" name="email" type="email" inputMode="email" autoComplete="email" error={errs["email"]} shakeKey={shake} />,
+          <Field key="e" label="Email, phone or username" name="identifier" placeholder="e.g. 01712345678 or yourname" autoComplete="username" error={errs["identifier"]} shakeKey={shake} />,
           <Field key="p" label="Password" name="password" password autoComplete="current-password" error={errs["password"]} shakeKey={shake} />,
           <div key="r" className="flex items-center justify-between text-sm">
             <label className="flex min-h-[44px] items-center gap-2 text-navy"><input type="checkbox" name="remember" defaultChecked className="h-4 w-4 accent-[var(--navy)]" /> Remember me</label>
@@ -196,7 +205,15 @@ function RegisterForm({ next }: { next?: string | undefined }) {
   const [state, setState] = useState<SubmitState>("idle");
   const [pw, setPw] = useState("");
   const [sent, setSent] = useState("");
+  const [uname, setUname] = useState(""); const [touched, setTouched] = useState(false);
+  const [avail, setAvail] = useState<null | boolean>(null);
   const score = passwordScore(pw);
+  useEffect(() => {
+    setAvail(null);
+    if (!USERNAME_RE.test(uname)) return;
+    const t = setTimeout(() => supabase.rpc("username_available", { _u: uname }).then(({ data }) => setAvail(!!data)), 350);
+    return () => clearTimeout(t);
+  }, [uname]);
   async function submit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const f = new FormData(e.currentTarget);
@@ -205,6 +222,8 @@ function RegisterForm({ next }: { next?: string | undefined }) {
     const phone = normalizeBdPhone(phoneRaw);
     const er: Record<string, string> = {};
     if (!name) er["full_name"] = "Enter your full name.";
+    if (!USERNAME_RE.test(uname)) er["username"] = "3–30 characters: lowercase letters, numbers, dot or underscore.";
+    else if (avail === false) er["username"] = "This username is taken.";
     if (!phone) er["phone"] = "Enter a Bangladesh mobile number, e.g. 01712-345678 or +880 1712-345678.";
     if (!/^\S+@\S+\.\S+$/.test(email)) er["email"] = "Enter a valid email address.";
     if (password.length < 8) er["password"] = "Use at least 8 characters.";
@@ -213,7 +232,13 @@ function RegisterForm({ next }: { next?: string | undefined }) {
     setErrs(er); setShake((s) => s + 1);
     if (Object.keys(er).length) return;
     setState("loading");
-    const { error } = await supabase.auth.signUp({ email, password, options: { emailRedirectTo: `${window.location.origin}/login`, data: { full_name: name.slice(0, 120), phone } } });
+    const [{ data: uOk }, { data: pOk }] = await Promise.all([supabase.rpc("username_available", { _u: uname }), supabase.rpc("phone_available", { _p: phone! })]);
+    if (!uOk || !pOk) {
+      setState("idle"); setShake((s) => s + 1);
+      setErrs({ ...(!uOk ? { username: "This username is taken." } : {}), ...(!pOk ? { phone: "An account with this phone number already exists. Try logging in." } : {}) });
+      return;
+    }
+    const { error } = await supabase.auth.signUp({ email, password, options: { emailRedirectTo: `${window.location.origin}/login`, data: { full_name: name.slice(0, 120), phone, username: uname } } });
     if (error) { setState("idle"); setErrs({ email: /registered|exists/i.test(error.message) ? "An account with this email already exists. Try logging in." : error.message }); return; }
     setState("success");
     setTimeout(() => setSent(email), 700);
@@ -234,7 +259,15 @@ function RegisterForm({ next }: { next?: string | undefined }) {
       <Stagger>
         {[
           <div key="h"><p className="eyebrow text-brand-red">Register</p><h1 className="mt-2 !text-4xl text-navy">Create your account</h1></div>,
-          <Field key="n" label="Full name" name="full_name" autoComplete="name" error={errs["full_name"]} shakeKey={shake} />,
+          <Field key="n" label="Full name" name="full_name" autoComplete="name" error={errs["full_name"]} shakeKey={shake} onChange={(v) => { if (!touched) setUname(suggestUsername(v)); }} />,
+          <Field key="u" label="Username" name="username" autoComplete="username" value={uname} error={errs["username"]} shakeKey={shake}
+            onChange={(v) => { setTouched(true); setUname(v.toLowerCase().replace(/\s/g, "")); }}>
+            {uname && !errs["username"] && (
+              <p className={`mt-1.5 text-sm ${avail === false || !USERNAME_RE.test(uname) ? "text-brand-red" : "text-navy/70"}`} aria-live="polite">
+                {!USERNAME_RE.test(uname) ? "3–30 characters: lowercase letters, numbers, dot or underscore." : avail === null ? "Checking…" : avail ? "✓ Available" : "Taken — try another"}
+              </p>
+            )}
+          </Field>,
           <Field key="ph" label="Phone (01XXXXXXXXX)" name="phone" type="tel" inputMode="tel" autoComplete="tel" error={errs["phone"]} shakeKey={shake} />,
           <Field key="e" label="Email" name="email" type="email" inputMode="email" autoComplete="email" error={errs["email"]} shakeKey={shake} />,
           <Field key="p" label="Password" name="password" password autoComplete="new-password" error={errs["password"]} shakeKey={shake} onChange={setPw}>
@@ -255,6 +288,51 @@ function RegisterForm({ next }: { next?: string | undefined }) {
           </div>,
           <SubmitButton key="s" state={state}>Create account →</SubmitButton>,
           <p key="l" className="text-center text-sm text-muted-foreground">Already have an account? <Link to="/login" search={next ? { redirect: next } : {}} className="font-semibold text-brand-red hover:underline">Login</Link></p>,
+        ]}
+      </Stagger>
+    </motion.form>
+  );
+}
+
+function SetPasswordForm({ onDone }: { onDone: () => void }) {
+  const [errs, setErrs] = useState<Record<string, string>>({});
+  const [shake, setShake] = useState(0);
+  const [state, setState] = useState<SubmitState>("idle");
+  const [pw, setPw] = useState("");
+  const score = passwordScore(pw);
+  async function submit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    const f = new FormData(e.currentTarget);
+    const password = String(f.get("password") || ""), confirm = String(f.get("confirm") || "");
+    const er: Record<string, string> = {};
+    if (password.length < 8) er["password"] = "Use at least 8 characters.";
+    if (confirm !== password) er["confirm"] = "Passwords don't match.";
+    setErrs(er); setShake((s) => s + 1);
+    if (Object.keys(er).length) return;
+    setState("loading");
+    const { data: u } = await supabase.auth.getUser();
+    const { error } = await supabase.auth.updateUser({ password });
+    if (error || !u.user) { setState("idle"); setErrs({ password: error?.message.includes("different") ? "Choose a password different from the current one." : "Couldn't save your password. Please try again." }); return; }
+    await supabase.from("profiles").update({ must_change_password: false }).eq("id", u.user.id);
+    setState("success");
+    setTimeout(onDone, 650);
+  }
+  const meter = ["Too short", "Weak", "Fair", "Good", "Strong"][score];
+  return (
+    <motion.form onSubmit={submit} noValidate>
+      <Stagger>
+        {[
+          <div key="h"><p className="eyebrow text-brand-red">First login</p><h1 className="mt-2 !text-4xl text-navy">Set your own password</h1><p className="mt-2 text-muted-foreground">Choose a new password to keep your account safe.</p></div>,
+          <Field key="p" label="New password" name="password" password autoComplete="new-password" error={errs["password"]} shakeKey={shake} onChange={setPw}>
+            {pw && (
+              <div className="mt-2 flex items-center gap-3" aria-live="polite">
+                <div className="flex flex-1 gap-1">{[0, 1, 2, 3].map((i) => <span key={i} className={`h-1 flex-1 rounded-full transition-colors ${i < score ? (score >= 3 ? "bg-navy" : "bg-brand-red") : "bg-navy/10"}`} />)}</div>
+                <span className="text-xs text-muted-foreground">{meter}</span>
+              </div>
+            )}
+          </Field>,
+          <Field key="c" label="Confirm new password" name="confirm" password autoComplete="new-password" error={errs["confirm"]} shakeKey={shake} />,
+          <SubmitButton key="s" state={state}>Save and continue →</SubmitButton>,
         ]}
       </Stagger>
     </motion.form>

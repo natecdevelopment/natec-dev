@@ -69,6 +69,8 @@ function AccountPage() {
   const verified = !!user.email_confirmed_at;
 
   useEffect(() => { supabase.from("profiles").update({ last_seen_at: new Date().toISOString() }).eq("id", user.id).then(() => {}); }, [user.id]);
+  // First login: the "Set your own password" screen comes before anything else.
+  useEffect(() => { if (profile.data?.must_change_password) navigate({ to: "/login", replace: true }); }, [profile.data?.must_change_password, navigate]);
 
   async function logout() {
     await qc.cancelQueries(); qc.clear();

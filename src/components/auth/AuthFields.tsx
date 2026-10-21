@@ -5,9 +5,9 @@ import { Eye, EyeOff, Loader2 } from "lucide-react";
 export const EASE = [0.22, 1, 0.36, 1] as const;
 
 /** Floating-label input with a red underline that grows from the left and a one-time shake on error. */
-export function Field({ label, name, type = "text", error, shakeKey, autoComplete, inputMode, defaultValue, onChange, children, password }: {
+export function Field({ label, name, type = "text", error, shakeKey, autoComplete, inputMode, defaultValue, onChange, children, password, placeholder, value }: {
   label: string; name: string; type?: string | undefined; error?: string | undefined; shakeKey?: number | undefined; autoComplete?: string | undefined; inputMode?: "tel" | "email" | "text" | undefined;
-  defaultValue?: string | undefined; onChange?: ((v: string) => void) | undefined; children?: React.ReactNode; password?: boolean | undefined;
+  defaultValue?: string | undefined; onChange?: ((v: string) => void) | undefined; children?: React.ReactNode; password?: boolean | undefined; placeholder?: string | undefined; value?: string | undefined;
 }) {
   const id = useId();
   const reduce = useReducedMotion();
@@ -21,10 +21,10 @@ export function Field({ label, name, type = "text", error, shakeKey, autoComplet
     >
       <div className="relative">
         <input
-          id={id} name={name} type={t} placeholder=" " autoComplete={autoComplete} inputMode={inputMode} defaultValue={defaultValue}
+          id={id} name={name} type={t} placeholder={placeholder || " "} autoComplete={autoComplete} inputMode={inputMode} {...(value !== undefined ? { value } : { defaultValue })}
           onChange={(e) => onChange?.(e.target.value)}
           aria-invalid={!!error} aria-describedby={error ? `${id}-err` : undefined}
-          className={`peer block h-14 w-full rounded-t-lg border-0 border-b bg-ivory/60 px-4 pb-2 pt-6 text-[15px] text-navy outline-none transition ${password ? "pr-12" : ""} ${error ? "border-brand-red" : "border-navy/25"}`}
+          className={`peer block h-14 w-full rounded-t-lg border-0 border-b bg-ivory/60 px-4 pb-2 pt-6 text-[15px] text-navy outline-none placeholder:text-transparent focus:placeholder:text-navy/40 transition ${password ? "pr-12" : ""} ${error ? "border-brand-red" : "border-navy/25"}`}
         />
         <label htmlFor={id} className="pointer-events-none absolute left-4 top-4 origin-left text-[15px] text-navy/60 transition-all duration-200 peer-focus:top-2 peer-focus:text-[11px] peer-focus:tracking-wide peer-focus:text-brand-red peer-[:not(:placeholder-shown)]:top-2 peer-[:not(:placeholder-shown)]:text-[11px]">
           {label}

@@ -440,6 +440,24 @@ export type Database = {
           },
         ]
       }
+      login_attempts: {
+        Row: {
+          created_at: string
+          id: number
+          identifier: string
+        }
+        Insert: {
+          created_at?: string
+          id?: number
+          identifier: string
+        }
+        Update: {
+          created_at?: string
+          id?: number
+          identifier?: string
+        }
+        Relationships: []
+      }
       media: {
         Row: {
           alt_text: string
@@ -561,8 +579,10 @@ export type Database = {
           full_name: string
           id: string
           last_seen_at: string | null
+          must_change_password: boolean
           phone: string
           status: string
+          username: string | null
         }
         Insert: {
           account_type?: string
@@ -571,8 +591,10 @@ export type Database = {
           full_name?: string
           id: string
           last_seen_at?: string | null
+          must_change_password?: boolean
           phone?: string
           status?: string
+          username?: string | null
         }
         Update: {
           account_type?: string
@@ -581,8 +603,10 @@ export type Database = {
           full_name?: string
           id?: string
           last_seen_at?: string | null
+          must_change_password?: boolean
           phone?: string
           status?: string
+          username?: string | null
         }
         Relationships: []
       }
@@ -923,6 +947,10 @@ export type Database = {
       }
       is_admin: { Args: never; Returns: boolean }
       is_my_client: { Args: { _client_id: string }; Returns: boolean }
+      normalize_bd_phone: { Args: { _p: string }; Returns: string }
+      phone_available: { Args: { _p: string }; Returns: boolean }
+      unique_username: { Args: { _base: string }; Returns: string }
+      username_available: { Args: { _u: string }; Returns: boolean }
     }
     Enums: {
       [_ in never]: never

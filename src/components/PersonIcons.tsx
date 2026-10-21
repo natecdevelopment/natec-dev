@@ -11,7 +11,7 @@ export function PersonMaleIcon({ className = "h-12 w-12" }: IconProps) {
       src={portraitMale}
       alt=""
       aria-hidden
-      loading="lazy"
+      loading="eager"
       width={512}
       height={512}
       className={className}
@@ -25,7 +25,7 @@ export function PersonFemaleIcon({ className = "h-12 w-12" }: IconProps) {
       src={portraitFemale}
       alt=""
       aria-hidden
-      loading="lazy"
+      loading="eager"
       width={512}
       height={512}
       className={className}

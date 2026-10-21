@@ -10,7 +10,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { WhatsAppIcon } from "@/components/SiteChrome";
 import { PaymentsTable, StatusChip, SummaryCards } from "@/components/ClientMoney";
 import { PAYMENT_METHODS, PAYMENT_TYPES, fmtDate, printStatement, type ClientRow, type PaymentRow } from "@/lib/account";
-import { allocatePayment, taka } from "@/lib/money";
+import { allocatePayment, taka, type PlanForm } from "@/lib/money";
+import { PaymentPlanForm, initialPlanState, planBlocker, type PlanState } from "@/components/admin/PaymentPlanForm";
 import { inviteClient } from "@/lib/admin-accounts.functions";
 
 export const Route = createFileRoute("/admin/accounts/$id")({ component: ClientDetail });
@@ -126,7 +127,7 @@ function ClientDetail() {
       </Card>
       <SummaryCards c={c} b={d.b} />
 
-      <Schedule clientId={c.id} rows={d.inst} total={Number(c.total_price)} onChange={refresh} />
+      <Schedule clientId={c.id} rows={d.inst} total={Number(c.total_price)} bookingDate={c.booking_date ?? ""} onChange={refresh} />
 
       <Card>
         <h2 className="mb-2 !text-xl text-navy">Payments</h2>
@@ -158,7 +159,30 @@ function ClientDetail() {
 
 type Inst = { id: string; due_date: string; amount: number; paid_amount: number; label: string; status: string };
 
-function Schedule({ clientId, rows, total, onChange }: { clientId: string; rows: Inst[]; total: number; onChange: () => void }) {
+function Schedule({ clientId, rows, total, bookingDate, onChange }: { clientId: string; rows: Inst[]; total: number; bookingDate: string; onChange: () => void }) {
+  const [edit, setEdit] = useState<PlanState | null>(null);
+  const [saving, setSaving] = useState(false);
+  function openEdit() {
+    const base = initialPlanState(bookingDate, total);
+    const sorted = [...rows].sort((a, b) => a.due_date.localeCompare(b.due_date));
+    const inst = sorted.filter((r) => r.label !== "Booking money" && r.label !== "Down payment");
+    const down = sorted.find((r) => r.label === "Down payment");
+    const plan: PlanForm = { ...base.plan, booking: Number(sorted.find((r) => r.label === "Booking money")?.amount ?? 0), count: inst.length || 24, firstDue: inst[0]?.due_date ?? base.plan.firstDue, downDue: down?.due_date ?? base.plan.downDue, instAmount: inst[0] ? Number(inst[0].amount) : null };
+    setEdit(sorted.length ? { plan, rows: sorted.map((r) => ({ due_date: r.due_date, amount: Number(r.amount), label: r.label })), dirty: true } : { ...base, plan });
+  }
+  async function saveEdit() {
+    if (!edit) return;
+    const b = planBlocker(edit, bookingDate);
+    if (b) return void toast.error(b);
+    setSaving(true);
+    try {
+      if (edit.plan.total !== total) { const r = await supabase.from("clients").update({ total_price: edit.plan.total }).eq("id", clientId); if (r.error) throw r.error; }
+      const d = await supabase.from("instalments").delete().eq("client_id", clientId); if (d.error) throw d.error;
+      const ins = await supabase.from("instalments").insert(edit.rows.map((r) => ({ client_id: clientId, due_date: r.due_date, amount: Number(r.amount), label: r.label.trim() || "Instalment" }))); if (ins.error) throw ins.error;
+      await reallocate(clientId);
+      toast.success("Schedule saved"); setEdit(null); onChange();
+    } catch (e) { toast.error(e instanceof Error ? e.message : "Could not save the schedule."); } finally { setSaving(false); }
+  }
   const planned = rows.reduce((s, r) => s + Number(r.amount), 0);
   async function upd(id: string, patch: Partial<Inst>) {
     const { error } = await supabase.from("instalments").update(patch).eq("id", id);
@@ -196,7 +220,21 @@ function Schedule({ clientId, rows, total, onChange }: { clientId: string; rows:
           ))}
         </ul>
       )}
-      <button onClick={add} className={`${btnSm} mt-3`}><Plus className="h-4 w-4" /> Add row</button>
+      <div className="mt-3 flex flex-wrap gap-2">
+        <button onClick={add} className={btnSm}><Plus className="h-4 w-4" /> Add row</button>
+        <button onClick={openEdit} className={btnSm}><Pencil className="h-4 w-4" /> Edit schedule</button>
+      </div>
+      <Dialog open={!!edit} onOpenChange={(o) => !o && setEdit(null)}>
+        <DialogContent className="max-h-[92svh] max-w-5xl overflow-y-auto">
+          <DialogHeader><DialogTitle>Edit schedule</DialogTitle></DialogHeader>
+          {edit && <PaymentPlanForm value={edit} onChange={setEdit} bookingDate={bookingDate} />}
+          <p className="text-xs text-muted-foreground">Saving replaces all schedule rows; payments already received are re-applied to the oldest rows first.</p>
+          <div className="flex justify-end gap-2">
+            <button type="button" onClick={() => setEdit(null)} className={btnSm}>Cancel</button>
+            <button type="button" disabled={saving || !!(edit && planBlocker(edit, bookingDate))} onClick={saveEdit} className="btn btn-primary !py-2 disabled:opacity-50">{saving ? "Saving…" : "Save schedule"}</button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </Card>
   );
 }

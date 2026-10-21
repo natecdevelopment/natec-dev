@@ -7,7 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, PageTitle, btnDanger, btnSm } from "@/components/admin/ui";
 import { normalizeBdPhone } from "@/components/InquiryForm";
 import { PAYMENT_METHODS, PAYMENT_TYPES, fmtDate } from "@/lib/account";
-import { addDays, allocatePayment, taka, type ScheduleRow } from "@/lib/money";
+import { addDays, allocatePayment, computePlan, taka, type ScheduleRow } from "@/lib/money";
 import { PaymentPlanForm, initialPlanState, planBlocker } from "@/components/admin/PaymentPlanForm";
 
 export const Route = createFileRoute("/admin/accounts/new")({
@@ -28,14 +28,12 @@ function NewClient() {
   const [c, setC] = useState({ full_name: "", phone: "", email: "", address: "", profile_id: profile ?? "", project_id: "", flat_no: "", floor: "", size_sft: "", parking: false, booking_date: today(), agreement_date: "", payment_plan_note: "" });
   const [ps, setPs] = useState(() => initialPlanState(today()));
   const plan = ps.plan, rows = ps.rows;
-  const touchedDownDue = ps.plan.downDue !== addDays(ps.plan.downDue ? c.booking_date : today(), 30);
   useEffect(() => {
     // keep the default down-payment due date = booking date + 30 days while the admin hasn't changed it
     if (!c.booking_date) return;
-    setPs((s) => ({ ...s, plan: { ...s.plan, downDue: addDays(c.booking_date, 30) } }));
+    setPs((s) => { const plan = { ...s.plan, downDue: addDays(c.booking_date, 30) }; return s.dirty ? { ...s, plan } : { plan, rows: computePlan(plan, c.booking_date).rows, dirty: false }; });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [c.booking_date]);
-  void touchedDownDue;
   const [pays, setPays] = useState<Pay[]>([]);
   const set = (k: keyof typeof c, v: string | boolean) => setC((x) => ({ ...x, [k]: v }));
 

@@ -110,3 +110,44 @@ export function computePlan(p: PlanForm, bookingDate: string): PlanResult {
   }
   return { remainingAfterBooking: rem, down, each, last, rows, errors };
 }
+
+const isExtra = (l: string) => l === "Booking money" || l === "Down payment";
+
+/**
+ * "Regenerate schedule" for an existing client: paid / partly-paid rows are kept as they are,
+ * and the rest of the total is spread over fresh unpaid rows built from the plan fields.
+ */
+export function rebuildKeepingPaid(p: PlanForm, bookingDate: string, current: ScheduleRow[]): ScheduleRow[] {
+  const locked = current.filter((r) => (r.paid ?? 0) > 0);
+  const lockedLabels = new Set(locked.map((r) => r.label));
+  const extras = computePlan(p, bookingDate).rows.filter((r) => isExtra(r.label) && !lockedLabels.has(r.label));
+  const n = Math.max(0, Math.floor(p.count));
+  const rest = p.total - locked.reduce((s, r) => s + r.amount, 0) - extras.reduce((s, r) => s + r.amount, 0);
+  const out = [...locked, ...extras];
+  if (n > 0 && rest > 0 && p.firstDue) {
+    const each = p.round > 0 ? Math.floor(rest / n / p.round) * p.round : Math.floor(rest / n);
+    for (let i = 0; i < n; i++) out.push({ due_date: addMonths(p.firstDue, i * p.freqMonths), amount: i === n - 1 ? rest - each * (n - 1) : each, label: `Instalment ${i + 1} of ${n}` });
+  }
+  return out.sort((a, b) => a.due_date.localeCompare(b.due_date));
+}
+
+/** Best guess of the plan fields from saved schedule rows (frequency from the gap between instalments). */
+export function guessPlan(rows: ScheduleRow[], bookingDate: string, total: number): PlanForm {
+  const sorted = [...rows].sort((a, b) => a.due_date.localeCompare(b.due_date));
+  const inst = sorted.filter((r) => !isExtra(r.label));
+  const down = sorted.find((r) => r.label === "Down payment");
+  let freq: PlanForm["freqMonths"] = 1;
+  if (inst.length > 1) {
+    const [a, b] = [inst[0]!.due_date, inst[1]!.due_date].map((d) => d.split("-").map(Number) as [number, number, number]);
+    const gap = (b![0] - a![0]) * 12 + (b![1] - a![1]);
+    if ([1, 2, 3, 6, 12].includes(gap)) freq = gap as PlanForm["freqMonths"];
+  }
+  const amounts = inst.map((r) => r.amount);
+  const round: PlanForm["round"] = amounts.every((x) => x % 1000 === 0) ? 1000 : amounts.every((x) => x % 500 === 0) ? 500 : amounts.every((x) => x % 100 === 0) ? 100 : 0;
+  const today = new Date().toISOString().slice(0, 10);
+  return {
+    total, booking: Number(sorted.find((r) => r.label === "Booking money")?.amount ?? 0), count: inst.length || 24, freqMonths: freq,
+    firstDue: inst[0]?.due_date ?? today, instAmount: null, downManual: null,
+    downDue: down?.due_date ?? addDays(bookingDate || today, 30), round: inst.length ? round : 1000,
+  };
+}

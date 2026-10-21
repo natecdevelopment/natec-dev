@@ -95,31 +95,61 @@ function initials(name: string) {
   return name.replace(/^Md\.\s*/, "").split(/\s+/).map((w) => w[0]).slice(0, 2).join("").toUpperCase();
 }
 
+function AboutHero() {
+  const ref = useRef<HTMLElement | null>(null);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    let raf = 0;
+    const write = () => {
+      raf = 0;
+      const p = Math.min(1, Math.max(0, window.scrollY / (el.offsetHeight || 1)));
+      el.style.setProperty("--hp", p.toFixed(3));
+    };
+    const onScroll = () => { if (!raf) raf = requestAnimationFrame(write); };
+    write();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+      if (raf) cancelAnimationFrame(raf);
+    };
+  }, []);
+
+  return (
+    <section ref={ref} className="relative isolate flex min-h-[88svh] items-end overflow-hidden bg-navy text-white md:min-h-[84svh]">
+      <img src="/projects/shobuj-angon/side.webp" alt="Shobuj Angon residential building by Natec Development at Rajendrapur Bazar, Sreepur" width={1200} height={900} className="about-hero-img absolute inset-0 h-full w-full object-cover" />
+      <div className="about-hero-veil absolute inset-0" aria-hidden />
+      <div className="about-hero-copy container-x relative z-10 pb-14 pt-10 md:pb-20">
+        <nav aria-label="Breadcrumb" className="eyebrow hero-in !text-[11px] text-white/55">
+          <Link to="/" className="hover:text-white">Home</Link> <span aria-hidden>›</span> <span aria-current="page" className="text-white/80">About</span>
+        </nav>
+        <p className="eyebrow hero-in mt-8 text-white/70 md:mt-10" style={{ animationDelay: "120ms" }}>About us</p>
+        <h1 className="hero-in mt-4 max-w-[20ch]" style={{ animationDelay: "220ms" }}>Building lasting homes in <em className="accent-dark">Sreepur, Gazipur</em></h1>
+        <p className="hero-in mt-6 max-w-[54ch] text-lg text-white/85" style={{ animationDelay: "340ms" }}>
+          Natec Development Ltd. is a real estate developer founded in 2023 at Rajendrapur Bazar. We plan, build and hand over residential buildings for families who want a well-built home close to Dhaka.
+        </p>
+        <div className="hero-in mt-9 flex flex-wrap gap-3" style={{ animationDelay: "460ms" }}>
+          <Link to="/projects" className="btn btn-primary">View projects</Link>
+          <a href={WA_VISIT} target="_blank" rel="noreferrer" className="btn btn-ghost-dark">Book a site visit</a>
+        </div>
+      </div>
+      <div className="pointer-events-none absolute bottom-5 right-5 z-10 hidden items-center gap-3 md:flex" aria-hidden>
+        <span className="eyebrow !text-[10px] text-white/50">Scroll</span>
+        <span className="block h-10 w-px overflow-hidden bg-white/20"><span className="scroll-hint-line block h-full w-full bg-white/70" /></span>
+      </div>
+    </section>
+  );
+}
+
 export function AboutPage() {
   return (
     <>
       {/* 1. Hero */}
-      <section className="bg-navy text-white">
-        <div className="container-x py-12 md:py-20">
-          <nav aria-label="Breadcrumb" className="eyebrow !text-[11px] text-muted-dark">
-            <Link to="/" className="hover:text-white">Home</Link> <span aria-hidden>›</span> <span aria-current="page" className="text-white">About</span>
-          </nav>
-          <div className="mt-8 grid items-center gap-10 md:grid-cols-2 md:gap-14">
-            <div>
-              <p className="eyebrow text-muted-dark">About us</p>
-              <h1 className="mt-4">Building lasting homes in <em className="accent-dark">Sreepur, Gazipur</em></h1>
-              <p className="mt-6 max-w-[62ch] text-lg text-muted-dark">
-                Natec Development Ltd. is a real estate developer founded in 2023 at Rajendrapur Bazar. We plan, build and hand over residential buildings for families who want a well-built home close to Dhaka.
-              </p>
-              <div className="mt-8 grid grid-cols-2 gap-3 sm:flex">
-                <Link to="/projects" className="btn btn-primary">View projects</Link>
-                <a href={WA_VISIT} target="_blank" rel="noreferrer" className="btn btn-ghost-dark">Book a site visit</a>
-              </div>
-            </div>
-            <img src="/projects/shobuj-angon/side.webp" alt="Shobuj Angon residential building by Natec Development at Rajendrapur Bazar, Sreepur" width={1200} height={900} className="aspect-[4/3] w-full rounded-2xl object-cover" />
-          </div>
-        </div>
-      </section>
+      <AboutHero />
 
       {/* 2. Story */}
       <section className="section-pad bg-ivory">
@@ -131,7 +161,7 @@ export function AboutPage() {
             <p>Our first project, Shobuj Angon at Padma Gate, Rajendrapur Bazar, is complete and every one of its 28 flats is sold. Shobuj Aloy and Shobuj Digonto are rising now, and they are fully sold too. Together that is 75 homes, delivered or under construction.</p>
             <p>We work across the whole development journey — finding and acquiring land, planning and design, permits, construction and sales — so our clients deal with one accountable team from the first meeting to handover.</p>
           </Reveal>
-          <Reveal className="grid grid-cols-2 gap-3 sm:gap-4">
+          <Reveal delay={140} className="grid grid-cols-2 gap-3 sm:gap-4">
             <img src="/projects/shobuj-angon/front.webp" alt="Front view of Shobuj Angon, completed by Natec" loading="lazy" width={800} height={1000} className="row-span-2 h-full w-full rounded-2xl object-cover" />
             <img src="/projects/shobuj-aloy/front.webp" alt="Shobuj Aloy residential building under construction" loading="lazy" width={800} height={600} className="aspect-[4/3] w-full rounded-2xl object-cover" />
             <img src="/projects/shobuj-digonto/front.webp" alt="Shobuj Digonto residential building under construction" loading="lazy" width={800} height={600} className="aspect-[4/3] w-full rounded-2xl object-cover" />
@@ -165,8 +195,8 @@ export function AboutPage() {
             {[
               { k: "Our mission", t: "To provide dependable real estate development services through thoughtful planning, practical design, and careful project coordination. We aim to understand our clients' needs, uphold professional standards, and support projects that create long-term value for clients, partners, and communities." },
               { k: "Our vision", t: "To grow as a trusted real estate development company in Bangladesh, recognized for responsible development, quality-focused service, and lasting relationships with clients and partners — contributing positively to the places where we work." },
-            ].map((c) => (
-              <Reveal key={c.k} className="rounded-2xl bg-ivory p-8 md:p-12">
+            ].map((c, i) => (
+              <Reveal key={c.k} delay={i * 110} className="rounded-2xl bg-ivory p-8 md:p-12">
                 <p className="eyebrow text-brand-red">{c.k}</p>
                 <p className="mt-5 font-display text-xl leading-snug text-primary md:text-2xl">{c.t}</p>
               </Reveal>
@@ -183,7 +213,7 @@ export function AboutPage() {
             {values.map((v, i) => {
               const Icon = valueIcons[i] ?? ShieldCheck;
               return (
-                <Reveal key={v.title} className="relative overflow-hidden rounded-2xl bg-white p-7">
+                <Reveal key={v.title} delay={i * 70} className="relative overflow-hidden rounded-2xl bg-white p-7">
                   <span className="absolute left-0 top-0 h-1 w-full bg-brand-red" aria-hidden />
                   <Icon className="h-8 w-8 text-primary" strokeWidth={1.4} aria-hidden />
                   <h3 className="mt-5 text-primary">{v.title}</h3>
@@ -247,8 +277,8 @@ export function AboutPage() {
             <Link to="/directors" className="btn btn-ghost-light">Meet the board</Link>
           </Reveal>
           <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {directors.map((d) => (
-              <Reveal key={d.name} className="rounded-2xl border border-border p-6">
+            {directors.map((d, i) => (
+              <Reveal key={d.name} delay={(i % 3) * 90} className="rounded-2xl border border-border p-6">
                 <div className="flex h-16 w-16 items-center justify-center rounded-full bg-navy font-display text-xl text-white" aria-hidden>{initials(d.name)}</div>
                 <h3 className="mt-5 text-primary">{d.name}</h3>
                 <p className="eyebrow mt-1 !text-[11px] text-brand-red">{d.role}</p>
@@ -273,8 +303,8 @@ export function AboutPage() {
               { I: Eye, t: "On-site supervision", b: "Our team follows construction on site as each building rises." },
               { I: FileText, t: "Clear communication and documents", b: "We explain each step and the paperwork involved, so you always know where things stand." },
               { I: BadgeCheck, t: "Every project sold out", b: "All 75 homes across Shobuj Angon, Shobuj Aloy and Shobuj Digonto are sold." },
-            ].map(({ I, t, b }) => (
-              <Reveal key={t}>
+            ].map(({ I, t, b }, i) => (
+              <Reveal key={t} delay={i * 80}>
                 <I className="h-8 w-8 text-white" strokeWidth={1.4} aria-hidden />
                 <h3 className="mt-4">{t}</h3>
                 <p className="mt-2 text-muted-dark">{b}</p>

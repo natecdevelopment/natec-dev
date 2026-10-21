@@ -79,6 +79,7 @@ export function Header() {
             ))}
           </nav>
           <div className="flex items-center gap-2">
+            <AccountLink />
             <a href={company.whatsappLink} target="_blank" rel="noreferrer" className="btn btn-primary hidden !px-5 !py-3 sm:inline-flex">
               <WhatsAppIcon /> WhatsApp
             </a>

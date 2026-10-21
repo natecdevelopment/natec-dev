@@ -117,7 +117,7 @@ export function ProjectsShowcase() {
                   <p className="text-sm text-muted-dark">Residential building, {p.building_type} · {p.total_flats} flats</p>
                   <div className="mt-4">
                     <div className="flex justify-between text-xs"><span className="eyebrow !text-[10px]">Construction</span><span className="num">{p.progress_pct}%</span></div>
-                    <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-white/20"><div className="h-full rounded-full bg-brand-red" style={{ width: `${p.pct}%` }} /></div>
+                    <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-white/20"><div className="h-full rounded-full bg-brand-red" style={{ width: `${p.progress_pct}%` }} /></div>
                   </div>
                   <ProjectCta p={p} className="mt-4 inline-flex items-center gap-2 text-sm font-semibold underline-offset-4 hover:underline" />
                 </div>

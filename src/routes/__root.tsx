@@ -12,6 +12,7 @@ import {
 import { useEffect, type ReactNode } from "react";
 
 import { Header, Footer } from "@/components/SiteChrome";
+import { Toaster } from "@/components/ui/sonner";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 
@@ -119,6 +120,15 @@ function RootShell({ children }: { children: ReactNode }) {
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   const home = useLocation({ select: (l) => l.pathname === "/" });
+  const admin = useLocation({ select: (l) => l.pathname === "/admin" || l.pathname.startsWith("/admin/") });
+
+  if (admin)
+    return (
+      <QueryClientProvider client={queryClient}>
+        <Outlet />
+        <Toaster richColors position="top-center" />
+      </QueryClientProvider>
+    );
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -128,6 +138,7 @@ function RootComponent() {
         <Outlet />
       </main>
       <Footer />
+      <Toaster richColors position="top-center" />
     </QueryClientProvider>
   );
 }

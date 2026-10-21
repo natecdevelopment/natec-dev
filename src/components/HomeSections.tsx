@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { ArrowRight, MapPin, Building2, ArrowUpDown, Trees, Car, HardHat, Play, MessageCircle, KeyRound, LayoutGrid, FileText, Phone, Mail, BedDouble, Bath, Sofa, UtensilsCrossed, CookingPot, Fence, Ruler } from "lucide-react";
+import { ArrowRight, MapPin, Building2, ArrowUpDown, Trees, Car, HardHat, Play, MessageCircle, LayoutGrid, FileText, Phone, Mail, BedDouble, Bath, Sofa, UtensilsCrossed, CookingPot, Fence, Ruler } from "lucide-react";
 import { company, directors } from "@/lib/site";
 import { PersonFemaleIcon, PersonMaleIcon } from "@/components/PersonIcons";
 import { Reveal, WhatsAppIcon } from "@/components/SiteChrome";
@@ -490,16 +490,16 @@ export function BuyingSteps() {
         </Reveal>
         <ol className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {BUY.map((s, n) => (
-            <Reveal key={s.t} className="rounded-2xl border border-border bg-ivory p-7">
-              <li className="list-none">
+            <li key={s.t} className="list-none">
+              <Reveal className="h-full rounded-2xl border border-border bg-ivory p-7">
                 <div className="flex items-center justify-between">
                   <s.i className="h-7 w-7 text-navy" strokeWidth={1.3} />
                   <span className="num text-3xl text-brand-red">{n + 1}</span>
                 </div>
                 <h3 className="mt-5 text-navy">{s.t}</h3>
                 <p className="mt-2 text-[15px] text-muted-foreground">{s.b}</p>
-              </li>
-            </Reveal>
+              </Reveal>
+            </li>
           ))}
         </ol>
         <a href={WA_SITE_VISIT} target="_blank" rel="noreferrer" className="btn btn-primary mt-10"><WhatsAppIcon /> Book a site visit</a>

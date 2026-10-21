@@ -17,6 +17,7 @@ const KEY = ["admin", "videos"];
 
 function VideosPage() {
   const qc = useQueryClient();
+  useEffect(() => () => { qc.invalidateQueries({ queryKey: ["public-videos"] }); }, [qc]);
   const { data, isLoading } = useQuery({
     queryKey: KEY,
     queryFn: async () => {

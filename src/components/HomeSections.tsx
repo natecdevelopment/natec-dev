@@ -425,7 +425,7 @@ export function VideosSection() {
         <Reveal className="mb-6 flex flex-col items-center gap-6 text-center md:mb-10 md:flex-row md:flex-wrap md:items-end md:justify-between md:text-left">
           <div>
             <Eyebrow>Site videos</Eyebrow>
-            <h2 id="videos-h" className="mx-auto mt-3 max-w-[320px] text-[clamp(1.75rem,8vw,2.2rem)] leading-[1.15] text-navy md:mx-0 md:max-w-none md:text-[clamp(1.9rem,3.6vw,3.1rem)] md:leading-[1.1]">See our projects <em className="accent-light">on video.</em></h2>
+            <h2 id="videos-h" className="mx-auto mt-3 max-w-[320px] text-[clamp(1.75rem,8vw,2.2rem)] leading-[1.15] text-navy md:mx-0 md:max-w-none md:text-[clamp(1.9rem,3.6vw,3.1rem)] md:leading-[1.1]">See our projects <br className="md:hidden" /><em className="accent-light">on video.</em></h2>
           </div>
           <a href={company.facebook} target="_blank" rel="noreferrer" className="btn btn-ghost-light hidden md:inline-flex">More on Facebook</a>
         </Reveal>

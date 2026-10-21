@@ -2,6 +2,11 @@
 @source "../src";
 @import "tw-animate-css";
 
+/* Metric-matched local fallbacks to avoid layout shift while web fonts load */
+@font-face { font-family: "Playfair Fallback"; src: local("Times New Roman"), local("Georgia"); size-adjust: 111%; ascent-override: 97%; descent-override: 22%; line-gap-override: 0%; }
+@font-face { font-family: "Marcellus Fallback"; src: local("Times New Roman"), local("Georgia"); size-adjust: 104%; ascent-override: 93%; descent-override: 25%; line-gap-override: 0%; }
+@font-face { font-family: "Jost Fallback"; src: local("Arial"), local("Helvetica"); size-adjust: 96%; ascent-override: 111%; descent-override: 39%; line-gap-override: 0%; }
+
 @custom-variant dark (&:is(.dark *));
 
 /*
@@ -58,9 +63,9 @@
   --color-steel: var(--steel);
   --color-caution: var(--caution);
   --color-success: var(--success);
-  --font-display: "Cormorant Garamond", "Hind Siliguri", Georgia, serif;
-  --font-label: "Cinzel", "Hind Siliguri", Georgia, serif;
-  --font-sans: "Manrope", "Hind Siliguri", system-ui, sans-serif;
+  --font-display: "Playfair Display", "Playfair Fallback", "Hind Siliguri", Georgia, serif;
+  --font-label: "Marcellus", "Marcellus Fallback", "Hind Siliguri", Georgia, serif;
+  --font-sans: "Jost", "Jost Fallback", "Hind Siliguri", system-ui, sans-serif;
   --color-navy: var(--navy);
   --color-navy-deep: var(--navy-deep);
   --color-brand-red: var(--red);
@@ -134,21 +139,23 @@
     font-size: 16px; line-height: 1.65; overflow-x: clip;
   }
   @media (min-width: 768px) { body { font-size: 17px; } }
-  h1, h2, h3 { font-family: var(--font-display); font-weight: 600; letter-spacing: -0.01em; }
-  h1 { font-size: clamp(2.6rem, 6vw, 5.2rem); line-height: 1.02; }
-  h2 { font-size: clamp(2rem, 4vw, 3.4rem); line-height: 1.08; }
-  h3 { font-size: 1.5rem; line-height: 1.2; }
+  body { line-height: 1.7; }
+  p { max-width: 64ch; }
+  h1, h2, h3 { font-family: var(--font-display); }
+  h1 { font-size: clamp(2.5rem, 5.6vw, 4.8rem); line-height: 1.05; font-weight: 500; letter-spacing: -0.015em; }
+  h2 { font-size: clamp(1.9rem, 3.6vw, 3.1rem); line-height: 1.1; font-weight: 500; letter-spacing: -0.01em; }
+  h3 { font-size: 1.45rem; line-height: 1.25; font-weight: 600; }
 }
 
 @utility eyebrow {
-  font-family: var(--font-label); font-weight: 500; font-size: 12px;
-  text-transform: uppercase; letter-spacing: 0.28em;
+  font-family: var(--font-label); font-weight: 400; font-size: 12px;
+  text-transform: uppercase; letter-spacing: 0.18em;
   @media (min-width: 768px) { font-size: 13px; }
 }
-@utility num { font-family: var(--font-sans); font-weight: 600; font-variant-numeric: tabular-nums; }
+@utility num { font-family: var(--font-display); font-weight: 500; font-variant-numeric: tabular-nums; }
 @utility btn {
   display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
-  border-radius: 999px; padding: 14px 26px; font-size: 14px; font-weight: 600;
+  border-radius: 999px; padding: 14px 26px; font-family: var(--font-label); font-size: 13px; font-weight: 400;
   text-transform: uppercase; letter-spacing: 0.08em; line-height: 1; white-space: nowrap;
   transition: background-color .25s, color .25s, transform .25s, border-color .25s;
   &:hover { transform: translateY(-2px); }
@@ -165,8 +172,8 @@
   background: transparent; color: var(--navy); border: 1.5px solid var(--navy);
   &:hover { background: var(--navy); color: var(--white); }
 }
-@utility accent-dark { font-style: italic; color: var(--white); text-decoration: underline; text-decoration-color: var(--red); text-decoration-thickness: 2px; text-underline-offset: 0.14em; }
-@utility accent-light { font-style: italic; color: var(--red); }
+@utility accent-dark { font-family: var(--font-display); font-style: italic; font-weight: 500; color: var(--white); text-decoration: underline; text-decoration-color: var(--red); text-decoration-thickness: 2px; text-underline-offset: 0.14em; }
+@utility accent-light { font-family: var(--font-display); font-style: italic; font-weight: 500; color: var(--red); }
 @utility section-pad { padding-block: 72px; @media (min-width: 768px) { padding-block: 120px; } }
 @utility container-x { margin-inline: auto; width: 100%; max-width: 1240px; padding-inline: 20px; @media (min-width: 768px) { padding-inline: 32px; } }
 

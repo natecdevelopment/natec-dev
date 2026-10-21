@@ -174,7 +174,7 @@ function AccountLink() {
     return () => data.subscription.unsubscribe();
   }, []);
   return (
-    <Link to={signedIn ? "/account" : "/auth"} className="eyebrow !text-[12px] px-2 text-navy/80 hover:text-navy">
+    <Link to={signedIn ? "/account" : "/auth"} className="eyebrow !text-[12px] whitespace-nowrap px-2 text-navy/80 hover:text-navy">
       {signedIn ? "Account" : "Sign in"}
     </Link>
   );

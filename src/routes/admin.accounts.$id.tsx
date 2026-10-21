@@ -71,12 +71,12 @@ function ClientDetail() {
   const [editInfo, setEditInfo] = useState(false);
   const [delAcc, setDelAcc] = useState<DeleteTarget[] | null>(null);
   const [delLogin, setDelLogin] = useState<LoginTarget[] | null>(null);
-  const lock = admins.has((d.loginEmail ?? c.email).toLowerCase());
   const admins = useAdminEmails();
 
   if (q.isLoading) return <ListSkeleton />;
   if (!q.data) return <Card><p>Client not found.</p><Link to="/admin/accounts" search={{ tab: "clients" }} className="btn btn-primary mt-4">Back</Link></Card>;
   const d = q.data, c = d.c;
+  const lock = admins.has((d.loginEmail ?? c.email).toLowerCase());
 
   const waPhone = c.phone.replace(/\D/g, "").replace(/^0/, "880");
   const reminder = d.b?.next_due_date
@@ -162,7 +162,7 @@ function ClientDetail() {
       <Card className="border border-brand-red/30">
         <h2 className="!text-xl text-brand-red">Danger zone</h2>
         <p className="mt-1 text-sm text-muted-foreground">{c.profile_id ? `Login: ${d.loginEmail ?? "linked"}` : "This client has no portal login."}</p>
-        {(() => { const lock = admins.has((d.loginEmail ?? c.email).toLowerCase()); return (
+        {(() => { return (
           <span title={lock ? ADMIN_LOCK_TIP : undefined} className="mt-3 inline-flex">
             <button disabled={lock} onClick={() => setDelAcc([{ profileId: c.profile_id, clientId: c.id, name: c.full_name, email: d.loginEmail ?? (c.email || c.phone), isClient: true }])} className={`${btnDanger} disabled:cursor-not-allowed disabled:opacity-40`}><Trash2 className="h-4 w-4" /> Delete account</button>
           </span>

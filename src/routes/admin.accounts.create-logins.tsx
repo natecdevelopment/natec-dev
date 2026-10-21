@@ -16,10 +16,12 @@ import { fmtDate } from "@/lib/account";
 
 type Tab = "without" | "with" | "all";
 export const Route = createFileRoute("/admin/accounts/create-logins")({
-  validateSearch: (s: Record<string, unknown>): { tab?: Tab; reset?: string } => ({
-    tab: s.tab === "with" || s.tab === "all" ? s.tab : undefined,
-    reset: typeof s.reset === "string" ? s.reset : undefined,
-  }),
+  validateSearch: (s: Record<string, unknown>): { tab?: Tab; reset?: string } => {
+    const o: { tab?: Tab; reset?: string } = {};
+    if (s["tab"] === "with" || s["tab"] === "all") o.tab = s["tab"];
+    if (typeof s["reset"] === "string") o.reset = s["reset"];
+    return o;
+  },
   component: CreateLogins,
 });
 

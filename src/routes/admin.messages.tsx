@@ -27,12 +27,12 @@ function MessagesPage() {
 
   async function toggleRead(id: string, read: boolean) {
     const { error } = await supabase.from("contact_submissions").update({ read_at: read ? new Date().toISOString() : null }).eq("id", id);
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     qc.invalidateQueries({ queryKey: KEY });
   }
   async function remove(id: string) {
     const { error } = await supabase.from("contact_submissions").delete().eq("id", id);
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     toast.success("Message deleted");
     qc.invalidateQueries({ queryKey: KEY });
   }
@@ -75,7 +75,7 @@ function MessagesPage() {
                 <div className="mt-4 flex flex-wrap gap-2">
                   <button onClick={() => toggleRead(m.id, !m.read_at)} className={btnSm}>{m.read_at ? <><Mail className="h-4 w-4" /> Mark unread</> : <><MailOpen className="h-4 w-4" /> Mark as read</>}</button>
                   <Confirm title="Delete this message?" description="This permanently removes the message." onConfirm={() => remove(m.id)}>
-                    <button className={btnDanger}><Trash2 className="h-4 w-4" /> Delete</button>
+                    {(ask) => <button onClick={ask} className={btnDanger}><Trash2 className="h-4 w-4" /> Delete</button>}
                   </Confirm>
                 </div>
               </Card>

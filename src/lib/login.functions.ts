@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { getRequest } from "@tanstack/react-start/server";
 import { createClient } from "@supabase/supabase-js";
+import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { parseLoginId, isSyntheticEmail, LOGIN_FAIL, LOGIN_LIMIT } from "@/lib/login-id";
 
 const input = (d: unknown) => {
@@ -75,4 +76,23 @@ export const requestPasswordReset = createServerFn({ method: "POST" })
     const { error } = await publicClient().auth.resetPasswordForEmail(email, { redirectTo: `${origin}/reset-password` });
     if (error) console.error("reset", error.message);
     return { status: error ? ("error" as const) : ("sent" as const) };
+  });
+
+/** First-login password: only allowed while the caller's profile has must_change_password. */
+export const setFirstPassword = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => ({ password: String((d as Record<string, unknown>)?.["password"] ?? "").slice(0, 200) }))
+  .handler(async ({ data, context }) => {
+    if (data.password.length < 8) return { error: "Use at least 8 characters." };
+    const { data: p } = await context.supabase.from("profiles").select("must_change_password").eq("id", context.userId).maybeSingle();
+    if (!p?.must_change_password) return { error: "Your password is already set." };
+    const db = await admin();
+    const { error } = await db.auth.admin.updateUserById(context.userId, { password: data.password });
+    if (error) return { error: /weak|pwned|known/i.test(error.message) ? "This password is too common. Please choose another." : "Couldn't save your password. Please try again." };
+    await db.from("profiles").update({ must_change_password: false }).eq("id", context.userId);
+    // Password changes end old sessions, so hand back a fresh one.
+    const email = String(context.claims["email"] ?? "");
+    const res = email ? await publicClient().auth.signInWithPassword({ email, password: data.password }) : null;
+    const s = res?.data.session;
+    return s ? { access_token: s.access_token, refresh_token: s.refresh_token } : { access_token: "", refresh_token: "" };
   });

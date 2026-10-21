@@ -8,6 +8,7 @@ import { normalizeBdPhone } from "@/components/InquiryForm";
 import { passwordScore } from "@/lib/money";
 import { safeNext } from "@/lib/account";
 import { signInAny } from "@/lib/login-client";
+import { setFirstPassword } from "@/lib/login.functions";
 import { suggestUsername, USERNAME_RE } from "@/lib/login-id";
 import { EASE, Field, SubmitButton, type SubmitState } from "./AuthFields";
 
@@ -310,10 +311,9 @@ function SetPasswordForm({ onDone }: { onDone: () => void }) {
     setErrs(er); setShake((s) => s + 1);
     if (Object.keys(er).length) return;
     setState("loading");
-    const { data: u } = await supabase.auth.getUser();
-    const { error } = await supabase.auth.updateUser({ password });
-    if (error || !u.user) { setState("idle"); setErrs({ password: error?.message.includes("different") ? "Choose a password different from the current one." : "Couldn't save your password. Please try again." }); return; }
-    await supabase.from("profiles").update({ must_change_password: false }).eq("id", u.user.id);
+    const r = await setFirstPassword({ data: { password } }).catch(() => ({ error: "Couldn't save your password. Please try again." }));
+    if ("error" in r) { setState("idle"); setErrs({ password: r.error }); return; }
+    if (r.access_token) await supabase.auth.setSession({ access_token: r.access_token, refresh_token: r.refresh_token });
     setState("success");
     setTimeout(onDone, 650);
   }

@@ -5,12 +5,12 @@ export const PORTAL_LOGIN_URL = "https://natec-dev.pages.dev/login";
 export const INTERNAL_EMAIL_DOMAIN = "clients.natecdev.com";
 export const internalEmail = (username: string) => `${username}@${INTERNAL_EMAIL_DOMAIN}`;
 
-const TITLES = new Set(["md", "mst", "mrs", "mr", "mohammad", "mohammed", "muhammad"].slice(0, 4));
+const TITLES = new Set(["md", "mst", "mrs", "mr"]);
 
 /** "MD. SHAH ALAM (UNCLE)" → "shahalamuncle" */
 export function usernameFromName(name: string): string {
   const words = name.toLowerCase().replace(/[^a-z0-9\s]/g, " ").split(/\s+/).filter(Boolean);
-  const kept = words.filter((w, i) => !(TITLES.has(w) && i < words.length - 1));
+  const kept = words.filter((w) => !TITLES.has(w));
   return kept.join("").slice(0, 30);
 }
 

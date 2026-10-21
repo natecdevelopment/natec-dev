@@ -14,7 +14,8 @@ const schema = z.object({
 const projects = ["Shobuj Angon", "Shobuj Aloy", "Shobuj Digonto", "Upcoming 2027 projects"];
 const field = "w-full rounded-xl border border-input bg-white px-4 py-3 text-[15px] text-foreground outline-none transition focus:border-navy focus:ring-2 focus:ring-navy/15";
 
-export function InquiryForm({ title = "Send an inquiry" }: { title?: string }) {
+export function InquiryForm({ title = "Send an inquiry", defaultProject = "" }: { title?: string; defaultProject?: string }) {
+  const projectOptions = defaultProject && !projects.includes(defaultProject) ? [defaultProject, ...projects] : projects;
   const [status, setStatus] = useState<"idle" | "sending" | "done" | "error">("idle");
   const [error, setError] = useState("");
 
@@ -53,9 +54,9 @@ export function InquiryForm({ title = "Send an inquiry" }: { title?: string }) {
         <input name="phone" aria-label="Phone number" placeholder="Phone number *" className={field} maxLength={30} />
       </div>
       <input name="email" type="email" aria-label="Email" placeholder="Email address" className={field} maxLength={200} />
-      <select name="service" aria-label="Project or service" className={field} defaultValue="">
+      <select name="service" aria-label="Project or service" className={field} defaultValue={defaultProject}>
         <option value="">Project of interest</option>
-        <optgroup label="Projects">{projects.map((p) => <option key={p}>{p}</option>)}</optgroup>
+        <optgroup label="Projects">{projectOptions.map((p) => <option key={p}>{p}</option>)}</optgroup>
         <optgroup label="Services">{services.map((s) => <option key={s.title}>{s.title}</option>)}</optgroup>
       </select>
       <textarea name="message" aria-label="Message" placeholder="Message *" rows={4} className={field} maxLength={2000} />

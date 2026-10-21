@@ -141,13 +141,55 @@ export function Footer() {
   );
 }
 
-export function PageHero({ eyebrow, title, intro }: { eyebrow: string; title: string; intro?: string }) {
+export type Crumb = { label: string; to?: "/" | "/projects" | "/about" };
+
+/** Shared page hero. With `image` it renders full-bleed (photo + navy veil, copy bottom-left, scroll parallax). */
+export function PageHero({ eyebrow, title, intro, image, imageAlt = "", imagePosition = "center", crumbs, children }: {
+  eyebrow: string; title: React.ReactNode; intro?: React.ReactNode; image?: string | null; imageAlt?: string; imagePosition?: string; crumbs?: Crumb[]; children?: React.ReactNode;
+}) {
+  const [el, setEl] = useState<HTMLElement | null>(null);
+  useEffect(() => {
+    if (!el || !image || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    let raf = 0;
+    const write = () => { raf = 0; el.style.setProperty("--hp", Math.min(1, Math.max(0, window.scrollY / (el.offsetHeight || 1))).toFixed(3)); };
+    const on = () => { if (!raf) raf = requestAnimationFrame(write); };
+    write();
+    window.addEventListener("scroll", on, { passive: true });
+    return () => { window.removeEventListener("scroll", on); if (raf) cancelAnimationFrame(raf); };
+  }, [el, image]);
+  const crumbNav = crumbs && (
+    <nav aria-label="Breadcrumb" className="eyebrow hero-in !text-[11px] text-white/60">
+      {crumbs.map((c, i) => (
+        <span key={i}>
+          {i > 0 && <span aria-hidden> › </span>}
+          {c.to ? <Link to={c.to} className="hover:text-white">{c.label}</Link> : <span aria-current="page" className="text-white/85">{c.label}</span>}
+        </span>
+      ))}
+    </nav>
+  );
+  if (!image) {
+    return (
+      <section className="bg-navy text-white">
+        <div className="container-x py-16 md:py-24">
+          {crumbNav}
+          <p className="eyebrow text-muted-dark">{eyebrow}</p>
+          <h1 className="mt-4 max-w-3xl">{title}</h1>
+          {intro && <p className="mt-5 max-w-[62ch] text-lg text-muted-dark">{intro}</p>}
+          {children}
+        </div>
+      </section>
+    );
+  }
   return (
-    <section className="bg-navy text-white">
-      <div className="container-x py-16 md:py-24">
-        <p className="eyebrow text-muted-dark">{eyebrow}</p>
-        <h1 className="mt-4 max-w-3xl">{title}</h1>
-        {intro && <p className="mt-5 max-w-[62ch] text-lg text-muted-dark">{intro}</p>}
+    <section ref={setEl} className="relative isolate flex min-h-[78svh] items-end overflow-hidden bg-navy text-white md:min-h-[76svh]">
+      <img src={image} alt={imageAlt} width={1600} height={1000} fetchPriority="high" className="about-hero-img absolute inset-0 h-full w-full object-cover" style={{ objectPosition: imagePosition }} />
+      <div className="about-hero-veil absolute inset-0" aria-hidden />
+      <div className="about-hero-copy container-x relative z-10 pb-14 pt-28 md:pb-20">
+        {crumbNav}
+        <p className="eyebrow hero-in mt-8 text-white/70" style={{ animationDelay: "120ms" }}>{eyebrow}</p>
+        <h1 className="hero-in mt-4 max-w-[22ch]" style={{ animationDelay: "220ms" }}>{title}</h1>
+        {intro && <p className="hero-in mt-6 max-w-[56ch] text-lg text-white/85" style={{ animationDelay: "340ms" }}>{intro}</p>}
+        {children && <div className="hero-in mt-9 flex flex-wrap items-center gap-3" style={{ animationDelay: "460ms" }}>{children}</div>}
       </div>
     </section>
   );

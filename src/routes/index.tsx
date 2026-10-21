@@ -29,7 +29,7 @@ const jsonLd = [
       postalCode: "1741",
       addressCountry: "BD",
     },
-    areaServed: { "@type": "AdministrativeArea", name: "Gazipur" },
+    areaServed: { "@type": "AdministrativeArea", name: "Rajendrapur, Sreepur, Gazipur" },
     sameAs: [company.facebook],
   },
   { "@context": "https://schema.org", "@type": "WebSite", "@id": `${SITE}/#website`, name: company.name, url: SITE, inLanguage: "en", publisher: { "@id": `${SITE}/#organization` } },

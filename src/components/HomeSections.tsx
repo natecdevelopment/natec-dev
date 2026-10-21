@@ -307,7 +307,7 @@ export function Board() {
           {directors.map((d) => (
             <Reveal key={d.name} className="flex flex-col rounded-2xl border border-border bg-ivory p-7">
               <div className="flex aspect-square w-20 items-center justify-center rounded-full bg-navy text-white">
-                {d.gender === "female" ? <PersonFemaleIcon className="h-16 w-16" /> : <PersonMaleIcon className="h-16 w-16" />}
+                {d.gender === "female" ? <PersonFemaleIcon className="h-10 w-10" /> : <PersonMaleIcon className="h-10 w-10" />}
               </div>
               <h3 className="mt-5 text-navy">{d.name}</h3>
               <p className="eyebrow mt-1 !text-[11px] text-brand-red">{d.role}</p>

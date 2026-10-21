@@ -131,7 +131,7 @@ function ProjectPage() {
   return (
     <div className="pb-20 lg:pb-0">
       <PageHero
-        image={p.cover?.public_url}
+        image={p.cover?.public_url ?? null}
         imageAlt={p.cover?.alt_text || `${p.name} by Natec Development`}
         crumbs={[{ label: "Home", to: "/" }, { label: "Projects", to: "/projects" }, { label: p.name }]}
         eyebrow={p.project_no || (upcoming ? "Upcoming project" : "Project")}

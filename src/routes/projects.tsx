@@ -21,7 +21,7 @@ function matchesTab(p: Pick<ProjectWithMedia, "kind" | "status">, tab: Tab) {
 
 export const Route = createFileRoute("/projects")({
   validateSearch: (s: Record<string, unknown>): { filter?: Tab } => {
-    const f = String(s.filter ?? "");
+    const f = String(s["filter"] ?? "");
     return (TABS as readonly string[]).includes(f) && f !== "all" ? { filter: f as Tab } : {};
   },
   loader: ({ context }) => context.queryClient.ensureQueryData(publicProjectsQuery),

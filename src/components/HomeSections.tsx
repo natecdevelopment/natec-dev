@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { ArrowRight, MapPin, Building2, ArrowUpDown, Trees, Car, HardHat, Play, MessageCircle, LayoutGrid, FileText, Phone, Mail, BedDouble, Bath, Sofa, UtensilsCrossed, CookingPot, Fence, Ruler } from "lucide-react";
+import { ArrowRight, MapPin, Building2, ArrowUpDown, Trees, Car, HardHat, Play, MessageCircle, LayoutGrid, FileText, Phone, Mail, BedDouble, Bath, Sofa, UtensilsCrossed, CookingPot, Fence, Ruler, Facebook } from "lucide-react";
 import { company, directors } from "@/lib/site";
 import { PersonFemaleIcon, PersonMaleIcon } from "@/components/PersonIcons";
 import { Reveal, WhatsAppIcon } from "@/components/SiteChrome";
@@ -418,7 +418,7 @@ export function VideosSection() {
     Array.from(box.children).forEach((c, i) => { const el = c as HTMLElement; const d = Math.abs(el.offsetLeft + el.offsetWidth / 2 - mid); if (d < dist) { dist = d; best = i; } });
     setSlide(best);
   };
-  const fbBtn = "md:hidden mx-auto mt-5 inline-flex h-10 items-center gap-2 rounded-full border-[1.5px] border-navy px-[18px] font-label text-[12px] uppercase tracking-[0.12em] text-navy";
+  const fbBtn = "self-center mt-5 inline-flex h-10 items-center gap-2 rounded-full border-[1.5px] border-navy px-[18px] font-label text-[12px] uppercase tracking-[0.12em] text-navy";
   return (
     <section className="bg-white py-14 md:py-[120px]" aria-labelledby="videos-h">
       <div className="container-x">

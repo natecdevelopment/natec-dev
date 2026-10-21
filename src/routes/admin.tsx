@@ -1,7 +1,7 @@
 import { createFileRoute, Link, Outlet, useNavigate } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
-import { LayoutDashboard, Film, Building2, Sparkles, Image as ImageIcon, ExternalLink, LogOut, Menu, X, Loader2 } from "lucide-react";
+import { LayoutDashboard, Inbox, Film, Building2, Sparkles, Image as ImageIcon, ExternalLink, LogOut, Menu, X, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/admin")({
@@ -110,6 +110,7 @@ const NAV = [
   { to: "/admin/projects", label: "Projects", icon: Building2 },
   { to: "/admin/upcoming", label: "Upcoming", icon: Sparkles },
   { to: "/admin/media", label: "Media", icon: ImageIcon },
+  { to: "/admin/messages", label: "Messages", icon: Inbox },
 ] as const;
 
 function AdminShell({ email }: { email: string }) {

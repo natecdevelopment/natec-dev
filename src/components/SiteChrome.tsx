@@ -144,8 +144,8 @@ export function Footer() {
 export type Crumb = { label: string; to?: "/" | "/projects" | "/about" };
 
 /** Shared page hero. With `image` it renders full-bleed (photo + navy veil, copy bottom-left, scroll parallax). */
-export function PageHero({ eyebrow, title, intro, image, imageAlt = "", imagePosition = "center", crumbs, children }: {
-  eyebrow: string; title: React.ReactNode; intro?: React.ReactNode; image?: string | null; imageAlt?: string; imagePosition?: string; crumbs?: Crumb[]; children?: React.ReactNode;
+export function PageHero({ eyebrow, title, intro, image, imageAlt = "", imagePosition = "center", crumbs, children, heightClass = "min-h-[78svh] md:min-h-[76svh]" }: {
+  eyebrow: string; title: React.ReactNode; intro?: React.ReactNode; image?: string | null; imageAlt?: string; imagePosition?: string; crumbs?: Crumb[]; children?: React.ReactNode; heightClass?: string;
 }) {
   const [el, setEl] = useState<HTMLElement | null>(null);
   useEffect(() => {
@@ -181,7 +181,7 @@ export function PageHero({ eyebrow, title, intro, image, imageAlt = "", imagePos
     );
   }
   return (
-    <section ref={setEl} className="relative isolate flex min-h-[78svh] items-end overflow-hidden bg-navy text-white md:min-h-[76svh]">
+    <section ref={setEl} className={`relative isolate flex ${heightClass} items-end overflow-hidden bg-navy text-white`}>
       <img src={image} alt={imageAlt} width={1600} height={1000} fetchPriority="high" className="about-hero-img absolute inset-0 h-full w-full object-cover" style={{ objectPosition: imagePosition }} />
       <div className="about-hero-veil absolute inset-0" aria-hidden />
       <div className="about-hero-copy container-x relative z-10 pb-14 pt-28 md:pb-20">

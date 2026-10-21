@@ -1,3 +1,4 @@
+import { UnderConstruction } from "@/components/UnderConstruction";
 import { useRef, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
@@ -40,7 +41,7 @@ export const Route = createFileRoute("/floor-plan")({
       }),
     }],
   }),
-  component: FloorPlanPage,
+  component: () => <UnderConstruction title="Floor Plan" real={FloorPlanPage} />,
   errorComponent: () => <p className="p-10 pt-32 text-center">This page could not be loaded. Please refresh.</p>,
   notFoundComponent: () => <p className="p-10 pt-32 text-center">Not found.</p>,
 });

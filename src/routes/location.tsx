@@ -1,3 +1,4 @@
+import { UnderConstruction } from "@/components/UnderConstruction";
 import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
@@ -55,7 +56,7 @@ export const Route = createFileRoute("/location")({
       },
     ],
   }),
-  component: LocationPage,
+  component: () => <UnderConstruction title="Location" real={LocationPage} />,
   errorComponent: () => <p className="p-10 pt-32 text-center">This page could not be loaded. Please refresh.</p>,
   notFoundComponent: () => <p className="p-10 pt-32 text-center">Not found.</p>,
 });

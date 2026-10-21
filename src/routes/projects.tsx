@@ -1,3 +1,4 @@
+import { UnderConstruction } from "@/components/UnderConstruction";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { PageHero, Reveal, WhatsAppIcon } from "@/components/SiteChrome";
@@ -66,7 +67,7 @@ export const Route = createFileRoute("/projects")({
       },
     ],
   }),
-  component: ProjectsPage,
+  component: () => <UnderConstruction title="Projects" real={ProjectsPage} />,
   errorComponent: () => <p className="p-10 pt-32 text-center">Projects could not be loaded. Please refresh.</p>,
   notFoundComponent: () => <p className="p-10 pt-32 text-center">No projects found.</p>,
 });

@@ -9,7 +9,7 @@ export const Route = createFileRoute("/privacy")({
     { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" },
   ] }),
   component: () => (
-    <section className="bg-ivory px-5 pb-24 pt-36">
+    <section className="bg-ivory px-5 pb-24 pt-16">
       <div className="mx-auto max-w-2xl">
         <p className="eyebrow text-brand-red">Legal</p>
         <h1 className="mt-3 text-primary">Privacy Policy</h1>

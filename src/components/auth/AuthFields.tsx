@@ -61,7 +61,7 @@ export function SubmitButton({ state, children }: { state: SubmitState; children
 /** Thin card shell used by forgot/reset pages. */
 export function AuthCard({ title, intro, children }: { title: string; intro?: string; children: React.ReactNode }) {
   return (
-    <section className="flex min-h-screen items-center justify-center bg-ivory px-4 pb-16 pt-28">
+    <section className="flex min-h-[80vh] items-center justify-center bg-ivory px-4 py-12">
       <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, ease: EASE }} className="w-full max-w-md overflow-hidden rounded-3xl bg-white shadow-2xl">
         <div className="bg-navy px-8 py-6 text-white">
           <img src="/brand/natec-logo-transparent.png" alt="Natec Development Ltd." width={60} height={72} className="h-14 w-auto rounded bg-white/95 p-1" />

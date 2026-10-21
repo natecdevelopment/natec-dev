@@ -241,7 +241,7 @@ function RecordPayment({ open, onClose, clientId, inst, onSaved }: { open: boole
     <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
       <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-2xl">
         <DialogHeader><DialogTitle>Record payment</DialogTitle></DialogHeader>
-        <form onSubmit={submit} onChange={(e) => { const t = e.target as HTMLInputElement; if (t.name === "amount") { setAmount(Number(t.value) || 0); setAlloc({}); } }} className="space-y-4">
+        <form onSubmit={submit} onChange={(e) => { const t = e.target as unknown as HTMLInputElement; if (t.name === "amount") { setAmount(Number(t.value) || 0); setAlloc({}); } }} className="space-y-4">
           <PaymentFields />
           {open_.length > 0 && amount > 0 && (
             <div>

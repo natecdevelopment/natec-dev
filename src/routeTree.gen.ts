@@ -10,8 +10,8 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as AuthRouteImport } from './routes/_auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
+import { Route as AuthpageRouteImport } from './routes/_authpage'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AuthRouteImport } from './routes/auth'
@@ -26,9 +26,9 @@ import { Route as ProjectsRouteImport } from './routes/projects'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as ServicesRouteImport } from './routes/services'
 import { Route as TermsRouteImport } from './routes/terms'
-import { Route as AuthLoginRouteImport } from './routes/_auth.login'
-import { Route as AuthRegisterRouteImport } from './routes/_auth.register'
 import { Route as AuthenticatedAccountRouteImport } from './routes/_authenticated/account'
+import { Route as AuthpageLoginRouteImport } from './routes/_authpage.login'
+import { Route as AuthpageRegisterRouteImport } from './routes/_authpage.register'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as AdminConstructionRouteImport } from './routes/admin.construction'
 import { Route as AdminMediaRouteImport } from './routes/admin.media'
@@ -49,12 +49,12 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthRoute = AuthRouteImport.update({
-  id: '/_auth',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
   id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthpageRoute = AuthpageRouteImport.update({
+  id: '/_authpage',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AboutRoute = AboutRouteImport.update({
@@ -127,20 +127,20 @@ const TermsRoute = TermsRouteImport.update({
   path: '/terms',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthLoginRoute = AuthLoginRouteImport.update({
-  id: '/login',
-  path: '/login',
-  getParentRoute: () => AuthRoute,
-} as any)
-const AuthRegisterRoute = AuthRegisterRouteImport.update({
-  id: '/register',
-  path: '/register',
-  getParentRoute: () => AuthRoute,
-} as any)
 const AuthenticatedAccountRoute = AuthenticatedAccountRouteImport.update({
   id: '/account',
   path: '/account',
   getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthpageLoginRoute = AuthpageLoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => AuthpageRoute,
+} as any)
+const AuthpageRegisterRoute = AuthpageRegisterRouteImport.update({
+  id: '/register',
+  path: '/register',
+  getParentRoute: () => AuthpageRoute,
 } as any)
 const AdminIndexRoute = AdminIndexRouteImport.update({
   id: '/',
@@ -229,9 +229,9 @@ export interface FileRoutesByFullPath {
   '/reset-password': typeof ResetPasswordRoute
   '/services': typeof ServicesRoute
   '/terms': typeof TermsRoute
-  '/login': typeof AuthLoginRoute
-  '/register': typeof AuthRegisterRoute
   '/account': typeof AuthenticatedAccountRoute
+  '/login': typeof AuthpageLoginRoute
+  '/register': typeof AuthpageRegisterRoute
   '/admin/construction': typeof AdminConstructionRoute
   '/admin/media': typeof AdminMediaRoute
   '/admin/messages': typeof AdminMessagesRoute
@@ -262,9 +262,9 @@ export interface FileRoutesByTo {
   '/reset-password': typeof ResetPasswordRoute
   '/services': typeof ServicesRoute
   '/terms': typeof TermsRoute
-  '/login': typeof AuthLoginRoute
-  '/register': typeof AuthRegisterRoute
   '/account': typeof AuthenticatedAccountRoute
+  '/login': typeof AuthpageLoginRoute
+  '/register': typeof AuthpageRegisterRoute
   '/admin/construction': typeof AdminConstructionRoute
   '/admin/media': typeof AdminMediaRoute
   '/admin/messages': typeof AdminMessagesRoute
@@ -284,7 +284,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
-  '/_auth': typeof AuthRouteWithChildren
+  '/_authpage': typeof AuthpageRouteWithChildren
   '/about': typeof AboutRoute
   '/admin': typeof AdminRouteWithChildren
   '/auth': typeof AuthRoute
@@ -299,9 +299,9 @@ export interface FileRoutesById {
   '/reset-password': typeof ResetPasswordRoute
   '/services': typeof ServicesRoute
   '/terms': typeof TermsRoute
-  '/_auth/login': typeof AuthLoginRoute
-  '/_auth/register': typeof AuthRegisterRoute
   '/_authenticated/account': typeof AuthenticatedAccountRoute
+  '/_authpage/login': typeof AuthpageLoginRoute
+  '/_authpage/register': typeof AuthpageRegisterRoute
   '/admin/construction': typeof AdminConstructionRoute
   '/admin/media': typeof AdminMediaRoute
   '/admin/messages': typeof AdminMessagesRoute
@@ -335,9 +335,9 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/services'
     | '/terms'
+    | '/account'
     | '/login'
     | '/register'
-    | '/account'
     | '/admin/construction'
     | '/admin/media'
     | '/admin/messages'
@@ -368,9 +368,9 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/services'
     | '/terms'
+    | '/account'
     | '/login'
     | '/register'
-    | '/account'
     | '/admin/construction'
     | '/admin/media'
     | '/admin/messages'
@@ -389,7 +389,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/_authenticated'
-    | '/_auth'
+    | '/_authpage'
     | '/about'
     | '/admin'
     | '/auth'
@@ -404,9 +404,9 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/services'
     | '/terms'
-    | '/_auth/login'
-    | '/_auth/register'
     | '/_authenticated/account'
+    | '/_authpage/login'
+    | '/_authpage/register'
     | '/admin/construction'
     | '/admin/media'
     | '/admin/messages'
@@ -426,7 +426,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
-  AuthRoute: typeof AuthRouteWithChildren
+  AuthpageRoute: typeof AuthpageRouteWithChildren
   AboutRoute: typeof AboutRoute
   AdminRoute: typeof AdminRouteWithChildren
   AuthRoute: typeof AuthRoute
@@ -454,18 +454,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_auth': {
-      id: '/_auth'
-      path: ''
-      fullPath: '/'
-      preLoaderRoute: typeof AuthRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/_authenticated': {
       id: '/_authenticated'
       path: ''
       fullPath: '/'
       preLoaderRoute: typeof AuthenticatedRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authpage': {
+      id: '/_authpage'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthpageRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/about': {
@@ -566,26 +566,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TermsRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_auth/login': {
-      id: '/_auth/login'
-      path: '/login'
-      fullPath: '/login'
-      preLoaderRoute: typeof AuthLoginRouteImport
-      parentRoute: typeof AuthRoute
-    }
-    '/_auth/register': {
-      id: '/_auth/register'
-      path: '/register'
-      fullPath: '/register'
-      preLoaderRoute: typeof AuthRegisterRouteImport
-      parentRoute: typeof AuthRoute
-    }
     '/_authenticated/account': {
       id: '/_authenticated/account'
       path: '/account'
       fullPath: '/account'
       preLoaderRoute: typeof AuthenticatedAccountRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authpage/login': {
+      id: '/_authpage/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof AuthpageLoginRouteImport
+      parentRoute: typeof AuthpageRoute
+    }
+    '/_authpage/register': {
+      id: '/_authpage/register'
+      path: '/register'
+      fullPath: '/register'
+      preLoaderRoute: typeof AuthpageRegisterRouteImport
+      parentRoute: typeof AuthpageRoute
     }
     '/admin/': {
       id: '/admin/'
@@ -699,17 +699,19 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
 const AuthenticatedRouteRouteWithChildren =
   AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
-interface AuthRouteChildren {
-  AuthLoginRoute: typeof AuthLoginRoute
-  AuthRegisterRoute: typeof AuthRegisterRoute
+interface AuthpageRouteChildren {
+  AuthpageLoginRoute: typeof AuthpageLoginRoute
+  AuthpageRegisterRoute: typeof AuthpageRegisterRoute
 }
 
-const AuthRouteChildren: AuthRouteChildren = {
-  AuthLoginRoute: AuthLoginRoute,
-  AuthRegisterRoute: AuthRegisterRoute,
+const AuthpageRouteChildren: AuthpageRouteChildren = {
+  AuthpageLoginRoute: AuthpageLoginRoute,
+  AuthpageRegisterRoute: AuthpageRegisterRoute,
 }
 
-const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
+const AuthpageRouteWithChildren = AuthpageRoute._addFileChildren(
+  AuthpageRouteChildren,
+)
 
 interface AdminRouteChildren {
   AdminConstructionRoute: typeof AdminConstructionRoute
@@ -746,7 +748,7 @@ const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
-  AuthRoute: AuthRouteWithChildren,
+  AuthpageRoute: AuthpageRouteWithChildren,
   AboutRoute: AboutRoute,
   AdminRoute: AdminRouteWithChildren,
   AuthRoute: AuthRoute,

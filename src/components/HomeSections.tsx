@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, type KeyboardEvent as ReactKeyboardEvent } from "react";
+import { ProjectFacts } from "@/components/ProjectFacts";
 import { Link } from "@tanstack/react-router";
 import { ArrowRight, MapPin, Building2, ArrowUpDown, Trees, Car, HardHat, Play, MessageCircle, LayoutGrid, FileText, Phone, Mail, BedDouble, Bath, Sofa, UtensilsCrossed, CookingPot, Fence, Ruler, Facebook } from "lucide-react";
 import { company, directors } from "@/lib/site";
@@ -115,11 +116,12 @@ export function ProjectsShowcase() {
                 <div className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(4,26,56,0.92) 0%, rgba(4,26,56,0.35) 45%, transparent 70%)" }} />
                 <span className={`eyebrow absolute left-5 top-5 rounded-full px-3 py-1.5 !text-[10px] ${p.status === "Completed" ? "bg-success text-white" : "bg-white text-navy"}`}>{p.status}</span>
                 <AvailabilityBadge text={p.availability} className="absolute right-5 top-5" />
+                <ProjectFacts p={p} tone="glass" className="absolute inset-x-5 top-[64px]" />
                 <div className="absolute inset-x-0 bottom-0 p-6">
                   <p className="eyebrow !text-[10px] text-white/70">{p.project_no}</p>
                   <h3 className="!text-3xl"><Link to="/projects/$slug" params={{ slug: p.slug }} className="hover:underline">{p.name}</Link></h3>
                   <p className="mt-1 text-sm text-muted-dark">{p.address}</p>
-                  <p className="text-sm text-muted-dark">Residential building, {p.building_type} · {p.total_flats} flats</p>
+                  {p.building_type && <p className="text-sm text-muted-dark">Residential building, {p.building_type}</p>}
                   <div className="mt-4">
                     <div className="flex justify-between text-xs"><span className="eyebrow !text-[10px]">Construction</span><span className="num">{p.progress_pct}%</span></div>
                     <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-white/20"><div className="h-full rounded-full bg-brand-red" style={{ width: `${p.progress_pct}%` }} /></div>

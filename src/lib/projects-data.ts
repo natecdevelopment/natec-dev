@@ -51,3 +51,33 @@ async function fetchPublishedVideos(): Promise<VideoRow[]> {
   return data ?? [];
 }
 export const publicVideosQuery = queryOptions({ queryKey: ["public-videos"], queryFn: fetchPublishedVideos, staleTime: 30_000 });
+
+/* ---------- Key facts shown on project cards (units · storeys · flat size) ---------- */
+const nf = new Intl.NumberFormat("en-IN", { maximumFractionDigits: 0 });
+
+/** Storeys: the admin "Number of floors" field, else read from building type, e.g. "B+G+7 (8-storey)" → 8. */
+export function storeysOf(p: Pick<ProjectRow, "total_floors" | "building_type">): number | null {
+  if (p.total_floors) return p.total_floors;
+  const m = /(\d+)\s*-?\s*stor(e)?y/i.exec(p.building_type ?? "");
+  return m ? Number(m[1]) : null;
+}
+
+/** Flat size: the admin "Flat sizes" text, else the min–max of the unit types, e.g. "1,276–1,353 sft". */
+export function flatSizeOf(p: Pick<ProjectWithMedia, "flat_sizes" | "units">): string | null {
+  if (p.flat_sizes?.trim()) return p.flat_sizes.trim();
+  const sizes = (p.units ?? []).map((u) => Number(u.size_sqft)).filter((n) => n > 0);
+  if (!sizes.length) return null;
+  const lo = Math.round(Math.min(...sizes)), hi = Math.round(Math.max(...sizes));
+  return lo === hi ? `${nf.format(lo)} sft` : `${nf.format(lo)}–${nf.format(hi)} sft`;
+}
+
+export type ProjectFact = { label: string; value: string };
+export function projectFacts(p: ProjectWithMedia): ProjectFact[] {
+  const facts: ProjectFact[] = [];
+  if (p.total_flats) facts.push({ label: "Units", value: nf.format(p.total_flats) });
+  const storeys = storeysOf(p);
+  if (storeys) facts.push({ label: "Storeys", value: String(storeys) });
+  const size = flatSizeOf(p);
+  if (size) facts.push({ label: "Flat size", value: size });
+  return facts;
+}

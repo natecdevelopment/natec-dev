@@ -1,10 +1,11 @@
 import { Link } from "@tanstack/react-router";
-import { Building2, Home, MapPin } from "lucide-react";
+import { Building2, MapPin } from "lucide-react";
 import { WhatsAppIcon } from "@/components/SiteChrome";
 import { waMessage } from "@/components/ProjectsGrid";
 import type { ProjectWithMedia } from "@/lib/projects-data";
 import { SaveHeart } from "@/components/SaveHeart";
 import { isListed } from "@/lib/construction-data";
+import { ProjectFacts } from "@/components/ProjectFacts";
 
 export function StatusBadge({ p, className = "" }: { p: ProjectWithMedia; className?: string }) {
   const upcoming = p.kind === "upcoming";
@@ -32,12 +33,12 @@ export function ProjectCard({ p }: { p: ProjectWithMedia }) {
         <SaveHeart projectId={p.id} name={p.name} className="absolute right-3 top-3" />
       </div>
       <div className="flex flex-1 flex-col p-6">
+        <ProjectFacts p={p} className="mb-5" />
         {p.project_no && <p className="eyebrow !text-[11px] text-brand-red">{p.project_no}</p>}
         <h3 className="mt-1 !text-2xl text-primary">{p.name}</h3>
         <ul className="mt-4 space-y-2 text-sm text-muted-foreground">
           {(p.location_short || p.address) && <li className="flex gap-2"><MapPin className="mt-0.5 h-4 w-4 shrink-0 text-navy" />{p.location_short || p.address}</li>}
           {p.building_type && <li className="flex gap-2"><Building2 className="mt-0.5 h-4 w-4 shrink-0 text-navy" />{p.building_type}</li>}
-          {p.total_flats != null && <li className="flex gap-2"><Home className="mt-0.5 h-4 w-4 shrink-0 text-navy" />{p.total_flats} flats</li>}
         </ul>
         {!upcoming && (
           <div className="mt-5">

@@ -78,6 +78,13 @@
       "when": 1792603852029,
       "tag": "0010_admin_revoke_sessions",
       "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1792606148251,
+      "tag": "0011_clients_is_demo",
+      "breakpoints": true
     }
   ]
 }

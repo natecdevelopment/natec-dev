@@ -117,6 +117,7 @@ function AccountPage() {
         </aside>
 
         <main className="min-w-0">
+          {client.data?.client.is_demo && <p role="status" className="mb-4 rounded-xl border border-amber-300 bg-amber-50 px-4 py-2 text-sm font-medium text-amber-900">This is a demo account. Figures are examples only.</p>}
           {profile.isLoading ? <div className="h-64 animate-pulse rounded-2xl bg-white" /> : p?.status === "suspended" ? (
             <div className="rounded-2xl bg-white p-8 text-center shadow-sm"><h1 className="!text-3xl text-navy">Account suspended</h1><p className="mt-3 text-muted-foreground">Your account is currently suspended. Please contact Natec for help.</p><a href={company.whatsappLink} target="_blank" rel="noreferrer" className="btn btn-primary mt-6"><WhatsAppIcon /> WhatsApp us</a></div>
           ) : (

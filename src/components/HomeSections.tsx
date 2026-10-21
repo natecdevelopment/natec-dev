@@ -60,7 +60,7 @@ export function Intro() {
               <img src={homeSketch} alt="Hand-drawn sketch of a modern family home surrounded by trees" loading="lazy" width={973} height={509} className="w-[168px] shrink-0 md:w-[232px]" />
               <div className="min-w-0 md:border-l md:border-border md:pl-6">
                 <p className="font-label text-[10px] font-medium uppercase leading-[1.9] tracking-[0.3em] text-navy md:text-[11px]">
-                  Building trust,<br className="hidden sm:block" /> generation after generation
+                  Building trust,<br /> generation after generation
                 </p>
                 <VintageKeyIcon className="mt-3 h-[15px] w-[30px] text-brand-red" />
               </div>

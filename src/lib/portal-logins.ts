@@ -51,7 +51,7 @@ export function proposeUsernames(clients: LoginCandidate[], takenUsernames: Set<
 }
 
 /** "Natec-" + 4 random digits. */
-export function tempPassword(rand: (a: Uint32Array) => Uint32Array = (a) => crypto.getRandomValues(a)): string {
+export function tempPassword(rand: (a: Uint32Array<ArrayBuffer>) => Uint32Array = (a) => crypto.getRandomValues(a)): string {
   const n = rand(new Uint32Array(1))[0]! % 10000;
   return `Natec-${String(n).padStart(4, "0")}`;
 }

@@ -1,4 +1,5 @@
 import { Link, useLocation } from "@tanstack/react-router";
+import { supabase } from "@/integrations/supabase/client";
 import { useEffect, useState } from "react";
 import { Menu, X, Phone, Mail, MapPin } from "lucide-react";
 import { company } from "@/lib/site";
@@ -79,6 +80,7 @@ export function Header() {
             ))}
           </nav>
           <div className="flex items-center gap-2">
+            <AccountLink />
             <a href={company.whatsappLink} target="_blank" rel="noreferrer" className="btn btn-primary hidden !px-5 !py-3 sm:inline-flex">
               <WhatsAppIcon /> WhatsApp
             </a>
@@ -162,4 +164,18 @@ export function Reveal({ children, className = "", as: Tag = "div" }: { children
     return () => io.disconnect();
   }, [el]);
   return <Tag ref={setEl as never} className={`reveal ${className}`}>{children}</Tag>;
+}
+
+function AccountLink() {
+  const [signedIn, setSignedIn] = useState(false);
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data }) => setSignedIn(!!data.session));
+    const { data } = supabase.auth.onAuthStateChange((_e, s) => setSignedIn(!!s));
+    return () => data.subscription.unsubscribe();
+  }, []);
+  return (
+    <Link to={signedIn ? "/account" : "/auth"} className="eyebrow !text-[12px] px-2 text-navy/80 hover:text-navy">
+      {signedIn ? "Account" : "Sign in"}
+    </Link>
+  );
 }

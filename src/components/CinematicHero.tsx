@@ -36,11 +36,12 @@ function Buttons({ kind }: { kind: "intro" | "end" }) {
 }
 
 function ChapterBody({ c, first }: { c: Chapter; first?: boolean }) {
-  const H = first ? "h1" : "h2";
+  // Only the first chapter is a heading (the page's single H1); the others are styled text.
+  const H = first ? "h1" : "p";
   return (
     <>
       {c.eyebrow && <p className="eyebrow !text-[11px] text-white/85 desk:!text-[13px]" style={bodyShadow}>{c.eyebrow}</p>}
-      <H className="mt-3 !text-[clamp(2rem,9vw,2.6rem)] text-white desk:!text-[clamp(2.6rem,6vw,5.2rem)]" style={headShadow}>{c.title}</H>
+      <H className="mt-3 font-display font-medium leading-[1.05] tracking-[-0.015em] !text-[clamp(2rem,9vw,2.6rem)] text-white desk:!text-[clamp(2.6rem,6vw,5.2rem)]" style={headShadow}>{c.title}</H>
       {c.body && <p className="mt-3 max-w-[62ch] text-[15px] font-medium desk:mt-4 desk:text-[17px]" style={bodyShadow}>{c.body}</p>}
       {c.cta && <Buttons kind={c.cta} />}
     </>

@@ -1,11 +1,15 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { ArrowRight, MapPin, ShieldCheck, ArrowUpDown, Trees, Car, Lock, Phone, Mail, BedDouble, Bath, Sofa, UtensilsCrossed, CookingPot, Fence, Ruler } from "lucide-react";
+import { ArrowRight, MapPin, Building2, ArrowUpDown, Trees, Car, HardHat, Play, MessageCircle, KeyRound, LayoutGrid, FileText, Phone, Mail, BedDouble, Bath, Sofa, UtensilsCrossed, CookingPot, Fence, Ruler } from "lucide-react";
 import { company, directors } from "@/lib/site";
 import { PersonFemaleIcon, PersonMaleIcon } from "@/components/PersonIcons";
 import { Reveal, WhatsAppIcon } from "@/components/SiteChrome";
 import { InquiryForm } from "@/components/InquiryForm";
 import { frameSrc } from "@/components/CinematicHero";
+import { useQuery } from "@tanstack/react-query";
+import { publicVideosQuery, type VideoRow } from "@/lib/projects-data";
+import { youtubeThumb } from "@/lib/video";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { AvailabilityBadge, ProjectCta, UpcomingCards, usePublicProjects } from "@/components/ProjectsGrid";
 import { VintageKeyIcon } from "@/components/VintageKeyIcon";
 import homeSketch from "@/assets/home-sketch.png";
@@ -44,9 +48,9 @@ function CountUp({ to, suffix = "" }: { to: number; suffix?: string | undefined 
 export function Intro() {
   const stats = [
     { n: 2023, l: "Established" },
+    { n: 75, l: "Homes delivered & under construction" },
     { n: 3, l: "Projects" },
-    { n: 5, l: "Directors" },
-    { n: 100, s: "%", l: "On-site supervision" },
+    { n: 100, s: "%", l: "Sold" },
   ];
   return (
     <section className="section-pad bg-ivory">
@@ -54,7 +58,7 @@ export function Intro() {
         <Reveal className="grid gap-10 md:grid-cols-[1.2fr_1fr] md:gap-16">
           <div>
             <h2 className="text-navy">
-              We build homes the careful way — <em className="accent-light">so families can live in them for generations.</em>
+              A real estate developer <em className="accent-light">rooted in Sreepur, Gazipur.</em>
             </h2>
             <div className="mt-9 flex flex-wrap items-center gap-x-6 gap-y-5 md:mt-11">
               <img src={homeSketch} alt="Hand-drawn sketch of a modern family home surrounded by trees" loading="lazy" width={973} height={509} className="w-[168px] shrink-0 md:w-[232px]" />
@@ -68,8 +72,9 @@ export function Intro() {
           </div>
           <div className="max-w-[62ch] space-y-4 text-muted-foreground">
             <Eyebrow>About Natec</Eyebrow>
-            <p>Established in 2023, Natec Development Ltd. is a real estate development company based in Sreepur, Gazipur. We support clients through every key stage — land acquisition, project planning, building design, construction management, marketing, sales and property management.</p>
-            <p>We approach each project with careful planning, clear communication and close attention to what our clients need.</p>
+            <p>Natec Development Ltd. is a real estate developer in Gazipur, established in 2023 and based at Rajendrapur Bazar, Sreepur. Our three residential buildings — Shobuj Angon, Shobuj Aloy and Shobuj Digonto — add up to 75 flats in Sreepur, and every one of them is sold.</p>
+            <p>We handle the whole journey: land acquisition, project planning, financing guidance, permits and approvals, building design, construction management, marketing and sales, and property management. Two upcoming projects in Gazipur are next.</p>
+            <p lang="bn" className="font-display text-lg text-navy">গাজীপুরের শ্রীপুরে পরিকল্পিত আবাসন</p>
             <Link to="/about" className="inline-flex items-center gap-2 font-semibold text-navy hover:text-brand-red">More about us <ArrowRight className="h-4 w-4" /></Link>
           </div>
         </Reveal>
@@ -97,7 +102,7 @@ export function ProjectsShowcase() {
         <Reveal className="mb-12 flex flex-wrap items-end justify-between gap-6">
           <div>
             <Eyebrow dark>Our projects</Eyebrow>
-            <h2 className="mt-3">Homes taking shape <em className="accent-dark">across Gazipur.</em></h2>
+            <h2 className="mt-3">Our residential projects <em className="accent-dark">in Gazipur.</em></h2>
             {flats > 0 && <p className="mt-4 text-lg text-muted-dark">{flats} homes delivered or under construction{allSold ? " — all sold." : "."}</p>}
           </div>
           <Link to="/projects" className="btn btn-ghost-dark">All projects</Link>
@@ -125,7 +130,8 @@ export function ProjectsShowcase() {
             </Reveal>
           ))}
         </div>
-        {upcoming.length > 0 && <h3 className="eyebrow mb-6 mt-16 !text-[13px] text-muted-dark">Upcoming projects</h3>}
+        {upcoming.length > 0 && <h3 className="eyebrow mb-2 mt-16 !text-[13px] text-muted-dark">Upcoming projects in Gazipur</h3>}
+        {upcoming.length > 0 && <p className="mb-6 text-muted-dark">Current buildings are sold out — register now for the next apartments in Gazipur.</p>}
         <UpcomingCards dark />
       </div>
     </section>
@@ -175,12 +181,12 @@ export function FloorPlan() {
 
 /* ---------- 4. Why Natec ---------- */
 const WHY = [
-  { i: MapPin, t: "Prime location", b: "Minutes from Rajendrapur Bazar and the Dhaka–Mymensingh Highway." },
-  { i: ShieldCheck, t: "Earthquake-resistant RCC structure", b: "Engineered frame, tested materials, checked at every floor." },
-  { i: ArrowUpDown, t: "Lift & generator backup", b: "Daily comfort, even during power cuts." },
-  { i: Trees, t: "Rooftop garden", b: "Open green space above the city." },
-  { i: Car, t: "Car parking", b: "Secure parking on the ground floor." },
-  { i: Lock, t: "24/7 security", b: "Guarded entry and CCTV for peace of mind." },
+  { i: MapPin, t: "Prime Rajendrapur location", b: "Our buildings sit close to Rajendrapur Bazar in Sreepur, Gazipur." },
+  { i: Building2, t: "Planned RCC buildings", b: "Each residential building is planned as a reinforced-concrete structure." },
+  { i: ArrowUpDown, t: "Lift and generator backup", b: "[confirm: which projects have a lift and generator backup]" },
+  { i: Trees, t: "Rooftop spaces", b: "Open rooftops for fresh air and family time." },
+  { i: Car, t: "Car parking", b: "[confirm: parking details, e.g. ground-floor spaces per building]" },
+  { i: HardHat, t: "On-site supervision", b: "Our team oversees the work on site, floor by floor." },
 ];
 
 export function WhyNatec() {
@@ -193,15 +199,15 @@ export function WhyNatec() {
     </Reveal>
   );
   return (
-    <section className="section-pad bg-white">
+    <section className="section-pad bg-ivory">
       <div className="container-x">
         <Reveal className="mb-12 max-w-2xl">
           <Eyebrow>Why Natec</Eyebrow>
-          <h2 className="mt-3 text-navy">Everything a family <em className="accent-light">needs, built in.</em></h2>
+          <h2 className="mt-3 text-navy">Why families <em className="accent-light">choose Natec.</em></h2>
         </Reveal>
         <div className="grid gap-5 md:grid-cols-3">
           <Reveal className="relative min-h-[420px] overflow-hidden rounded-2xl md:row-span-2">
-            <img src={frameSrc("d", 53)} alt="Rooftop garden view of a Natec building" loading="lazy" width={1920} height={1080} className="absolute inset-0 h-full w-full object-cover" />
+            <img src={frameSrc("d", 53)} alt="Open rooftop space on a Natec residential building in Sreepur, Gazipur" loading="lazy" width={1920} height={1080} className="absolute inset-0 h-full w-full object-cover" />
             <div className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(4,26,56,0.85), transparent 60%)" }} />
             <div className="absolute inset-x-0 bottom-0 p-7 text-white">
               <span className="mb-4 block h-2 w-2 rounded-full bg-brand-red" />
@@ -246,7 +252,7 @@ export function HowWeBuild() {
       <div className="container-x">
         <Reveal className="mb-14 max-w-2xl">
           <Eyebrow dark>How we build</Eyebrow>
-          <h2 className="mt-3">Five stages. <em className="accent-dark">One team.</em></h2>
+          <h2 className="mt-3">How we build, <em className="accent-dark">step by step.</em></h2>
         </Reveal>
         <ol ref={ref} className="relative grid gap-10 pl-10 md:grid-cols-5 md:gap-6 md:pl-0 md:pt-12">
           <div aria-hidden className="absolute bottom-0 left-[11px] top-0 w-px bg-line-dark md:left-0 md:right-0 md:top-[11px] md:h-px md:w-auto" />
@@ -267,16 +273,16 @@ export function HowWeBuild() {
 
 /* ---------- 6. Location ---------- */
 const NEARBY = [
-  { t: "Rajendrapur Bazar", d: "2 min" },
-  { t: "Dhaka–Mymensingh Highway", d: "10 min" },
-  { t: "Schools & colleges", d: "5 min" },
-  { t: "Hospital", d: "10 min" },
-  { t: "Market & shopping", d: "3 min" },
+  { t: "Rajendrapur Bazar", d: "[x min]" },
+  { t: "Dhaka–Mymensingh Highway", d: "[x min]" },
+  { t: "Schools & colleges", d: "[x min]" },
+  { t: "Hospital", d: "[x min]" },
+  { t: "Market & shopping", d: "[x min]" },
 ];
 
 export function Location() {
   return (
-    <section className="section-pad bg-ivory">
+    <section className="section-pad bg-white">
       <div className="container-x grid gap-10 md:grid-cols-[1fr_1.4fr]">
         <Reveal>
           <Eyebrow>Location</Eyebrow>
@@ -300,7 +306,7 @@ export function Location() {
 /* ---------- 7. Board ---------- */
 export function Board() {
   return (
-    <section className="section-pad bg-white">
+    <section className="section-pad bg-ivory">
       <div className="container-x">
         <Reveal className="mb-12 max-w-2xl">
           <Eyebrow>Board of directors</Eyebrow>
@@ -308,7 +314,7 @@ export function Board() {
         </Reveal>
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {directors.map((d) => (
-            <Reveal key={d.name} className="flex flex-col rounded-2xl border border-border bg-ivory p-7">
+            <Reveal key={d.name} className="flex flex-col rounded-2xl border border-border bg-white p-7">
               <div className="flex aspect-square w-20 items-center justify-center rounded-full bg-navy text-white">
                 {d.gender === "female" ? <PersonFemaleIcon className="h-10 w-10" /> : <PersonMaleIcon className="h-10 w-10" />}
               </div>

@@ -24,3 +24,31 @@ describe("money rules", () => {
     expect(r.unapplied).toBe(0);
   });
 });
+
+import { computePlan, type PlanForm } from "./money";
+const base: PlanForm = { total: 758242, booking: 54444, count: 24, freqMonths: 3, firstDue: "2026-11-01", instAmount: 25000, downManual: null, downDue: "", round: 1000 };
+describe("payment plan builder", () => {
+  it("instalment amount given → down payment is the rest (user example)", () => {
+    const r = computePlan(base, "2026-10-01");
+    expect(r.down).toBe(103798);
+    expect(r.rows.reduce((s, x) => s + x.amount, 0)).toBe(758242);
+    expect(r.rows[1]).toEqual({ due_date: "2026-10-31", amount: 103798, label: "Down payment" });
+    expect(r.rows[3]!.due_date).toBe("2027-02-01");
+  });
+  it("instalments too big → blocking error", () => {
+    expect(computePlan({ ...base, instAmount: 40000 }, "2026-10-01").errors.instAmount).toMatch(/more than the price/);
+  });
+  it("no instalment amount → down 0, rounded down, last absorbs", () => {
+    const r = computePlan({ ...base, instAmount: null }, "2026-10-01");
+    expect(r.down).toBe(0); expect(r.each).toBe(29000); expect(r.last).toBe(703798 - 29000 * 23);
+    expect(r.rows.reduce((s, x) => s + x.amount, 0)).toBe(758242);
+  });
+  it("manual down payment → reverse mode", () => {
+    const r = computePlan({ ...base, instAmount: null, downManual: 103798 }, "2026-10-01");
+    expect(r.each).toBe(25000); expect(r.last).toBe(25000);
+  });
+  it("31st clamps to month end", () => {
+    const r = computePlan({ ...base, firstDue: "2027-01-31", freqMonths: 1, instAmount: null }, "2026-10-01");
+    expect(r.rows[1]!.due_date).toBe("2027-01-31"); expect(r.rows[2]!.due_date).toBe("2027-02-28");
+  });
+});

@@ -7,7 +7,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, PageTitle, btnDanger, btnSm } from "@/components/admin/ui";
 import { normalizeBdPhone } from "@/components/InquiryForm";
 import { PAYMENT_METHODS, PAYMENT_TYPES, fmtDate } from "@/lib/account";
-import { allocatePayment, generateSchedule, taka, type ScheduleRow } from "@/lib/money";
+import { addDays, allocatePayment, computePlan, taka, type ScheduleRow } from "@/lib/money";
+import { PaymentPlanForm, initialPlanState, planBlocker } from "@/components/admin/PaymentPlanForm";
 
 export const Route = createFileRoute("/admin/accounts/new")({
   validateSearch: (s: Record<string, unknown>): { profile?: string } => (typeof s["profile"] === "string" ? { profile: s["profile"] } : {}),
@@ -25,8 +26,14 @@ function NewClient() {
   const [step, setStep] = useState(0);
   const [busy, setBusy] = useState(false);
   const [c, setC] = useState({ full_name: "", phone: "", email: "", address: "", profile_id: profile ?? "", project_id: "", flat_no: "", floor: "", size_sft: "", parking: false, booking_date: today(), agreement_date: "", payment_plan_note: "" });
-  const [plan, setPlan] = useState({ total: 0, booking: 0, down: 0, count: 24, frequency: "monthly" as "monthly" | "quarterly" | "custom", firstDue: today() });
-  const [rows, setRows] = useState<ScheduleRow[]>([]);
+  const [ps, setPs] = useState(() => initialPlanState(today()));
+  const plan = ps.plan, rows = ps.rows;
+  useEffect(() => {
+    // keep the default down-payment due date = booking date + 30 days while the admin hasn't changed it
+    if (!c.booking_date) return;
+    setPs((s) => { const plan = { ...s.plan, downDue: addDays(c.booking_date, 30) }; return s.dirty ? { ...s, plan } : { plan, rows: computePlan(plan, c.booking_date).rows, dirty: false }; });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [c.booking_date]);
   const [pays, setPays] = useState<Pay[]>([]);
   const set = (k: keyof typeof c, v: string | boolean) => setC((x) => ({ ...x, [k]: v }));
 
@@ -42,14 +49,12 @@ function NewClient() {
     queryFn: async () => (await supabase.from("profiles").select("id, email, full_name").ilike("email", `%${emailSearch.trim()}%`).limit(6)).data ?? [],
   });
 
-  const planned = rows.reduce((s, r) => s + Number(r.amount || 0), 0);
-  const remaining = plan.total - planned;
   const paid = pays.reduce((s, p) => s + Number(p.amount || 0), 0);
 
   function validate(): string | null {
     if (step === 0) { if (!c.full_name.trim()) return "Enter the client's name."; if (!normalizeBdPhone(c.phone)) return "Enter a valid Bangladesh mobile number."; if (c.email && !/^\S+@\S+\.\S+$/.test(c.email)) return "Email looks wrong."; }
     if (step === 1 && !c.project_id) return "Choose a project.";
-    if (step === 2) { if (plan.total <= 0) return "Enter the total price."; if (Math.abs(remaining) > 0.5) return `The schedule must add up to the total price (${taka(remaining)} ${remaining > 0 ? "left to plan" : "over"}).`; }
+    if (step === 2) { const b = planBlocker(ps, c.booking_date); if (b) return b; }
     if (step === 3 && pays.some((p) => !(p.amount > 0) || !p.paid_on)) return "Each payment needs a date and an amount.";
     return null;
   }
@@ -80,7 +85,7 @@ function NewClient() {
 
   const input = "admin-input mt-1";
   return (
-    <div className="max-w-4xl">
+    <div className="max-w-5xl">
       <Link to="/admin/accounts" search={{ tab: "clients" }} className="mb-3 inline-flex items-center gap-1 text-sm text-navy"><ArrowLeft className="h-4 w-4" /> Clients</Link>
       <PageTitle title="Add client" />
       <ol className="mb-6 flex flex-wrap gap-2">
@@ -124,32 +129,7 @@ function NewClient() {
         )}
         {step === 2 && (
           <div className="space-y-5">
-            <div className="grid gap-4 md:grid-cols-3">
-              {([["total", "Total price (৳)"], ["booking", "Booking money (৳)"], ["down", "Down payment (৳)"], ["count", "Number of instalments"]] as const).map(([k, l]) => (
-                <label key={k} className="text-sm font-medium text-navy">{l}<input type="number" min={0} value={plan[k] || ""} onChange={(e) => setPlan((p) => ({ ...p, [k]: Number(e.target.value) }))} className={input} /></label>
-              ))}
-              <label className="text-sm font-medium text-navy">Frequency
-                <select value={plan.frequency} onChange={(e) => setPlan((p) => ({ ...p, frequency: e.target.value as typeof plan.frequency }))} className={input}><option value="monthly">Monthly</option><option value="quarterly">Quarterly</option><option value="custom">Custom (edit dates)</option></select>
-              </label>
-              <label className="text-sm font-medium text-navy">First due date<input type="date" value={plan.firstDue} onChange={(e) => setPlan((p) => ({ ...p, firstDue: e.target.value }))} className={input} /></label>
-            </div>
-            <div className="flex flex-wrap items-center gap-3">
-              <button type="button" onClick={() => setRows(generateSchedule({ ...plan, bookingDate: c.booking_date }))} className="btn btn-primary !py-2">Generate schedule</button>
-              <button type="button" onClick={() => setRows((r) => [...r, { due_date: plan.firstDue, amount: Math.max(0, remaining), label: "Instalment" }])} className={btnSm}><Plus className="h-4 w-4" /> Add row</button>
-              <span className={`text-sm font-semibold ${Math.abs(remaining) > 0.5 ? "text-brand-red" : "text-navy"}`} aria-live="polite">Remaining to plan: {taka(remaining)}</span>
-            </div>
-            {rows.length > 0 && (
-              <ul className="space-y-2">
-                {rows.map((r, i) => (
-                  <li key={i} className="grid gap-2 sm:grid-cols-[160px_1fr_160px_auto]">
-                    <input type="date" value={r.due_date} aria-label="Due date" onChange={(e) => setRows((rs) => rs.map((x, j) => (j === i ? { ...x, due_date: e.target.value } : x)))} className="admin-input" />
-                    <input value={r.label} aria-label="Label" onChange={(e) => setRows((rs) => rs.map((x, j) => (j === i ? { ...x, label: e.target.value } : x)))} className="admin-input" />
-                    <input type="number" min={0} value={r.amount} aria-label="Amount" onChange={(e) => setRows((rs) => rs.map((x, j) => (j === i ? { ...x, amount: Number(e.target.value) } : x)))} className="admin-input" />
-                    <button type="button" onClick={() => setRows((rs) => rs.filter((_, j) => j !== i))} className={btnDanger} aria-label="Remove row"><Trash2 className="h-4 w-4" /></button>
-                  </li>
-                ))}
-              </ul>
-            )}
+            <PaymentPlanForm value={ps} onChange={setPs} bookingDate={c.booking_date} />
             <label className="block text-sm font-medium text-navy">Payment plan note<textarea value={c.payment_plan_note} onChange={(e) => set("payment_plan_note", e.target.value)} rows={2} className={input} /></label>
           </div>
         )}

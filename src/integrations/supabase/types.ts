@@ -935,6 +935,7 @@ export type Database = {
         Args: { _client_id: string }
         Returns: undefined
       }
+      admin_revoke_sessions: { Args: { _uid: string }; Returns: undefined }
       admin_save_client: {
         Args: {
           _changes: Json

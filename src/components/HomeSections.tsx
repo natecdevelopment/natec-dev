@@ -72,7 +72,7 @@ export function Intro() {
           </div>
           <div className="max-w-[62ch] space-y-4 text-muted-foreground">
             <Eyebrow>About Natec</Eyebrow>
-            <p>Natec Development Ltd. is a real estate developer in Gazipur, established in 2023 and based at Rajendrapur Bazar, Sreepur. Our three residential buildings — Shobuj Angon, Shobuj Aloy and Shobuj Digonto — add up to 75 flats in Sreepur, and every one of them is sold.</p>
+            <p>Natec Development Ltd. is a real estate developer in Gazipur and a young apartment developer in Bangladesh, established in 2023 and based at Rajendrapur Bazar, Sreepur. Our three residential buildings — Shobuj Angon, Shobuj Aloy and Shobuj Digonto — add up to 75 flats in Sreepur, and every one of them is sold.</p>
             <p>We handle the whole journey: land acquisition, project planning, financing guidance, permits and approvals, building design, construction management, marketing and sales, and property management. Two upcoming projects in Gazipur are next.</p>
             <p lang="bn" className="font-display text-lg text-navy">গাজীপুরের শ্রীপুরে পরিকল্পিত আবাসন</p>
             <Link to="/about" className="inline-flex items-center gap-2 font-semibold text-navy hover:text-brand-red">More about us <ArrowRight className="h-4 w-4" /></Link>
@@ -511,7 +511,7 @@ export function BuyingSteps() {
 /* ---------- FAQ ---------- */
 export const FAQS = [
   { q: "Where are Natec's projects located?", a: "Our projects are in Rajendrapur Bazar, Sreepur, Gazipur: Shobuj Angon and Shobuj Aloy at Padma Gate, and Shobuj Digonto at Pepsi Gate. Our two upcoming projects are in Rajendrapur Bazar and Gazipur." },
-  { q: "Are there flats available now?", a: "All 75 flats in our three current projects are sold out. Register your interest for our upcoming projects in Gazipur and we will contact you first." },
+  { q: "Are there flats available now?", a: "There are no ready flats left right now — all 75 flats in our three current projects are sold out. Register your interest for our upcoming projects in Gazipur and we will contact you first." },
   { q: "How do I book a site visit?", a: `Message us on WhatsApp at ${company.whatsapp} or call ${company.phone}, and we will arrange a time to show you the site.` },
   { q: "What sizes are the flats?", a: "Flat sizes in our projects range from [sizes]. Contact us for the exact size and layout of each flat." },
   { q: "Do you help with documents and registration?", a: "Yes. We guide buyers through booking and the documents involved. [confirm: details of the registration support you offer]" },

@@ -18,6 +18,18 @@ const norm = (s: string) => s.toLowerCase().replace(/[^a-z]/g, "").replace(/h/g,
 
 type Result = { flat: string; ok: boolean; message: string };
 
+/** Supabase/PostgREST errors are plain objects, so `instanceof Error` misses them. */
+function errText(e: unknown): string {
+  if (e instanceof Error) return e.message;
+  if (e && typeof e === "object") {
+    const o = e as { message?: string; details?: string; hint?: string; code?: string };
+    return [o.message, o.details, o.hint].filter(Boolean).join(" — ") || (o.code ? `Database error ${o.code}` : "Unknown error");
+  }
+  return String(e);
+}
+/** The database keeps flat sizes as whole square feet. */
+const wholeSft = (n: number | null) => (n == null ? null : Math.round(n));
+
 function ImportClients() {
   const qc = useQueryClient();
   const [fileName, setFileName] = useState("");
@@ -67,16 +79,22 @@ function ImportClients() {
     const project = projects.data?.find((p) => p.id === projectId);
     try {
       if (updateFacts && parsed.units.length) {
-        const r1 = await supabase.from("projects").update({ units_per_floor: parsed.units.length, flat_sizes: sizeRange(parsed.units) }).eq("id", projectId);
-        if (r1.error) throw r1.error;
-        const { data: have } = await supabase.from("project_units").select("id, label").eq("project_id", projectId);
-        for (const [i, u] of parsed.units.entries()) {
-          const label = `Unit ${u.letter}`;
-          const found = (have ?? []).find((h) => h.label.trim().toUpperCase() === label.toUpperCase() || h.label.trim().toUpperCase() === u.letter);
-          const r = found
-            ? await supabase.from("project_units").update({ size_sqft: u.size_sft }).eq("id", found.id)
-            : await supabase.from("project_units").insert({ project_id: projectId, label, size_sqft: u.size_sft, sort_order: i });
-          if (r.error) throw r.error;
+        try {
+          const r1 = await supabase.from("projects").update({ units_per_floor: parsed.units.length, flat_sizes: sizeRange(parsed.units) }).eq("id", projectId);
+          if (r1.error) throw r1.error;
+          const { data: have, error: e0 } = await supabase.from("project_units").select("id, label").eq("project_id", projectId);
+          if (e0) throw e0;
+          for (const [i, u] of parsed.units.entries()) {
+            const label = `Unit ${u.letter}`;
+            const found = (have ?? []).find((h) => h.label.trim().toUpperCase() === label.toUpperCase() || h.label.trim().toUpperCase() === u.letter);
+            const r = found
+              ? await supabase.from("project_units").update({ size_sqft: wholeSft(u.size_sft) }).eq("id", found.id)
+              : await supabase.from("project_units").insert({ project_id: projectId, label, size_sqft: wholeSft(u.size_sft), sort_order: i + 1 });
+            if (r.error) throw r.error;
+          }
+          out.push({ flat: "Project", ok: true, message: `Flat sizes ${sizeRange(parsed.units)}, ${parsed.units.length} units per floor, unit types updated` });
+        } catch (e) {
+          out.push({ flat: "Project", ok: false, message: `Project details not updated: ${errText(e)} (clients are still imported)` });
         }
       }
       for (const [n, r] of toImport.entries()) {
@@ -89,7 +107,7 @@ function ImportClients() {
           ].join("\n");
           const { data: client, error } = await supabase.from("clients").insert({
             full_name: c.full_name, phone: c.phone, address: c.address, project_id: projectId,
-            flat_no: c.flat_no, floor: c.floor, size_sft: c.size_sft, total_price: c.total_price, payment_plan_note: note,
+            flat_no: c.flat_no, floor: c.floor, size_sft: wholeSft(c.size_sft), total_price: c.total_price, payment_plan_note: note,
           }).select("id").single();
           if (error) throw error;
           const inst = r.plan.rows.map((x) => ({ ...x, client_id: client.id }));
@@ -97,17 +115,19 @@ function ImportClients() {
           if (r.plan.pays.length) { const e3 = await supabase.from("payments").insert(r.plan.pays.map((p) => ({ ...p, client_id: client.id }))); if (e3.error) throw e3.error; }
           out.push({ flat: c.flat_no, ok: true, message: `${c.full_name} — ${taka(c.total_price)}, paid ${taka(r.paid)}` });
         } catch (e) {
-          out.push({ flat: c.flat_no, ok: false, message: e instanceof Error ? e.message : "Failed" });
+          out.push({ flat: c.flat_no, ok: false, message: errText(e) });
         }
         setProgress(Math.round(((n + 1) / toImport.length) * 100));
       }
-      await logAudit("import_clients", "", { file: fileName, project: project?.name, imported: out.filter((x) => x.ok).map((x) => x.flat), failed: out.filter((x) => !x.ok).map((x) => x.flat) });
+      const clientRes = out.filter((x) => x.flat !== "Project");
+      await logAudit("import_clients", "", { file: fileName, project: project?.name, imported: clientRes.filter((x) => x.ok).map((x) => x.flat), failed: clientRes.filter((x) => !x.ok).map((x) => x.flat) }).catch(() => undefined);
       setResults(out);
       qc.invalidateQueries({ queryKey: ["admin"] });
-      const okN = out.filter((x) => x.ok).length;
-      okN === out.length ? toast.success(`${okN} clients imported`) : toast.error(`${okN} imported, ${out.length - okN} failed — see the list`);
+      const okN = clientRes.filter((x) => x.ok).length;
+      okN === clientRes.length ? toast.success(`${okN} clients imported`) : toast.error(`${okN} imported, ${clientRes.length - okN} failed — see the list below`);
+      setTimeout(() => document.getElementById("import-result")?.scrollIntoView({ behavior: "smooth" }), 50);
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Import failed.");
+      toast.error(`Import failed: ${errText(e)}`);
     } finally { setBusy(false); }
   }
 
@@ -178,7 +198,7 @@ function ImportClients() {
                 <button className={btnSm} onClick={() => setSelected(new Set())}>Select none</button>
               </div>
             </div>
-            <table className="w-full min-w-[900px] text-sm">
+            <table className="w-full min-w-[1100px] text-sm">
               <thead><tr className="border-b text-left text-xs uppercase tracking-wide text-muted-foreground">
                 <th className="py-2"></th><th>Flat</th><th>Name</th><th>Phone</th><th className="text-right">Total</th><th className="text-right">Booking</th><th className="text-right">Down</th><th className="text-right">Paid</th><th className="text-right">Due</th><th>Notes</th>
               </tr></thead>
@@ -189,11 +209,11 @@ function ImportClients() {
                     <td className="font-semibold text-navy">{c.flat_no}<span className="block text-xs font-normal text-muted-foreground">{c.floor}{c.size_sft ? ` · ${c.size_sft} sft` : ""}</span></td>
                     <td>{c.full_name}<span className="block text-xs text-muted-foreground">{c.address}</span></td>
                     <td className="whitespace-nowrap">{c.phone || <span className="text-brand-red">missing</span>}</td>
-                    <td className="num text-right">{taka(c.total_price)}</td>
-                    <td className="num text-right">{taka(c.booking)}</td>
-                    <td className="num text-right">{taka(c.down)}</td>
-                    <td className="num text-right">{taka(paid)}</td>
-                    <td className="num text-right font-semibold">{taka(due)}</td>
+                    <td className="num whitespace-nowrap text-right">{taka(c.total_price)}</td>
+                    <td className="num whitespace-nowrap text-right">{taka(c.booking)}</td>
+                    <td className="num whitespace-nowrap text-right">{taka(c.down)}</td>
+                    <td className="num whitespace-nowrap text-right">{taka(paid)}</td>
+                    <td className="num whitespace-nowrap text-right font-semibold">{taka(due)}</td>
                     <td className="max-w-[280px] text-xs">
                       {exists && <span className="mb-1 inline-block rounded-full bg-navy/10 px-2 py-0.5 text-navy">Already in this project — skipped</span>}
                       {c.issues.map((i) => <span key={i} className="block text-amber-800">• {i}</span>)}
@@ -216,7 +236,7 @@ function ImportClients() {
 
           {results.length > 0 && (
             <Card className="mt-6">
-              <h2 className="!text-xl text-navy">Result</h2>
+              <h2 id="import-result" className="!text-xl text-navy">Result</h2>
               <ul className="mt-3 space-y-1 text-sm">
                 {results.map((r) => (
                   <li key={r.flat} className={`flex gap-2 ${r.ok ? "text-navy" : "text-brand-red"}`}>

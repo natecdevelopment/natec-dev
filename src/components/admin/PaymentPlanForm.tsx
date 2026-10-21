@@ -127,7 +127,6 @@ export function PaymentPlanForm({ value, onChange, bookingDate, build }: { value
                 </li>
                 );
               })}
-              ))}
             </ul>
           )}
         </div>

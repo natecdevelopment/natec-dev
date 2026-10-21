@@ -49,6 +49,6 @@ describe("payment plan builder", () => {
   });
   it("31st clamps to month end", () => {
     const r = computePlan({ ...base, firstDue: "2027-01-31", freqMonths: 1, instAmount: null }, "2026-10-01");
-    expect(r.rows[2]!.due_date).toBe("2027-01-31"); expect(r.rows[3]!.due_date).toBe("2027-02-28");
+    expect(r.rows[1]!.due_date).toBe("2027-01-31"); expect(r.rows[2]!.due_date).toBe("2027-02-28");
   });
 });

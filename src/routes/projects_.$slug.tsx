@@ -1,3 +1,4 @@
+import { UnderConstruction } from "@/components/UnderConstruction";
 import { useState } from "react";
 import { createFileRoute, notFound, Link } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
@@ -70,7 +71,7 @@ export const Route = createFileRoute("/projects_/$slug")({
       ],
     };
   },
-  component: ProjectPage,
+  component: () => <UnderConstruction title="Project" real={ProjectPage} />,
   errorComponent: () => <p className="p-10 pt-32 text-center">This project could not be loaded. Please refresh.</p>,
   notFoundComponent: () => (
     <section className="bg-ivory px-5 pb-24 pt-36 text-center">

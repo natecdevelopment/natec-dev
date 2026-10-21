@@ -1,3 +1,4 @@
+import { UnderConstruction } from "@/components/UnderConstruction";
 import { createFileRoute } from "@tanstack/react-router";
 import { MapPin, Phone, Mail, Clock, Navigation, PhoneCall, CalendarCheck, FileText } from "lucide-react";
 import { PageHero, Reveal, WhatsAppIcon } from "@/components/SiteChrome";
@@ -62,7 +63,7 @@ export const Route = createFileRoute("/contact")({
       },
     ],
   }),
-  component: ContactPage,
+  component: () => <UnderConstruction title="Contact" real={ContactPage} />,
 });
 
 const CARDS = [

@@ -52,7 +52,7 @@ export function AuthScreen({ mode, next }: { mode: Mode; next?: string | undefin
   const form = mode === "login" ? <LoginForm key="login" onDone={finish} next={next} /> : <RegisterForm key="register" next={next} />;
 
   return (
-    <section className="relative min-h-screen bg-ivory pt-16 md:pt-[72px]">
+    <section className="relative min-h-[calc(100vh-72px)] bg-ivory">
       {desktop ? (
         <div className="relative mx-auto min-h-[calc(100vh-72px)] w-full overflow-hidden">
           <motion.div className="absolute inset-y-0 w-1/2 bg-white" initial={false} animate={{ left: mode === "login" ? "0%" : "50%" }} transition={{ duration: dur, ease: EASE }}>

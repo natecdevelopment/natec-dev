@@ -69,7 +69,7 @@ function StatusIndex() {
         heightClass="min-h-[64svh] md:min-h-[66svh]"
       />
 
-      <section className="section-pad bg-ivory">
+      <section className="section-pad overflow-x-clip bg-ivory">
         <div className="container-x">
           {list.length === 0 ? (
             <p className="py-16 text-center text-muted-foreground">Construction updates will appear here soon.</p>

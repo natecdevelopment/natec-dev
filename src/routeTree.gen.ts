@@ -14,6 +14,7 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as ConstructionStatusRouteImport } from './routes/construction-status'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as DirectorsRouteImport } from './routes/directors'
 import { Route as FloorPlanRouteImport } from './routes/floor-plan'
@@ -53,6 +54,11 @@ const AdminRoute = AdminRouteImport.update({
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ConstructionStatusRoute = ConstructionStatusRouteImport.update({
+  id: '/construction-status',
+  path: '/construction-status',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ContactRoute = ContactRouteImport.update({
@@ -141,6 +147,7 @@ export interface FileRoutesByFullPath {
   '/about': typeof AboutRoute
   '/admin': typeof AdminRouteWithChildren
   '/auth': typeof AuthRoute
+  '/construction-status': typeof ConstructionStatusRoute
   '/contact': typeof ContactRoute
   '/directors': typeof DirectorsRoute
   '/floor-plan': typeof FloorPlanRoute
@@ -162,6 +169,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/auth': typeof AuthRoute
+  '/construction-status': typeof ConstructionStatusRoute
   '/contact': typeof ContactRoute
   '/directors': typeof DirectorsRoute
   '/floor-plan': typeof FloorPlanRoute
@@ -186,6 +194,7 @@ export interface FileRoutesById {
   '/about': typeof AboutRoute
   '/admin': typeof AdminRouteWithChildren
   '/auth': typeof AuthRoute
+  '/construction-status': typeof ConstructionStatusRoute
   '/contact': typeof ContactRoute
   '/directors': typeof DirectorsRoute
   '/floor-plan': typeof FloorPlanRoute
@@ -210,6 +219,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/admin'
     | '/auth'
+    | '/construction-status'
     | '/contact'
     | '/directors'
     | '/floor-plan'
@@ -231,6 +241,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/auth'
+    | '/construction-status'
     | '/contact'
     | '/directors'
     | '/floor-plan'
@@ -254,6 +265,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/admin'
     | '/auth'
+    | '/construction-status'
     | '/contact'
     | '/directors'
     | '/floor-plan'
@@ -278,6 +290,7 @@ export interface RootRouteChildren {
   AboutRoute: typeof AboutRoute
   AdminRoute: typeof AdminRouteWithChildren
   AuthRoute: typeof AuthRoute
+  ConstructionStatusRoute: typeof ConstructionStatusRoute
   ContactRoute: typeof ContactRoute
   DirectorsRoute: typeof DirectorsRoute
   FloorPlanRoute: typeof FloorPlanRoute
@@ -322,6 +335,13 @@ declare module '@tanstack/react-router' {
       path: '/auth'
       fullPath: '/auth'
       preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/construction-status': {
+      id: '/construction-status'
+      path: '/construction-status'
+      fullPath: '/construction-status'
+      preLoaderRoute: typeof ConstructionStatusRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/contact': {
@@ -480,6 +500,7 @@ const rootRouteChildren: RootRouteChildren = {
   AboutRoute: AboutRoute,
   AdminRoute: AdminRouteWithChildren,
   AuthRoute: AuthRoute,
+  ConstructionStatusRoute: ConstructionStatusRoute,
   ContactRoute: ContactRoute,
   DirectorsRoute: DirectorsRoute,
   FloorPlanRoute: FloorPlanRoute,

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type KeyboardEvent as ReactKeyboardEvent } from "react";
 import { Link } from "@tanstack/react-router";
 import { ArrowRight, MapPin, Building2, ArrowUpDown, Trees, Car, HardHat, Play, MessageCircle, LayoutGrid, FileText, Phone, Mail, BedDouble, Bath, Sofa, UtensilsCrossed, CookingPot, Fence, Ruler, Facebook } from "lucide-react";
 import { company, directors } from "@/lib/site";
@@ -422,7 +422,7 @@ export function VideosSection() {
   if (!data?.length) return null;
   const reveal = (i: number) => (listRef.current?.children[i] as HTMLElement | undefined)?.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "nearest" });
   const pick = (i: number) => { setActive(i); setPlayed(true); setFocusIdx(i); reveal(i); };
-  const onListKey = (e: React.KeyboardEvent) => {
+  const onListKey = (e: ReactKeyboardEvent) => {
     const cur = focusIdx < 0 ? active : focusIdx;
     if (e.key === "ArrowDown" || e.key === "ArrowUp") {
       e.preventDefault();

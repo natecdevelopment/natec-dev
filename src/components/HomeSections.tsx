@@ -6,7 +6,7 @@ import { PersonFemaleIcon, PersonMaleIcon } from "@/components/PersonIcons";
 import { Reveal, WhatsAppIcon } from "@/components/SiteChrome";
 import { InquiryForm } from "@/components/InquiryForm";
 import { frameSrc } from "@/components/CinematicHero";
-import { useQuery } from "@tanstack/react-query";
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { publicVideosQuery, type VideoRow } from "@/lib/projects-data";
 import { youtubeThumb } from "@/lib/video";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
@@ -400,7 +400,7 @@ function LiteVideo({ v, autoplay = false }: { v: VideoRow; autoplay?: boolean })
 }
 
 export function VideosSection() {
-  const { data } = useQuery(publicVideosQuery);
+  const { data } = useSuspenseQuery(publicVideosQuery);
   const [active, setActive] = useState(0);
   const [played, setPlayed] = useState(false);
   const [slide, setSlide] = useState(0);

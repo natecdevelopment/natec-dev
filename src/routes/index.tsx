@@ -58,7 +58,7 @@ export const Route = createFileRoute("/")({
     scripts: jsonLd.map((j) => ({ type: "application/ld+json", children: JSON.stringify(j) })),
   }),
   loader: async ({ context }) => {
-    await Promise.all([context.queryClient.ensureQueryData(publicProjectsQuery), context.queryClient.prefetchQuery(publicVideosQuery)]);
+    await Promise.all([context.queryClient.ensureQueryData(publicProjectsQuery), context.queryClient.ensureQueryData(publicVideosQuery)]);
   },
   component: Index,
   errorComponent: () => <p className="p-10 text-center">Something went wrong loading this page. Please refresh.</p>,

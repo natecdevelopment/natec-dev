@@ -4,7 +4,9 @@ import { Menu, X, Phone, Mail, MapPin } from "lucide-react";
 import { company } from "@/lib/site";
 
 export const logo = { url: "/brand/natec-logo.png" };
-const whiteLogoUrl = "/brand/natec-logo-white.png";
+// Original brand colours on a transparent background (no white box).
+const fullLogoUrl = "/brand/natec-logo-transparent.png";
+const markUrl = "/brand/natec-mark.png";
 
 const nav = [
   { to: "/", label: "Home" },
@@ -46,38 +48,53 @@ export function Header() {
   }, [home]);
 
   return (
-    <header
-      className={`fixed inset-x-0 top-0 z-50 text-white transition-colors duration-300 ${
-        solid ? "bg-navy" : "bg-transparent"
-      }`}
-    >
-      <div className="container-x flex h-16 items-center justify-between md:h-[72px]">
-        <Link to="/" className="flex items-center gap-3" onClick={() => setOpen(false)}>
-          <img src={whiteLogoUrl} alt="Natec Development Ltd. logo" width={44} height={44} className="h-10 w-auto md:h-11" />
-          <span className="font-label text-[11px] leading-tight tracking-[0.22em]">
-            NATEC<span className="block text-[9px] opacity-80">DEVELOPMENT LTD.</span>
-          </span>
-        </Link>
-        <nav className="hidden items-center gap-7 lg:flex">
-          {nav.map((n) => (
-            <Link key={n.to} to={n.to} className="eyebrow !text-[12px] text-white/80 transition hover:text-white" activeProps={{ className: "!text-white underline decoration-brand-red decoration-2 underline-offset-8" }} activeOptions={{ exact: true }}>
-              {n.label}
-            </Link>
-          ))}
-        </nav>
-        <div className="flex items-center gap-3">
-          <a href={company.whatsappLink} target="_blank" rel="noreferrer" className="btn btn-primary hidden !px-5 !py-3 sm:inline-flex">
-            <WhatsAppIcon /> WhatsApp
-          </a>
-          <button className="p-2 lg:hidden" onClick={() => setOpen(!open)} aria-label={open ? "Close menu" : "Open menu"}>
-            {open ? <X /> : <Menu />}
-          </button>
+    <header className="fixed inset-x-0 top-0 z-50">
+      {/* Over the hero: a floating white bar. After it: a full-width white bar. White keeps the logo in its real colours. */}
+      <div
+        className={`transition-all duration-300 ${
+          solid
+            ? "bg-white shadow-[0_1px_0_rgba(7,47,99,0.08),0_8px_24px_-12px_rgba(7,47,99,0.25)]"
+            : "mx-3 mt-2 rounded-2xl bg-white/95 shadow-[0_10px_30px_-12px_rgba(4,26,56,0.45)] md:mx-6 md:mt-3"
+        }`}
+      >
+        <div className={`container-x flex items-center justify-between transition-all duration-300 ${solid ? "h-16 md:h-[72px]" : "h-14 md:h-16"}`}>
+          <Link to="/" className="flex items-center gap-3" onClick={() => setOpen(false)}>
+            <img src={markUrl} alt="" aria-hidden width={44} height={44} className="h-9 w-auto md:h-10" />
+            <span className="font-label text-[12px] leading-tight tracking-[0.24em] text-navy">
+              NATEC<span className="block text-[9px] tracking-[0.2em] text-navy/75">DEVELOPMENT LTD.</span>
+            </span>
+            <span className="sr-only">Natec Development Ltd. — home</span>
+          </Link>
+          <nav className="hidden items-center gap-7 lg:flex">
+            {nav.map((n) => (
+              <Link
+                key={n.to}
+                to={n.to}
+                className="eyebrow !text-[12px] text-navy/70 transition hover:text-navy"
+                activeProps={{ className: "!text-navy underline decoration-brand-red decoration-2 underline-offset-8" }}
+                activeOptions={{ exact: true }}
+              >
+                {n.label}
+              </Link>
+            ))}
+          </nav>
+          <div className="flex items-center gap-2">
+            <a href={company.whatsappLink} target="_blank" rel="noreferrer" className="btn btn-primary hidden !px-5 !py-3 sm:inline-flex">
+              <WhatsAppIcon /> WhatsApp
+            </a>
+            <a href={company.whatsappLink} target="_blank" rel="noreferrer" aria-label="WhatsApp" className="flex h-10 w-10 items-center justify-center rounded-full bg-brand-red text-white sm:hidden">
+              <WhatsAppIcon />
+            </a>
+            <button className="rounded-full p-2 text-navy hover:bg-navy/5 lg:hidden" onClick={() => setOpen(!open)} aria-label={open ? "Close menu" : "Open menu"}>
+              {open ? <X /> : <Menu />}
+            </button>
+          </div>
         </div>
       </div>
       {open && (
-        <nav className="fixed inset-0 top-16 flex flex-col gap-1 overflow-y-auto bg-navy px-6 py-8 md:top-[72px] lg:hidden">
+        <nav className="fixed inset-0 -z-10 flex flex-col gap-1 overflow-y-auto bg-white px-6 pb-8 pt-24 text-navy md:pt-28 lg:hidden">
           {nav.map((n) => (
-            <Link key={n.to} to={n.to} onClick={() => setOpen(false)} className="border-b border-line-dark py-4 font-display text-3xl">
+            <Link key={n.to} to={n.to} onClick={() => setOpen(false)} className="border-b border-navy/10 py-4 font-display text-3xl hover:text-brand-red" activeProps={{ className: "!text-brand-red" }} activeOptions={{ exact: true }}>
               {n.label}
             </Link>
           ))}
@@ -91,32 +108,33 @@ export function Header() {
 }
 
 export function Footer() {
+  const social = "flex h-10 w-10 items-center justify-center rounded-full border border-navy/15 text-navy transition hover:border-brand-red hover:bg-brand-red hover:text-white";
   return (
-    <footer className="bg-navy-deep text-white">
+    <footer className="border-t-4 border-brand-red bg-ivory text-ink">
       <div className="container-x grid gap-12 py-16 md:grid-cols-[1.4fr_1fr_1.4fr] md:py-20">
         <div>
-          <img src={whiteLogoUrl} alt="Natec Development Ltd. logo" width={80} height={80} loading="lazy" className="h-20 w-auto" />
-          <p className="mt-5 max-w-xs text-sm text-muted-dark">Well-planned homes in Sreepur, Gazipur — built floor by floor since 2023.</p>
+          <img src={fullLogoUrl} alt="Natec Development Ltd. logo" width={120} height={144} loading="lazy" className="h-28 w-auto md:h-32" />
+          <p className="mt-5 max-w-xs text-sm text-muted-foreground">Well-planned homes in Sreepur, Gazipur — built floor by floor since 2023.</p>
           <div className="mt-6 flex gap-3">
-            <a href={company.facebook} target="_blank" rel="noreferrer" aria-label="Facebook" className="flex h-10 w-10 items-center justify-center rounded-full border border-line-dark hover:bg-white hover:text-navy"><FacebookIcon /></a>
-            <a href={company.whatsappLink} target="_blank" rel="noreferrer" aria-label="WhatsApp" className="flex h-10 w-10 items-center justify-center rounded-full border border-line-dark hover:bg-white hover:text-navy"><WhatsAppIcon /></a>
+            <a href={company.facebook} target="_blank" rel="noreferrer" aria-label="Facebook" className={social}><FacebookIcon /></a>
+            <a href={company.whatsappLink} target="_blank" rel="noreferrer" aria-label="WhatsApp" className={social}><WhatsAppIcon /></a>
           </div>
         </div>
         <div>
-          <h4 className="eyebrow mb-5 text-muted-dark">Quick links</h4>
+          <h4 className="eyebrow mb-5 !text-brand-red">Quick links</h4>
           <ul className="space-y-2 text-sm">
-            {nav.map((n) => <li key={n.to}><Link to={n.to} className="text-white/85 hover:text-white">{n.label}</Link></li>)}
+            {nav.map((n) => <li key={n.to}><Link to={n.to} className="text-navy/80 transition hover:text-brand-red">{n.label}</Link></li>)}
           </ul>
         </div>
         <div className="space-y-3 text-sm">
-          <h4 className="eyebrow mb-5 text-muted-dark">Contact</h4>
-          <a className="flex items-center gap-3 text-white/85 hover:text-white" href={company.whatsappLink}><WhatsAppIcon /> {company.whatsapp}</a>
-          <a className="flex items-center gap-3 text-white/85 hover:text-white" href={company.phoneLink}><Phone className="h-4 w-4" /> {company.phone}</a>
-          <a className="flex items-center gap-3 text-white/85 hover:text-white" href={`mailto:${company.email}`}><Mail className="h-4 w-4" /> {company.email}</a>
-          <p className="flex gap-3 text-muted-dark"><MapPin className="h-4 w-4 shrink-0" /> {company.address}</p>
+          <h4 className="eyebrow mb-5 !text-brand-red">Contact</h4>
+          <a className="flex items-center gap-3 text-navy/80 transition hover:text-brand-red" href={company.whatsappLink}><WhatsAppIcon /> {company.whatsapp}</a>
+          <a className="flex items-center gap-3 text-navy/80 transition hover:text-brand-red" href={company.phoneLink}><Phone className="h-4 w-4" /> {company.phone}</a>
+          <a className="flex items-center gap-3 text-navy/80 transition hover:text-brand-red" href={`mailto:${company.email}`}><Mail className="h-4 w-4" /> {company.email}</a>
+          <p className="flex gap-3 text-muted-foreground"><MapPin className="h-4 w-4 shrink-0 text-navy" /> {company.address}</p>
         </div>
       </div>
-      <div className="border-t border-line-dark py-6 text-center text-xs text-muted-dark">© {new Date().getFullYear()} Natec Development Ltd.</div>
+      <div className="bg-navy py-5 text-center text-xs tracking-wide text-white/80">© {new Date().getFullYear()} Natec Development Ltd. · All rights reserved.</div>
     </footer>
   );
 }

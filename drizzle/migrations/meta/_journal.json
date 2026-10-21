@@ -64,6 +64,13 @@
       "when": 1792574397624,
       "tag": "0008_admin_save_client",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1792598799066,
+      "tag": "0009_login_identifiers",
+      "breakpoints": true
     }
   ]
 }

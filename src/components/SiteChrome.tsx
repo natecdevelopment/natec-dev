@@ -1,4 +1,7 @@
-import { Link, useLocation } from "@tanstack/react-router";
+import { Link, useLocation, useNavigate } from "@tanstack/react-router";
+import { useQueryClient } from "@tanstack/react-query";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { initials, useSession } from "@/lib/account";
 import { supabase } from "@/integrations/supabase/client";
 import { useEffect, useState } from "react";
 import { Menu, X, Phone, Mail, MapPin } from "lucide-react";
@@ -101,6 +104,7 @@ export function Header() {
               {n.label}
             </Link>
           ))}
+          <AccountLink mobile onNavigate={() => setOpen(false)} />
           <a href={company.whatsappLink} target="_blank" rel="noreferrer" className="btn btn-primary mt-8 w-full">
             <WhatsAppIcon /> WhatsApp
           </a>
@@ -210,16 +214,53 @@ export function Reveal({ children, className = "", delay = 0, as: Tag = "div" }:
   return <Tag ref={setEl as never} className={`reveal ${className}`} style={delay ? { transitionDelay: `${delay}ms` } : undefined}>{children}</Tag>;
 }
 
-function AccountLink() {
-  const [signedIn, setSignedIn] = useState(false);
+function AccountLink({ mobile, onNavigate }: { mobile?: boolean; onNavigate?: () => void }) {
+  const session = useSession();
+  const navigate = useNavigate();
+  const qc = useQueryClient();
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => setSignedIn(!!data.session));
-    const { data } = supabase.auth.onAuthStateChange((_e, s) => setSignedIn(!!s));
-    return () => data.subscription.unsubscribe();
-  }, []);
+    // "Remember me" off: end the session when the browser was closed.
+    if (session && localStorage.getItem("natec-temp-session") && !sessionStorage.getItem("natec-alive")) {
+      localStorage.removeItem("natec-temp-session");
+      supabase.auth.signOut();
+    }
+  }, [session]);
+  const user = session?.user;
+  async function logout() {
+    await qc.cancelQueries();
+    qc.removeQueries({ queryKey: ["me"] });
+    await supabase.auth.signOut();
+    navigate({ to: "/login", replace: true });
+  }
+  if (!user) {
+    return (
+      <Link to="/login" onClick={onNavigate} className={mobile ? "border-b border-navy/10 py-4 font-display text-3xl hover:text-brand-red" : "eyebrow !text-[12px] inline-flex min-h-[44px] items-center whitespace-nowrap px-2 text-navy/80 hover:text-navy"}>
+        Login
+      </Link>
+    );
+  }
+  const name = String(user.user_metadata?.["full_name"] ?? "");
+  if (mobile) {
+    return (
+      <>
+        <Link to="/account" onClick={onNavigate} className="border-b border-navy/10 py-4 font-display text-3xl hover:text-brand-red">Dashboard</Link>
+        <button onClick={() => { onNavigate?.(); logout(); }} className="border-b border-navy/10 py-4 text-left font-display text-3xl hover:text-brand-red">Logout</button>
+      </>
+    );
+  }
   return (
-    <Link to={signedIn ? "/account" : "/auth"} className="eyebrow !text-[12px] whitespace-nowrap px-2 text-navy/80 hover:text-navy">
-      {signedIn ? "Account" : "Sign in"}
-    </Link>
+    <DropdownMenu>
+      <DropdownMenuTrigger aria-label="Account menu" className="flex h-10 w-10 items-center justify-center rounded-full bg-navy font-label text-[13px] text-white ring-offset-2 hover:ring-2 hover:ring-brand-red focus-visible:ring-2 focus-visible:ring-brand-red">
+        {initials(name, user.email ?? "")}
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="w-56">
+        <div className="px-2 py-1.5 text-xs text-muted-foreground"><p className="truncate font-semibold text-navy">{name || "My account"}</p><p className="truncate">{user.email}</p></div>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem onSelect={() => navigate({ to: "/account" })}>Dashboard</DropdownMenuItem>
+        <DropdownMenuItem onSelect={() => navigate({ to: "/account", search: { tab: "saved" } })}>Saved projects</DropdownMenuItem>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem onSelect={logout} className="text-brand-red">Logout</DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }

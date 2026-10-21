@@ -14,3 +14,6 @@
 - Brand colours are CSS variables in src/styles.css (--navy, --red, --ivory…) and shadcn tokens alias them; never add other accent colours.
 - Home page sections live in src/components/HomeSections.tsx and are reused by inner routes so content stays in one place.
 - The `desk:` variant means "not a portrait phone" so phones in landscape get the desktop hero layout.
+- Projects, project stages, media and videos live in the database; public pages read published rows via publicProjectsQuery (src/lib/projects-data.ts), never hard-coded arrays.
+- Admin access = signed-in email listed in public.admins, checked by public.is_admin() in RLS; the /admin layout (ssr:false) renders login/not-authorised inline and hides the public header/footer.
+- The "media" storage bucket is private (workspace blocks public buckets), so uploads store a 10-year signed URL in media.public_url; seeded files point at /public paths.

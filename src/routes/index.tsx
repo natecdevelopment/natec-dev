@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { publicProjectsQuery } from "@/lib/projects-data";
 import { CinematicHero } from "@/components/CinematicHero";
 import { Intro, ProjectsShowcase, FloorPlan, WhyNatec, HowWeBuild, Location, Board, ContactCTA } from "@/components/HomeSections";
 
@@ -11,7 +12,10 @@ export const Route = createFileRoute("/")({
       { property: "og:description", content: "From bare land to lasting homes. Residential projects in Sreepur, Gazipur, Bangladesh." },
     ],
   }),
+  loader: ({ context }) => context.queryClient.ensureQueryData(publicProjectsQuery),
   component: Index,
+  errorComponent: () => <p className="p-10 text-center">Something went wrong loading this page. Please refresh.</p>,
+  notFoundComponent: () => <p className="p-10 text-center">Not found.</p>,
 });
 
 function Index() {

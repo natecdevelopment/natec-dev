@@ -6,7 +6,7 @@ import { PersonFemaleIcon, PersonMaleIcon } from "@/components/PersonIcons";
 import { Reveal, WhatsAppIcon } from "@/components/SiteChrome";
 import { InquiryForm } from "@/components/InquiryForm";
 import { frameSrc } from "@/components/CinematicHero";
-import { PROJECTS, SoldOut, UpcomingCards, WA_UPCOMING } from "@/components/ProjectsGrid";
+import { AvailabilityBadge, ProjectCta, UpcomingCards, usePublicProjects } from "@/components/ProjectsGrid";
 import { VintageKeyIcon } from "@/components/VintageKeyIcon";
 import homeSketch from "@/assets/home-sketch.png";
 
@@ -88,6 +88,9 @@ export function Intro() {
 
 /* ---------- 2. Projects ---------- */
 export function ProjectsShowcase() {
+  const { current, upcoming } = usePublicProjects();
+  const flats = current.reduce((n, p) => n + (p.total_flats ?? 0), 0);
+  const allSold = current.length > 0 && current.every((p) => p.availability === "Sold out");
   return (
     <section className="section-pad bg-navy-deep text-white">
       <div className="container-x">
@@ -95,34 +98,34 @@ export function ProjectsShowcase() {
           <div>
             <Eyebrow dark>Our projects</Eyebrow>
             <h2 className="mt-3">Homes taking shape <em className="accent-dark">across Gazipur.</em></h2>
-            <p className="mt-4 text-lg text-muted-dark">75 homes delivered or under construction — all sold.</p>
+            {flats > 0 && <p className="mt-4 text-lg text-muted-dark">{flats} homes delivered or under construction{allSold ? " — all sold." : "."}</p>}
           </div>
           <Link to="/projects" className="btn btn-ghost-dark">All projects</Link>
         </Reveal>
         <div className="grid gap-6 md:grid-cols-3">
-          {PROJECTS.map((p) => (
-            <Reveal key={p.name}>
+          {current.map((p) => (
+            <Reveal key={p.id}>
               <div className="group relative block overflow-hidden rounded-2xl">
-                <img src={p.gallery[0]} alt={`${p.name} by Natec Development`} loading="lazy" width={1200} height={900} className="aspect-[4/5] w-full object-cover transition-transform duration-700 group-hover:scale-105" />
+                <img src={p.cover?.public_url} alt={p.cover?.alt_text || `${p.name} by Natec Development`} title={p.cover?.title || undefined} loading="lazy" width={p.cover?.width ?? 1200} height={p.cover?.height ?? 900} className="aspect-[4/5] w-full object-cover transition-transform duration-700 group-hover:scale-105" />
                 <div className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(4,26,56,0.92) 0%, rgba(4,26,56,0.35) 45%, transparent 70%)" }} />
                 <span className={`eyebrow absolute left-5 top-5 rounded-full px-3 py-1.5 !text-[10px] ${p.status === "Completed" ? "bg-success text-white" : "bg-white text-navy"}`}>{p.status}</span>
-                <SoldOut className="absolute right-5 top-5" />
+                <AvailabilityBadge text={p.availability} className="absolute right-5 top-5" />
                 <div className="absolute inset-x-0 bottom-0 p-6">
-                  <p className="eyebrow !text-[10px] text-white/70">{p.no}</p>
-                  <h3 className="!text-3xl">{p.name}</h3>
+                  <p className="eyebrow !text-[10px] text-white/70">{p.project_no}</p>
+                  <h3 className="!text-3xl"><Link to="/projects/$slug" params={{ slug: p.slug }} className="hover:underline">{p.name}</Link></h3>
                   <p className="mt-1 text-sm text-muted-dark">{p.address}</p>
-                  <p className="text-sm text-muted-dark">{p.type} · {p.flats} flats</p>
+                  <p className="text-sm text-muted-dark">Residential building, {p.building_type} · {p.total_flats} flats</p>
                   <div className="mt-4">
-                    <div className="flex justify-between text-xs"><span className="eyebrow !text-[10px]">Construction</span><span className="num">{p.pct}%</span></div>
-                    <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-white/20"><div className="h-full rounded-full bg-brand-red" style={{ width: `${p.pct}%` }} /></div>
+                    <div className="flex justify-between text-xs"><span className="eyebrow !text-[10px]">Construction</span><span className="num">{p.progress_pct}%</span></div>
+                    <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-white/20"><div className="h-full rounded-full bg-brand-red" style={{ width: `${p.progress_pct}%` }} /></div>
                   </div>
-                  <a href={WA_UPCOMING} target="_blank" rel="noreferrer" className="mt-4 inline-flex items-center gap-2 text-sm font-semibold underline-offset-4 hover:underline">Register interest for upcoming projects <ArrowRight className="h-4 w-4" /></a>
+                  <ProjectCta p={p} className="mt-4 inline-flex items-center gap-2 text-sm font-semibold underline-offset-4 hover:underline" />
                 </div>
               </div>
             </Reveal>
           ))}
         </div>
-        <h3 className="eyebrow mb-6 mt-16 !text-[13px] text-muted-dark">Upcoming projects</h3>
+        {upcoming.length > 0 && <h3 className="eyebrow mb-6 mt-16 !text-[13px] text-muted-dark">Upcoming projects</h3>}
         <UpcomingCards dark />
       </div>
     </section>

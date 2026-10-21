@@ -14,6 +14,18 @@ export type Database = {
   }
   public: {
     Tables: {
+      admins: {
+        Row: {
+          email: string
+        }
+        Insert: {
+          email: string
+        }
+        Update: {
+          email?: string
+        }
+        Relationships: []
+      }
       contact_submissions: {
         Row: {
           created_at: string
@@ -44,12 +56,225 @@ export type Database = {
         }
         Relationships: []
       }
+      media: {
+        Row: {
+          alt_text: string
+          caption: string
+          created_at: string
+          file_name: string
+          height: number | null
+          id: string
+          project_id: string | null
+          public_url: string
+          size_bytes: number | null
+          sort_order: number
+          storage_path: string | null
+          title: string
+          width: number | null
+        }
+        Insert: {
+          alt_text?: string
+          caption?: string
+          created_at?: string
+          file_name?: string
+          height?: number | null
+          id?: string
+          project_id?: string | null
+          public_url: string
+          size_bytes?: number | null
+          sort_order?: number
+          storage_path?: string | null
+          title?: string
+          width?: number | null
+        }
+        Update: {
+          alt_text?: string
+          caption?: string
+          created_at?: string
+          file_name?: string
+          height?: number | null
+          id?: string
+          project_id?: string | null
+          public_url?: string
+          size_bytes?: number | null
+          sort_order?: number
+          storage_path?: string | null
+          title?: string
+          width?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "media_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      project_stages: {
+        Row: {
+          completed_on: string | null
+          id: string
+          note: string
+          project_id: string
+          sort_order: number
+          stage: string
+          status: string
+        }
+        Insert: {
+          completed_on?: string | null
+          id?: string
+          note?: string
+          project_id: string
+          sort_order?: number
+          stage: string
+          status?: string
+        }
+        Update: {
+          completed_on?: string | null
+          id?: string
+          note?: string
+          project_id?: string
+          sort_order?: number
+          stage?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_stages_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      projects: {
+        Row: {
+          address: string
+          availability: string
+          building_type: string
+          cover_media_id: string | null
+          created_at: string
+          description: string
+          features: string[]
+          flat_sizes: string
+          handover_date: string
+          id: string
+          kind: string
+          location_short: string
+          map_url: string
+          name: string
+          progress_pct: number
+          project_no: string
+          published: boolean
+          slug: string
+          sort_order: number
+          status: string
+          total_flats: number | null
+          updated_at: string
+        }
+        Insert: {
+          address?: string
+          availability?: string
+          building_type?: string
+          cover_media_id?: string | null
+          created_at?: string
+          description?: string
+          features?: string[]
+          flat_sizes?: string
+          handover_date?: string
+          id?: string
+          kind?: string
+          location_short?: string
+          map_url?: string
+          name: string
+          progress_pct?: number
+          project_no?: string
+          published?: boolean
+          slug: string
+          sort_order?: number
+          status?: string
+          total_flats?: number | null
+          updated_at?: string
+        }
+        Update: {
+          address?: string
+          availability?: string
+          building_type?: string
+          cover_media_id?: string | null
+          created_at?: string
+          description?: string
+          features?: string[]
+          flat_sizes?: string
+          handover_date?: string
+          id?: string
+          kind?: string
+          location_short?: string
+          map_url?: string
+          name?: string
+          progress_pct?: number
+          project_no?: string
+          published?: boolean
+          slug?: string
+          sort_order?: number
+          status?: string
+          total_flats?: number | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "projects_cover_media_fk"
+            columns: ["cover_media_id"]
+            isOneToOne: false
+            referencedRelation: "media"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      videos: {
+        Row: {
+          created_at: string
+          id: string
+          provider: string
+          published: boolean
+          sort_order: number
+          thumbnail_url: string | null
+          title: string
+          url: string
+          video_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          provider: string
+          published?: boolean
+          sort_order?: number
+          thumbnail_url?: string | null
+          title?: string
+          url: string
+          video_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          provider?: string
+          published?: boolean
+          sort_order?: number
+          thumbnail_url?: string | null
+          title?: string
+          url?: string
+          video_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      is_admin: { Args: never; Returns: boolean }
     }
     Enums: {
       [_ in never]: never

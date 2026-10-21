@@ -276,7 +276,7 @@ function UpdateForm({ projectId, projectName, saver, onDone, onCancel }: { proje
 function UpdateEditor({ u, projectId, projectName, saver, reload }: { u: UpdateFull; projectId: string; projectName: string; saver: ReturnType<typeof useSaver>; reload: () => void }) {
   const [busy, setBusy] = useState("");
   const photos = useMemo(() => [...u.photos].sort((a, b) => a.link_sort - b.link_sort), [u.photos]);
-  const save = async (patch: Record<string, string>) => { await saver.run(() => supabase.from("construction_updates").update(patch).eq("id", u.id)); reload(); };
+  const save = async (patch: { month?: string; title?: string; note?: string }) => { await saver.run(() => supabase.from("construction_updates").update(patch).eq("id", u.id)); reload(); };
   async function addFiles(files: File[]) {
     try { await uploadPhotos(files, u.id, projectId, projectName, monthYear(u.month), photos.length, setBusy); } catch (e) { toast.error(e instanceof Error ? e.message : "Upload failed"); }
     setBusy(""); reload();

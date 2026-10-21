@@ -8,9 +8,9 @@ import { Skeleton } from "@/components/ui/skeleton";
 export const Route = createFileRoute("/admin/")({ component: Dashboard });
 
 async function count(table: "videos" | "projects" | "media", kind?: string) {
-  let q = supabase.from(table).select("id", { count: "exact", head: true });
-  if (kind) q = q.eq("kind", kind);
-  const { count: c, error } = await q;
+  const { count: c, error } = kind
+    ? await supabase.from("projects").select("id", { count: "exact", head: true }).eq("kind", kind)
+    : await supabase.from(table).select("id", { count: "exact", head: true });
   if (error) throw error;
   return c ?? 0;
 }

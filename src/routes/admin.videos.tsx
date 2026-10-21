@@ -36,13 +36,13 @@ function VideosPage() {
   }
   async function togglePublished(v: VideoRow) {
     const { error } = await supabase.from("videos").update({ published: !v.published }).eq("id", v.id);
-    if (error) return toast.error(error.message);
+    if (error) return void toast.error(error.message);
     toast.success(v.published ? "Video hidden" : "Video published");
     qc.invalidateQueries({ queryKey: KEY });
   }
   async function remove(v: VideoRow) {
     const { error } = await supabase.from("videos").delete().eq("id", v.id);
-    if (error) return toast.error(error.message);
+    if (error) return void toast.error(error.message);
     toast.success("Video deleted");
     qc.invalidateQueries({ queryKey: ["admin"] });
   }
@@ -117,7 +117,7 @@ function AddVideo({ minOrder, onAdded }: { minOrder: number; onAdded: () => void
 
   async function add(e: React.FormEvent) {
     e.preventDefault();
-    if (!parsed) return toast.error("Please paste a YouTube or Facebook video link.");
+    if (!parsed) return void toast.error("Please paste a YouTube or Facebook video link.");
     setBusy(true);
     const { error } = await supabase.from("videos").insert({
       url: url.trim(),
@@ -128,7 +128,7 @@ function AddVideo({ minOrder, onAdded }: { minOrder: number; onAdded: () => void
       sort_order: minOrder - 1,
     });
     setBusy(false);
-    if (error) return toast.error(error.message);
+    if (error) return void toast.error(error.message);
     toast.success("Video added");
     setUrl(""); setTitle(""); setThumb(null);
     onAdded();
@@ -168,9 +168,9 @@ function EditVideo({ video, onClose, onSaved }: { video: VideoRow | null; onClos
   async function save() {
     if (!video) return;
     const p = parseVideoUrl(url);
-    if (!p) return toast.error("Only YouTube and Facebook video links are supported.");
+    if (!p) return void toast.error("Only YouTube and Facebook video links are supported.");
     const { error } = await supabase.from("videos").update({ title: title.trim(), url: url.trim(), provider: p.provider, video_id: p.videoId, ...(p.provider === "youtube" && video.thumbnail_url?.includes("ytimg") ? { thumbnail_url: youtubeThumb(p.videoId) } : {}) }).eq("id", video.id);
-    if (error) return toast.error(error.message);
+    if (error) return void toast.error(error.message);
     toast.success("Video updated");
     onSaved(); onClose();
   }

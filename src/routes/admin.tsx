@@ -83,7 +83,7 @@ function AdminLogin() {
     const f = new FormData(e.currentTarget);
     const email = String(f.get("email") || "").trim();
     const password = String(f.get("password") || "");
-    if (!email || !password) return setError("Enter your email and password.");
+    if (!email || !password) return void setError("Enter your email and password.");
     setBusy(true);
     setError("");
     const { error } = await supabase.auth.signInWithPassword({ email, password });

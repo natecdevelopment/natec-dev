@@ -96,7 +96,7 @@ function MediaPanel({ media, projects, onClose, onChanged }: { media: MediaRow |
 
   async function save() {
     const { error } = await supabase.from("media").update({ title: f.title.trim(), alt_text: f.alt_text.trim(), caption: f.caption.trim(), project_id: f.project_id || null }).eq("id", media!.id);
-    if (error) return toast.error(error.message);
+    if (error) return void toast.error(error.message);
     toast.success("Saved");
     onChanged();
     onClose();
@@ -104,7 +104,7 @@ function MediaPanel({ media, projects, onClose, onChanged }: { media: MediaRow |
   async function remove() {
     if (media!.storage_path) await supabase.storage.from("media").remove([media!.storage_path]);
     const { error } = await supabase.from("media").delete().eq("id", media!.id);
-    if (error) return toast.error(error.message);
+    if (error) return void toast.error(error.message);
     toast.success("File deleted");
     onChanged();
     onClose();

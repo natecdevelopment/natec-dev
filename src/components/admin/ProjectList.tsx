@@ -34,7 +34,7 @@ export function ProjectList({ kind }: { kind: "current" | "upcoming" }) {
   }
   async function toggle(p: ProjectWithMedia) {
     const { error } = await supabase.from("projects").update({ published: !p.published }).eq("id", p.id);
-    if (error) return toast.error(error.message);
+    if (error) return void toast.error(error.message);
     toast.success(p.published ? "Project hidden from the site" : "Project published");
     refresh();
   }
@@ -42,7 +42,7 @@ export function ProjectList({ kind }: { kind: "current" | "upcoming" }) {
     await supabase.from("project_stages").delete().eq("project_id", p.id);
     await supabase.from("media").update({ project_id: null }).eq("project_id", p.id);
     const { error } = await supabase.from("projects").delete().eq("id", p.id);
-    if (error) return toast.error(error.message);
+    if (error) return void toast.error(error.message);
     toast.success("Project deleted");
     refresh();
   }

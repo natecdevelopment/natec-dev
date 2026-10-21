@@ -133,7 +133,7 @@ export function ProjectWizard({ id: initialId, kind: initialKind = "current" }: 
 
   async function onFiles(files: FileList | File[]) {
     const list = Array.from(files).filter((f) => f.type.startsWith("image/"));
-    if (!list.length) return toast.error("Please choose image files");
+    if (!list.length) return void toast.error("Please choose image files");
     const pid = id ?? (await save({ quiet: true }));
     if (!pid) return;
     await Promise.all(list.map(async (f, n) => {

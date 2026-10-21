@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { createFileRoute, notFound, Link } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { ArrowUpDown, Car, Check, Circle, Clock, Images, Phone, Shield, Sun, Zap, Building2, Home, Ruler, CalendarDays, BadgeCheck, Activity, MapPin, Droplets, Flame, Trees, Sparkles, type LucideIcon } from "lucide-react";
+import { ArrowUpDown, Car, Check, Circle, Clock, Images, Phone, Shield, Sun, Zap, Building2, Home, Ruler, CalendarDays, BadgeCheck, Activity, MapPin, Droplets, Flame, Trees, Sparkles, Layers, LayoutGrid, BedDouble, Bath, DoorOpen, type LucideIcon } from "lucide-react";
 import { PageHero, Reveal, WhatsAppIcon } from "@/components/SiteChrome";
 import { InquiryForm } from "@/components/InquiryForm";
 import { Lightbox } from "@/components/Lightbox";
@@ -121,6 +121,8 @@ function ProjectPage() {
 
   const facts: { icon: LucideIcon; label: string; value: string }[] = [
     { icon: Building2, label: "Building type", value: p.building_type },
+    { icon: Layers, label: "Floors", value: p.total_floors != null ? String(p.total_floors) : "" },
+    { icon: LayoutGrid, label: "Units per floor", value: p.units_per_floor != null ? String(p.units_per_floor) : "" },
     { icon: Home, label: "Total flats", value: p.total_flats != null ? String(p.total_flats) : "" },
     { icon: Ruler, label: "Flat sizes", value: p.flat_sizes },
     { icon: Activity, label: "Status", value: upcoming ? "Upcoming" : p.status },
@@ -147,7 +149,7 @@ function ProjectPage() {
 
       {facts.length > 0 && (
         <section aria-label="Key facts" className="border-b border-border bg-white">
-          <dl className="container-x grid grid-cols-2 gap-x-6 gap-y-6 py-8 sm:grid-cols-3 lg:grid-cols-6">
+          <dl className="container-x grid grid-cols-2 gap-x-6 gap-y-6 py-8 sm:grid-cols-3 lg:grid-cols-4">
             {facts.map((f) => (
               <div key={f.label} className="flex gap-3">
                 <f.icon className="mt-1 h-5 w-5 shrink-0 text-brand-red" aria-hidden />
@@ -168,6 +170,28 @@ function ProjectPage() {
                   <button key={g.id} onClick={() => setLb(i)} className={`group overflow-hidden rounded-2xl ${i === 0 ? "col-span-2 row-span-2" : ""}`} aria-label={`Open photo ${i + 1}: ${g.alt_text || p.name}`}>
                     <img loading="lazy" src={g.public_url} alt={g.alt_text || `${p.name} photo ${i + 1}`} width={g.width ?? 800} height={g.height ?? 600} className="aspect-[4/3] h-full w-full object-cover transition duration-500 group-hover:scale-105" />
                   </button>
+                ))}
+              </div>
+            </Reveal>
+          )}
+
+          {p.units.length > 0 && (
+            <Reveal as="section">
+              <h2 className="text-primary">Unit types</h2>
+              <div className="mt-8 grid gap-4 sm:grid-cols-2">
+                {p.units.map((u) => (
+                  <div key={u.id} className="rounded-2xl border border-border bg-card p-6">
+                    <div className="flex items-baseline justify-between gap-3">
+                      <h3 className="!text-xl text-navy">{u.label}</h3>
+                      {u.size_sqft != null && <span className="font-display text-2xl text-brand-red">{u.size_sqft.toLocaleString("en-US")} <span className="text-sm text-muted-foreground">sqft</span></span>}
+                    </div>
+                    <ul className="mt-4 flex flex-wrap gap-x-5 gap-y-2 text-sm text-navy">
+                      {u.bedrooms != null && <li className="flex items-center gap-1.5"><BedDouble className="h-4 w-4 text-brand-red" />{u.bedrooms} bed</li>}
+                      {u.bathrooms != null && <li className="flex items-center gap-1.5"><Bath className="h-4 w-4 text-brand-red" />{u.bathrooms} bath</li>}
+                      {u.balconies != null && <li className="flex items-center gap-1.5"><DoorOpen className="h-4 w-4 text-brand-red" />{u.balconies} balcony</li>}
+                    </ul>
+                    {u.note && <p className="mt-3 text-sm text-muted-foreground">{u.note}</p>}
+                  </div>
                 ))}
               </div>
             </Reveal>

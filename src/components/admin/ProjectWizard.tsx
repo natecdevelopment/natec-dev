@@ -15,15 +15,18 @@ type Kind = "current" | "upcoming";
 type Form = {
   name: string; project_no: string; kind: Kind; slug: string; status: string; availability: string;
   address: string; location_short: string; map_url: string;
-  building_type: string; total_flats: string; flat_sizes: string; handover_date: string; features: string[]; description: string;
+  building_type: string; total_floors: string; units_per_floor: string; total_flats: string; flat_sizes: string; handover_date: string; features: string[]; description: string;
   progress_pct: number; cover_media_id: string | null; published: boolean;
 };
 type Stage = { stage: string; status: string; completed_on: string; note: string };
+type Unit = { label: string; size_sqft: string; bedrooms: string; bathrooms: string; balconies: string; note: string };
+const blankUnit = (i: number): Unit => ({ label: `Unit ${String.fromCharCode(65 + i)}`, size_sqft: "", bedrooms: "", bathrooms: "", balconies: "", note: "" });
+const num = (v: string) => (v.trim() && /^\d+$/.test(v.trim()) ? Number(v.trim()) : null);
 type Upload = { key: string; name: string; pct: number; error?: string };
 
 const blank = (kind: Kind): Form => ({
   name: "", project_no: "", kind, slug: "", status: kind === "upcoming" ? "Upcoming" : "Ongoing", availability: kind === "upcoming" ? "Coming soon" : "Available",
-  address: "", location_short: "", map_url: "", building_type: "", total_flats: "", flat_sizes: "", handover_date: "", features: [], description: "",
+  address: "", location_short: "", map_url: "", building_type: "", total_floors: "", units_per_floor: "", total_flats: "", flat_sizes: "", handover_date: "", features: [], description: "",
   progress_pct: 0, cover_media_id: null, published: false,
 });
 const blankStages = (): Stage[] => STAGES.map((s) => ({ stage: s, status: "Not started", completed_on: "", note: "" }));
@@ -37,6 +40,7 @@ export function ProjectWizard({ id: initialId, kind: initialKind = "current" }: 
   const [form, setForm] = useState<Form>(blank(initialKind));
   const [slugTouched, setSlugTouched] = useState(!!initialId);
   const [stages, setStages] = useState<Stage[]>(blankStages());
+  const [units, setUnits] = useState<Unit[]>([]);
   const [images, setImages] = useState<MediaRow[]>([]);
   const [uploads, setUploads] = useState<Upload[]>([]);
   const [step, setStep] = useState(0);
@@ -47,14 +51,16 @@ export function ProjectWizard({ id: initialId, kind: initialKind = "current" }: 
   useEffect(() => {
     if (!initialId) return;
     (async () => {
-      const [p, s, m] = await Promise.all([
+      const [p, s, m, u] = await Promise.all([
         supabase.from("projects").select("*").eq("id", initialId).maybeSingle(),
         supabase.from("project_stages").select("*").eq("project_id", initialId).order("sort_order"),
         supabase.from("media").select("*").eq("project_id", initialId).order("sort_order"),
+        supabase.from("project_units").select("*").eq("project_id", initialId).order("sort_order"),
       ]);
       if (p.error || !p.data) { toast.error("Project not found"); navigate({ to: "/admin/projects" }); return; }
       const d = p.data;
-      setForm({ ...blank(d.kind as Kind), ...d, kind: d.kind as Kind, total_flats: d.total_flats?.toString() ?? "" });
+      setForm({ ...blank(d.kind as Kind), ...d, kind: d.kind as Kind, total_flats: d.total_flats?.toString() ?? "", total_floors: d.total_floors?.toString() ?? "", units_per_floor: d.units_per_floor?.toString() ?? "" });
+      setUnits((u.data ?? []).map((x) => ({ label: x.label, size_sqft: x.size_sqft?.toString() ?? "", bedrooms: x.bedrooms?.toString() ?? "", bathrooms: x.bathrooms?.toString() ?? "", balconies: x.balconies?.toString() ?? "", note: x.note })));
       if (s.data?.length) setStages(STAGES.map((st) => { const r = s.data.find((x) => x.stage === st); return { stage: st, status: r?.status ?? "Not started", completed_on: r?.completed_on ?? "", note: r?.note ?? "" }; }));
       setImages(m.data ?? []);
       setLoading(false);
@@ -76,7 +82,7 @@ export function ProjectWizard({ id: initialId, kind: initialKind = "current" }: 
       if (!form.address.trim()) e["address"] = "Address is required";
     }
     if (name === "Building details" || name === "all") {
-      if (form.total_flats && !/^\d+$/.test(form.total_flats)) e["total_flats"] = "Enter a whole number";
+      for (const k of ["total_flats", "total_floors", "units_per_floor"] as const) if (form[k] && !/^\d+$/.test(form[k])) e[k] = "Enter a whole number";
     }
     setErrors(e);
     return Object.keys(e).length === 0;
@@ -94,7 +100,7 @@ export function ProjectWizard({ id: initialId, kind: initialKind = "current" }: 
       const row = {
         name: form.name.trim(), project_no: form.project_no.trim(), kind: form.kind, slug: form.slug, status: form.status, availability: form.availability,
         address: form.address.trim(), location_short: form.location_short.trim(), map_url: form.map_url.trim(),
-        building_type: form.building_type.trim(), total_flats: form.total_flats ? Number(form.total_flats) : null, flat_sizes: form.flat_sizes.trim(),
+        building_type: form.building_type.trim(), total_flats: form.total_flats ? Number(form.total_flats) : null, total_floors: num(form.total_floors), units_per_floor: num(form.units_per_floor), flat_sizes: form.flat_sizes.trim(),
         handover_date: form.handover_date.trim(), features: form.features, description: form.description, progress_pct: isUpcoming ? 0 : form.progress_pct,
         cover_media_id: form.cover_media_id, published: opts.publish ?? form.published,
       };
@@ -113,6 +119,12 @@ export function ProjectWizard({ id: initialId, kind: initialKind = "current" }: 
         await supabase.from("project_stages").delete().eq("project_id", pid);
         const { error } = await supabase.from("project_stages").insert(stages.map((s, i) => ({ project_id: pid!, stage: s.stage, status: s.status, completed_on: s.completed_on || null, note: s.note, sort_order: i + 1 })));
         if (error) throw error;
+      }
+      {
+        const { error: delErr } = await supabase.from("project_units").delete().eq("project_id", pid);
+        if (delErr) throw delErr;
+        const rows = units.filter((u) => u.label.trim() || u.size_sqft.trim()).map((u, i) => ({ project_id: pid!, label: u.label.trim(), size_sqft: num(u.size_sqft), bedrooms: num(u.bedrooms), bathrooms: num(u.bathrooms), balconies: num(u.balconies), note: u.note.trim(), sort_order: i + 1 }));
+        if (rows.length) { const { error } = await supabase.from("project_units").insert(rows); if (error) throw error; }
       }
       const res = await Promise.all(images.map((m, i) => supabase.from("media").update({ sort_order: i + 1, alt_text: m.alt_text, title: m.title }).eq("id", m.id)));
       const bad = res.find((r) => r.error);
@@ -215,9 +227,33 @@ export function ProjectWizard({ id: initialId, kind: initialKind = "current" }: 
           <>
             <div className="grid gap-4 sm:grid-cols-2">
               <Field label="Building type"><input className="admin-input" value={form.building_type} onChange={(e) => set("building_type", e.target.value)} placeholder="B+G+7 (8-storey)" /></Field>
+              <Field label="Number of floors" error={errors["total_floors"]}><input className="admin-input" inputMode="numeric" value={form.total_floors} onChange={(e) => set("total_floors", e.target.value)} placeholder="8" /></Field>
+              <Field label="Units per floor" error={errors["units_per_floor"]}><input className="admin-input" inputMode="numeric" value={form.units_per_floor} onChange={(e) => set("units_per_floor", e.target.value)} placeholder="4" /></Field>
               <Field label="Total flats" error={errors["total_flats"]}><input className="admin-input" inputMode="numeric" value={form.total_flats} onChange={(e) => set("total_flats", e.target.value)} /></Field>
               <Field label="Flat sizes"><input className="admin-input" value={form.flat_sizes} onChange={(e) => set("flat_sizes", e.target.value)} placeholder="1,250–1,450 sft" /></Field>
               <Field label="Handover date"><input className="admin-input" value={form.handover_date} onChange={(e) => set("handover_date", e.target.value)} placeholder="December 2027" /></Field>
+            </div>
+            <div>
+              <div className="flex items-center justify-between">
+                <span className={label}>Unit types</span>
+                <button type="button" onClick={() => setUnits((u) => [...u, blankUnit(u.length)])} className="btn btn-ghost-light !px-4 !py-2 !text-xs">+ Add unit</button>
+              </div>
+              {units.length === 0 && <p className="mt-2 text-sm text-muted-foreground">No units yet. Add Unit A, Unit B… with size, beds, baths and balconies.</p>}
+              <div className="mt-3 space-y-3">
+                {units.map((u, i) => {
+                  const up = (k: keyof Unit, v: string) => setUnits((all) => all.map((x, j) => (j === i ? { ...x, [k]: v } : x)));
+                  return (
+                    <div key={i} className="grid grid-cols-2 gap-2 rounded-xl border border-border p-3 sm:grid-cols-[1.2fr_1fr_repeat(3,0.8fr)_auto]">
+                      <input className="admin-input" aria-label="Unit name" value={u.label} onChange={(e) => up("label", e.target.value)} placeholder="Unit A" />
+                      <input className="admin-input" aria-label="Size (sqft)" inputMode="numeric" value={u.size_sqft} onChange={(e) => up("size_sqft", e.target.value)} placeholder="sqft" />
+                      <input className="admin-input" aria-label="Bedrooms" inputMode="numeric" value={u.bedrooms} onChange={(e) => up("bedrooms", e.target.value)} placeholder="Beds" />
+                      <input className="admin-input" aria-label="Bathrooms" inputMode="numeric" value={u.bathrooms} onChange={(e) => up("bathrooms", e.target.value)} placeholder="Baths" />
+                      <input className="admin-input" aria-label="Balconies" inputMode="numeric" value={u.balconies} onChange={(e) => up("balconies", e.target.value)} placeholder="Balc." />
+                      <button type="button" onClick={() => setUnits((all) => all.filter((_, j) => j !== i))} className="text-sm text-brand-red hover:underline" aria-label={`Remove ${u.label || "unit"}`}>Remove</button>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
             <Field label="Key features"><TagInput value={form.features} onChange={(v) => set("features", v)} /></Field>
             <Field label="Description"><RichText value={form.description} onChange={(v) => set("description", v)} /></Field>
@@ -283,7 +319,7 @@ export function ProjectWizard({ id: initialId, kind: initialKind = "current" }: 
           <dl className="grid gap-3 text-sm sm:grid-cols-2">
             {[
               ["Name", form.name], ["Project number", form.project_no], ["Kind", form.kind], ["Slug", `/projects/${form.slug}`], ["Status", form.status], ["Availability", form.availability],
-              ["Address", form.address], ["Short location", form.location_short], ["Building type", form.building_type], ["Total flats", form.total_flats], ["Flat sizes", form.flat_sizes], ["Handover", form.handover_date],
+              ["Address", form.address], ["Short location", form.location_short], ["Building type", form.building_type], ["Floors", form.total_floors], ["Units per floor", form.units_per_floor], ["Total flats", form.total_flats], ["Unit types", units.map((u) => `${u.label}${u.size_sqft ? ` ${u.size_sqft} sqft` : ""}`).join(", ")], ["Flat sizes", form.flat_sizes], ["Handover", form.handover_date],
               ["Features", form.features.join(", ")], ...(isUpcoming ? [] : [["Progress", `${form.progress_pct}%`]]), ["Images", `${images.length} (${form.cover_media_id ? "cover chosen" : "no cover"})`],
             ].map(([k, v]) => (
               <div key={k} className="border-b border-border pb-2"><dt className="text-muted-foreground">{k}</dt><dd className="font-medium text-navy">{v || "—"}</dd></div>

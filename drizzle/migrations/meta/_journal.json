@@ -15,6 +15,13 @@
       "when": 1792559128096,
       "tag": "0001_admin_panel",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1792563574148,
+      "tag": "0002_project_floors_units",
+      "breakpoints": true
     }
   ]
 }

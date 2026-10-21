@@ -26,6 +26,153 @@ export type Database = {
         }
         Relationships: []
       }
+      construction_items: {
+        Row: {
+          category: string
+          id: string
+          name: string
+          progress_pct: number
+          project_id: string
+          sort_order: number
+          status: string
+        }
+        Insert: {
+          category: string
+          id?: string
+          name: string
+          progress_pct?: number
+          project_id: string
+          sort_order?: number
+          status?: string
+        }
+        Update: {
+          category?: string
+          id?: string
+          name?: string
+          progress_pct?: number
+          project_id?: string
+          sort_order?: number
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "construction_items_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      construction_subscribers: {
+        Row: {
+          created_at: string
+          email: string | null
+          id: string
+          name: string
+          phone: string
+          project_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          id?: string
+          name: string
+          phone: string
+          project_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          id?: string
+          name?: string
+          phone?: string
+          project_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "construction_subscribers_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      construction_update_media: {
+        Row: {
+          id: string
+          media_id: string
+          sort_order: number
+          update_id: string
+        }
+        Insert: {
+          id?: string
+          media_id: string
+          sort_order?: number
+          update_id: string
+        }
+        Update: {
+          id?: string
+          media_id?: string
+          sort_order?: number
+          update_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "construction_update_media_media_id_fkey"
+            columns: ["media_id"]
+            isOneToOne: false
+            referencedRelation: "media"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "construction_update_media_update_id_fkey"
+            columns: ["update_id"]
+            isOneToOne: false
+            referencedRelation: "construction_updates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      construction_updates: {
+        Row: {
+          created_at: string
+          id: string
+          month: string
+          note: string
+          project_id: string
+          sort_order: number
+          title: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          month: string
+          note?: string
+          project_id: string
+          sort_order?: number
+          title?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          month?: string
+          note?: string
+          project_id?: string
+          sort_order?: number
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "construction_updates_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       contact_submissions: {
         Row: {
           created_at: string
@@ -208,6 +355,7 @@ export type Database = {
           cover_media_id: string | null
           created_at: string
           description: string
+          expected_completion: string
           features: string[]
           flat_sizes: string
           handover_date: string
@@ -222,6 +370,8 @@ export type Database = {
           slug: string
           sort_order: number
           status: string
+          status_details_published: boolean
+          status_updated_at: string | null
           total_flats: number | null
           total_floors: number | null
           units_per_floor: number | null
@@ -234,6 +384,7 @@ export type Database = {
           cover_media_id?: string | null
           created_at?: string
           description?: string
+          expected_completion?: string
           features?: string[]
           flat_sizes?: string
           handover_date?: string
@@ -248,6 +399,8 @@ export type Database = {
           slug: string
           sort_order?: number
           status?: string
+          status_details_published?: boolean
+          status_updated_at?: string | null
           total_flats?: number | null
           total_floors?: number | null
           units_per_floor?: number | null
@@ -260,6 +413,7 @@ export type Database = {
           cover_media_id?: string | null
           created_at?: string
           description?: string
+          expected_completion?: string
           features?: string[]
           flat_sizes?: string
           handover_date?: string
@@ -274,6 +428,8 @@ export type Database = {
           slug?: string
           sort_order?: number
           status?: string
+          status_details_published?: boolean
+          status_updated_at?: string | null
           total_flats?: number | null
           total_floors?: number | null
           units_per_floor?: number | null

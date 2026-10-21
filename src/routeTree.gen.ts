@@ -14,6 +14,7 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as ConstructionStatusRouteImport } from './routes/construction-status'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as DirectorsRouteImport } from './routes/directors'
 import { Route as FloorPlanRouteImport } from './routes/floor-plan'
@@ -22,10 +23,12 @@ import { Route as ProjectsRouteImport } from './routes/projects'
 import { Route as ServicesRouteImport } from './routes/services'
 import { Route as AuthenticatedAccountRouteImport } from './routes/_authenticated/account'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
+import { Route as AdminConstructionRouteImport } from './routes/admin.construction'
 import { Route as AdminMediaRouteImport } from './routes/admin.media'
 import { Route as AdminMessagesRouteImport } from './routes/admin.messages'
 import { Route as AdminUpcomingRouteImport } from './routes/admin.upcoming'
 import { Route as AdminVideosRouteImport } from './routes/admin.videos'
+import { Route as ConstructionStatusSlugRouteImport } from './routes/construction-status_.$slug'
 import { Route as ProjectsSlugRouteImport } from './routes/projects_.$slug'
 import { Route as AdminProjectsIndexRouteImport } from './routes/admin.projects.index'
 import { Route as AdminProjectsIdRouteImport } from './routes/admin.projects.$id'
@@ -53,6 +56,11 @@ const AdminRoute = AdminRouteImport.update({
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ConstructionStatusRoute = ConstructionStatusRouteImport.update({
+  id: '/construction-status',
+  path: '/construction-status',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ContactRoute = ContactRouteImport.update({
@@ -95,6 +103,11 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminConstructionRoute = AdminConstructionRouteImport.update({
+  id: '/construction',
+  path: '/construction',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminMediaRoute = AdminMediaRouteImport.update({
   id: '/media',
   path: '/media',
@@ -114,6 +127,11 @@ const AdminVideosRoute = AdminVideosRouteImport.update({
   id: '/videos',
   path: '/videos',
   getParentRoute: () => AdminRoute,
+} as any)
+const ConstructionStatusSlugRoute = ConstructionStatusSlugRouteImport.update({
+  id: '/construction-status_/$slug',
+  path: '/construction-status/$slug',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const ProjectsSlugRoute = ProjectsSlugRouteImport.update({
   id: '/projects_/$slug',
@@ -141,6 +159,7 @@ export interface FileRoutesByFullPath {
   '/about': typeof AboutRoute
   '/admin': typeof AdminRouteWithChildren
   '/auth': typeof AuthRoute
+  '/construction-status': typeof ConstructionStatusRoute
   '/contact': typeof ContactRoute
   '/directors': typeof DirectorsRoute
   '/floor-plan': typeof FloorPlanRoute
@@ -148,10 +167,12 @@ export interface FileRoutesByFullPath {
   '/projects': typeof ProjectsRoute
   '/services': typeof ServicesRoute
   '/account': typeof AuthenticatedAccountRoute
+  '/admin/construction': typeof AdminConstructionRoute
   '/admin/media': typeof AdminMediaRoute
   '/admin/messages': typeof AdminMessagesRoute
   '/admin/upcoming': typeof AdminUpcomingRoute
   '/admin/videos': typeof AdminVideosRoute
+  '/construction-status/$slug': typeof ConstructionStatusSlugRoute
   '/projects/$slug': typeof ProjectsSlugRoute
   '/admin/': typeof AdminIndexRoute
   '/admin/projects/$id': typeof AdminProjectsIdRoute
@@ -162,6 +183,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/auth': typeof AuthRoute
+  '/construction-status': typeof ConstructionStatusRoute
   '/contact': typeof ContactRoute
   '/directors': typeof DirectorsRoute
   '/floor-plan': typeof FloorPlanRoute
@@ -169,10 +191,12 @@ export interface FileRoutesByTo {
   '/projects': typeof ProjectsRoute
   '/services': typeof ServicesRoute
   '/account': typeof AuthenticatedAccountRoute
+  '/admin/construction': typeof AdminConstructionRoute
   '/admin/media': typeof AdminMediaRoute
   '/admin/messages': typeof AdminMessagesRoute
   '/admin/upcoming': typeof AdminUpcomingRoute
   '/admin/videos': typeof AdminVideosRoute
+  '/construction-status/$slug': typeof ConstructionStatusSlugRoute
   '/projects/$slug': typeof ProjectsSlugRoute
   '/admin': typeof AdminIndexRoute
   '/admin/projects/$id': typeof AdminProjectsIdRoute
@@ -186,6 +210,7 @@ export interface FileRoutesById {
   '/about': typeof AboutRoute
   '/admin': typeof AdminRouteWithChildren
   '/auth': typeof AuthRoute
+  '/construction-status': typeof ConstructionStatusRoute
   '/contact': typeof ContactRoute
   '/directors': typeof DirectorsRoute
   '/floor-plan': typeof FloorPlanRoute
@@ -193,10 +218,12 @@ export interface FileRoutesById {
   '/projects': typeof ProjectsRoute
   '/services': typeof ServicesRoute
   '/_authenticated/account': typeof AuthenticatedAccountRoute
+  '/admin/construction': typeof AdminConstructionRoute
   '/admin/media': typeof AdminMediaRoute
   '/admin/messages': typeof AdminMessagesRoute
   '/admin/upcoming': typeof AdminUpcomingRoute
   '/admin/videos': typeof AdminVideosRoute
+  '/construction-status_/$slug': typeof ConstructionStatusSlugRoute
   '/projects_/$slug': typeof ProjectsSlugRoute
   '/admin/': typeof AdminIndexRoute
   '/admin/projects/$id': typeof AdminProjectsIdRoute
@@ -210,6 +237,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/admin'
     | '/auth'
+    | '/construction-status'
     | '/contact'
     | '/directors'
     | '/floor-plan'
@@ -217,10 +245,12 @@ export interface FileRouteTypes {
     | '/projects'
     | '/services'
     | '/account'
+    | '/admin/construction'
     | '/admin/media'
     | '/admin/messages'
     | '/admin/upcoming'
     | '/admin/videos'
+    | '/construction-status/$slug'
     | '/projects/$slug'
     | '/admin/'
     | '/admin/projects/$id'
@@ -231,6 +261,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/auth'
+    | '/construction-status'
     | '/contact'
     | '/directors'
     | '/floor-plan'
@@ -238,10 +269,12 @@ export interface FileRouteTypes {
     | '/projects'
     | '/services'
     | '/account'
+    | '/admin/construction'
     | '/admin/media'
     | '/admin/messages'
     | '/admin/upcoming'
     | '/admin/videos'
+    | '/construction-status/$slug'
     | '/projects/$slug'
     | '/admin'
     | '/admin/projects/$id'
@@ -254,6 +287,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/admin'
     | '/auth'
+    | '/construction-status'
     | '/contact'
     | '/directors'
     | '/floor-plan'
@@ -261,10 +295,12 @@ export interface FileRouteTypes {
     | '/projects'
     | '/services'
     | '/_authenticated/account'
+    | '/admin/construction'
     | '/admin/media'
     | '/admin/messages'
     | '/admin/upcoming'
     | '/admin/videos'
+    | '/construction-status_/$slug'
     | '/projects_/$slug'
     | '/admin/'
     | '/admin/projects/$id'
@@ -278,12 +314,14 @@ export interface RootRouteChildren {
   AboutRoute: typeof AboutRoute
   AdminRoute: typeof AdminRouteWithChildren
   AuthRoute: typeof AuthRoute
+  ConstructionStatusRoute: typeof ConstructionStatusRoute
   ContactRoute: typeof ContactRoute
   DirectorsRoute: typeof DirectorsRoute
   FloorPlanRoute: typeof FloorPlanRoute
   LocationRoute: typeof LocationRoute
   ProjectsRoute: typeof ProjectsRoute
   ServicesRoute: typeof ServicesRoute
+  ConstructionStatusSlugRoute: typeof ConstructionStatusSlugRoute
   ProjectsSlugRoute: typeof ProjectsSlugRoute
 }
 
@@ -322,6 +360,13 @@ declare module '@tanstack/react-router' {
       path: '/auth'
       fullPath: '/auth'
       preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/construction-status': {
+      id: '/construction-status'
+      path: '/construction-status'
+      fullPath: '/construction-status'
+      preLoaderRoute: typeof ConstructionStatusRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/contact': {
@@ -380,6 +425,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminIndexRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/construction': {
+      id: '/admin/construction'
+      path: '/construction'
+      fullPath: '/admin/construction'
+      preLoaderRoute: typeof AdminConstructionRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/media': {
       id: '/admin/media'
       path: '/media'
@@ -407,6 +459,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/videos'
       preLoaderRoute: typeof AdminVideosRouteImport
       parentRoute: typeof AdminRoute
+    }
+    '/construction-status_/$slug': {
+      id: '/construction-status_/$slug'
+      path: '/construction-status/$slug'
+      fullPath: '/construction-status/$slug'
+      preLoaderRoute: typeof ConstructionStatusSlugRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/projects_/$slug': {
       id: '/projects_/$slug'
@@ -451,6 +510,7 @@ const AuthenticatedRouteRouteWithChildren =
   AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
 interface AdminRouteChildren {
+  AdminConstructionRoute: typeof AdminConstructionRoute
   AdminMediaRoute: typeof AdminMediaRoute
   AdminMessagesRoute: typeof AdminMessagesRoute
   AdminUpcomingRoute: typeof AdminUpcomingRoute
@@ -462,6 +522,7 @@ interface AdminRouteChildren {
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
+  AdminConstructionRoute: AdminConstructionRoute,
   AdminMediaRoute: AdminMediaRoute,
   AdminMessagesRoute: AdminMessagesRoute,
   AdminUpcomingRoute: AdminUpcomingRoute,
@@ -480,12 +541,14 @@ const rootRouteChildren: RootRouteChildren = {
   AboutRoute: AboutRoute,
   AdminRoute: AdminRouteWithChildren,
   AuthRoute: AuthRoute,
+  ConstructionStatusRoute: ConstructionStatusRoute,
   ContactRoute: ContactRoute,
   DirectorsRoute: DirectorsRoute,
   FloorPlanRoute: FloorPlanRoute,
   LocationRoute: LocationRoute,
   ProjectsRoute: ProjectsRoute,
   ServicesRoute: ServicesRoute,
+  ConstructionStatusSlugRoute: ConstructionStatusSlugRoute,
   ProjectsSlugRoute: ProjectsSlugRoute,
 }
 export const routeTree = rootRouteImport

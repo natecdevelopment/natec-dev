@@ -13,6 +13,7 @@ const nav = [
   { to: "/", label: "Home" },
   { to: "/about", label: "About" },
   { to: "/projects", label: "Projects" },
+  { to: "/construction-status", label: "Construction Status" },
   { to: "/floor-plan", label: "Floor Plan" },
   { to: "/location", label: "Location" },
   { to: "/contact", label: "Contact" },
@@ -66,7 +67,7 @@ export function Header() {
             </span>
             <span className="sr-only">Natec Development Ltd. — home</span>
           </Link>
-          <nav className="hidden items-center gap-7 lg:flex">
+          <nav className="hidden items-center gap-6 xl:flex">
             {nav.map((n) => (
               <Link
                 key={n.to}
@@ -87,14 +88,14 @@ export function Header() {
             <a href={company.whatsappLink} target="_blank" rel="noreferrer" aria-label="WhatsApp" className="flex h-10 w-10 items-center justify-center rounded-full bg-brand-red text-white sm:hidden">
               <WhatsAppIcon />
             </a>
-            <button className="rounded-full p-2 text-navy hover:bg-navy/5 lg:hidden" onClick={() => setOpen(!open)} aria-label={open ? "Close menu" : "Open menu"}>
+            <button className="rounded-full p-2 text-navy hover:bg-navy/5 xl:hidden" onClick={() => setOpen(!open)} aria-label={open ? "Close menu" : "Open menu"}>
               {open ? <X /> : <Menu />}
             </button>
           </div>
         </div>
       </div>
       {open && (
-        <nav className="fixed inset-0 -z-10 flex flex-col gap-1 overflow-y-auto bg-white px-6 pb-8 pt-24 text-navy md:pt-28 lg:hidden">
+        <nav className="fixed inset-0 -z-10 flex flex-col gap-1 overflow-y-auto bg-white px-6 pb-8 pt-24 text-navy md:pt-28 xl:hidden">
           {nav.map((n) => (
             <Link key={n.to} to={n.to} onClick={() => setOpen(false)} className="border-b border-navy/10 py-4 font-display text-3xl hover:text-brand-red" activeProps={{ className: "!text-brand-red" }} activeOptions={{ exact: true }}>
               {n.label}
@@ -141,11 +142,11 @@ export function Footer() {
   );
 }
 
-export type Crumb = { label: string; to?: "/" | "/projects" | "/about" };
+export type Crumb = { label: string; to?: "/" | "/projects" | "/about" | "/construction-status" };
 
 /** Shared page hero. With `image` it renders full-bleed (photo + navy veil, copy bottom-left, scroll parallax). */
-export function PageHero({ eyebrow, title, intro, image, imageAlt = "", imagePosition = "center", crumbs, children, heightClass = "min-h-[78svh] md:min-h-[76svh]" }: {
-  eyebrow: string; title: React.ReactNode; intro?: React.ReactNode; image?: string | null; imageAlt?: string; imagePosition?: string; crumbs?: Crumb[]; children?: React.ReactNode; heightClass?: string;
+export function PageHero({ eyebrow, title, intro, image, imageAlt = "", imagePosition = "center", crumbs, children, top, heightClass = "min-h-[78svh] md:min-h-[76svh]" }: {
+  eyebrow: string; title: React.ReactNode; intro?: React.ReactNode; image?: string | null; imageAlt?: string; imagePosition?: string; crumbs?: Crumb[]; children?: React.ReactNode; top?: React.ReactNode; heightClass?: string;
 }) {
   const [el, setEl] = useState<HTMLElement | null>(null);
   useEffect(() => {
@@ -185,6 +186,7 @@ export function PageHero({ eyebrow, title, intro, image, imageAlt = "", imagePos
       <img src={image} alt={imageAlt} width={1600} height={1000} fetchPriority="high" className="about-hero-img absolute inset-0 h-full w-full object-cover" style={{ objectPosition: imagePosition }} />
       <div className="about-hero-veil absolute inset-0" aria-hidden />
       <div className="about-hero-copy container-x relative z-10 pb-14 pt-28 md:pb-20">
+        {top && <div className="hero-in mb-4">{top}</div>}
         {crumbNav}
         <p className="eyebrow hero-in mt-8 text-white/70" style={{ animationDelay: "120ms" }}>{eyebrow}</p>
         <h1 className="hero-in mt-4 max-w-[22ch]" style={{ animationDelay: "220ms" }}>{title}</h1>

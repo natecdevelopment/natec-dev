@@ -9,6 +9,7 @@ import { Lightbox } from "@/components/Lightbox";
 import { ProjectCard, SoldOutBadge, StatusBadge } from "@/components/ProjectCard";
 import { mapEmbed, waMessage } from "@/components/ProjectsGrid";
 import { publicProjectsQuery } from "@/lib/projects-data";
+import { isListed } from "@/lib/construction-data";
 import { sanitizeHtml } from "@/lib/sanitize";
 import { company } from "@/lib/site";
 
@@ -200,7 +201,10 @@ function ProjectPage() {
 
           {!upcoming && (
             <Reveal as="section">
-              <h2 className="text-primary">Construction progress</h2>
+              <div className="flex flex-wrap items-end justify-between gap-3">
+                <h2 className="text-primary">Construction progress</h2>
+                {isListed(p) && <Link to="/construction-status/$slug" params={{ slug: p.slug }} className="eyebrow inline-flex min-h-[44px] items-center !text-[12px] text-brand-red hover:text-navy">Construction status →</Link>}
+              </div>
               <div className="mt-8 grid items-start gap-10 md:grid-cols-[220px_1fr]">
                 <ProgressRing pct={p.progress_pct} />
                 {p.stages.length > 0 ? (

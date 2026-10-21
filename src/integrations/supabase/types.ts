@@ -150,6 +150,50 @@ export type Database = {
           },
         ]
       }
+      project_units: {
+        Row: {
+          balconies: number | null
+          bathrooms: number | null
+          bedrooms: number | null
+          id: string
+          label: string
+          note: string
+          project_id: string
+          size_sqft: number | null
+          sort_order: number
+        }
+        Insert: {
+          balconies?: number | null
+          bathrooms?: number | null
+          bedrooms?: number | null
+          id?: string
+          label?: string
+          note?: string
+          project_id: string
+          size_sqft?: number | null
+          sort_order?: number
+        }
+        Update: {
+          balconies?: number | null
+          bathrooms?: number | null
+          bedrooms?: number | null
+          id?: string
+          label?: string
+          note?: string
+          project_id?: string
+          size_sqft?: number | null
+          sort_order?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_units_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       projects: {
         Row: {
           address: string
@@ -173,6 +217,8 @@ export type Database = {
           sort_order: number
           status: string
           total_flats: number | null
+          total_floors: number | null
+          units_per_floor: number | null
           updated_at: string
         }
         Insert: {
@@ -197,6 +243,8 @@ export type Database = {
           sort_order?: number
           status?: string
           total_flats?: number | null
+          total_floors?: number | null
+          units_per_floor?: number | null
           updated_at?: string
         }
         Update: {
@@ -221,6 +269,8 @@ export type Database = {
           sort_order?: number
           status?: string
           total_flats?: number | null
+          total_floors?: number | null
+          units_per_floor?: number | null
           updated_at?: string
         }
         Relationships: [

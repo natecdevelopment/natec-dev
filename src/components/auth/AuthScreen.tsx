@@ -62,12 +62,12 @@ export function AuthScreen({ mode, next }: { mode: Mode; next?: string | undefin
   const form = mode === "login" ? <LoginForm key="login" onDone={finish} next={next} /> : <RegisterForm key="register" next={next} />;
 
   return (
-    <section className="relative bg-ivory pb-14 pt-[88px] md:pt-[96px] lg:min-h-[calc(100svh-72px)]">
+    <section className="relative bg-ivory pb-14 pt-6 lg:min-h-[calc(100svh-72px)]">
       {desktop ? (
         <div className="relative mx-auto grid w-full grid-cols-2">
           <motion.div className="relative z-10 bg-white" initial={false} animate={{ x: mode === "login" ? "0%" : "100%" }} transition={{ duration: dur, ease: EASE }}>
             <AutoHeight dur={dur}>
-              <div className="flex min-h-[calc(100svh-168px)] items-center justify-center px-10 py-12">
+              <div className="flex min-h-[calc(100svh-152px)] items-center justify-center px-10 py-12">
                 <div className="w-full max-w-md">
                   <AnimatePresence mode="wait" initial={false}>{form}</AnimatePresence>
                 </div>

@@ -25,3 +25,4 @@
 - Account deletion runs only in the deleteAccount server function (admin-checked, service role loaded in-handler); admin actions are logged to public.admin_audit_log.
 - Client edits save through the admin_save_client DB function (one transaction, is_admin-checked, audit-logged); payment changes re-apply via admin_reallocate_payments — so partial saves can't happen.
 - Login (site + /admin) goes through signInWithIdentifier in src/lib/login.functions.ts: email/phone/username resolved and password checked on the server, rate-limited via public.login_attempts, so the browser never learns another account's email.
+- Client portal logins are created/reset only in src/lib/portal-logins.functions.ts (admin-checked, service role in-handler); temp passwords are returned once and never stored or logged; clients without email get <username>@clients.natecdev.com, treated as non-real by isSyntheticEmail.

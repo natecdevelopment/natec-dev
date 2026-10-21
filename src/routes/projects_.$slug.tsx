@@ -7,7 +7,7 @@ import { InquiryForm } from "@/components/InquiryForm";
 import { Lightbox } from "@/components/Lightbox";
 import { ProjectCard, SoldOutBadge, StatusBadge } from "@/components/ProjectCard";
 import { mapEmbed, waMessage } from "@/components/ProjectsGrid";
-import { publicProjectsQuery, type ProjectWithMedia } from "@/lib/projects-data";
+import { publicProjectsQuery } from "@/lib/projects-data";
 import { sanitizeHtml } from "@/lib/sanitize";
 import { company } from "@/lib/site";
 
@@ -264,4 +264,3 @@ function ProjectPage() {
   );
 }
 
-export type { ProjectWithMedia };

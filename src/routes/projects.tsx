@@ -12,7 +12,7 @@ const TITLE = "Residential Projects in Gazipur | Natec Development Ltd.";
 const DESC = "Natec residential projects in Sreepur, Gazipur: 75 homes at Rajendrapur Bazar delivered or under construction, all sold, plus upcoming projects.";
 const WA_VISIT = waMessage("Hi Natec, I'd like to book a site visit at Rajendrapur Bazar.");
 
-export function matchesTab(p: Pick<ProjectWithMedia, "kind" | "status">, tab: Tab) {
+function matchesTab(p: Pick<ProjectWithMedia, "kind" | "status">, tab: Tab) {
   if (tab === "all") return true;
   if (tab === "upcoming") return p.kind === "upcoming";
   if (p.kind === "upcoming") return false;

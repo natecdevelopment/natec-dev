@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { CheckCircle2, Plus, Trash2 } from "lucide-react";
+import { CheckCircle2, Lock, Plus, Trash2 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { btnDanger, btnSm } from "@/components/admin/ui";
 import { fmtDate } from "@/lib/account";
@@ -19,6 +19,7 @@ export function planBlocker(s: PlanState, bookingDate: string): string | null {
   const first = Object.values(r.errors)[0];
   if (first) return first;
   if (s.rows.some((x) => !x.due_date || !(x.amount >= 0))) return "Every schedule row needs a date and an amount.";
+  if (s.rows.some((x) => x.amount < (x.paid ?? 0))) return "A paid instalment cannot be reduced below the amount already paid.";
   const remaining = s.plan.total - s.rows.reduce((a, x) => a + Number(x.amount || 0), 0);
   if (Math.abs(remaining) > 0.5) return `Remaining to plan must be ৳ 0 (now ${taka(remaining)}).`;
   return null;
@@ -29,8 +30,10 @@ const num = (v: string) => (digits(v) === "" ? 0 : Number(digits(v)));
 const FREQ: [PlanForm["freqMonths"], string][] = [[1, "Monthly"], [2, "Every 2 months"], [3, "Quarterly"], [6, "Every 6 months"], [12, "Yearly"]];
 const ROUND: [PlanForm["round"], string][] = [[0, "None"], [100, "৳100"], [500, "৳500"], [1000, "৳1,000"]];
 
-export function PaymentPlanForm({ value, onChange, bookingDate }: { value: PlanState; onChange: (s: PlanState) => void; bookingDate: string }) {
+/** `build` overrides how the schedule is generated (client editor: keep paid rows). Rows with paid > 0 are locked. */
+export function PaymentPlanForm({ value, onChange, bookingDate, build }: { value: PlanState; onChange: (s: PlanState) => void; bookingDate: string; build?: (p: PlanForm) => ScheduleRow[] }) {
   const { plan, rows, dirty } = value;
+  const gen = (p: PlanForm) => (build ? build(p) : computePlan(p, bookingDate).rows);
   const calc = useMemo(() => computePlan(plan, bookingDate), [plan, bookingDate]);
   const [pending, setPending] = useState<PlanForm | null>(null);
   const [kept, setKept] = useState(false);
@@ -38,7 +41,7 @@ export function PaymentPlanForm({ value, onChange, bookingDate }: { value: PlanS
   function setPlan(patch: Partial<PlanForm>) {
     const next = { ...plan, ...patch };
     if (dirty) { onChange({ ...value, plan: next }); if (!kept) setPending(next); return; }
-    onChange({ plan: next, rows: computePlan(next, bookingDate).rows, dirty: false });
+    onChange({ plan: next, rows: gen(next), dirty: false });
   }
   const setRow = (i: number, patch: Partial<ScheduleRow>) => onChange({ ...value, rows: rows.map((r, j) => (j === i ? { ...r, ...patch } : r)), dirty: true });
 
@@ -102,19 +105,28 @@ export function PaymentPlanForm({ value, onChange, bookingDate }: { value: PlanS
           <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
             <h3 className="!text-lg text-navy">Schedule</h3>
             <div className="flex gap-2">
-              {dirty && <button type="button" onClick={() => { setKept(false); onChange({ plan, rows: calc.rows, dirty: false }); }} className={btnSm}>Regenerate</button>}
+              {build ? <button type="button" onClick={() => setPending(plan)} className={btnSm}>Regenerate schedule</button> : dirty && <button type="button" onClick={() => { setKept(false); onChange({ plan, rows: calc.rows, dirty: false }); }} className={btnSm}>Regenerate</button>}
               <button type="button" onClick={() => onChange({ ...value, rows: [...rows, { due_date: plan.firstDue, amount: Math.max(0, remaining), label: "Instalment" }], dirty: true })} className={btnSm}><Plus className="h-4 w-4" /> Add row</button>
             </div>
           </div>
           {!rows.length ? <p className="text-sm text-muted-foreground">Fill in the fields above to build the schedule.</p> : (
             <ul className="space-y-2">
-              {rows.map((r, i) => (
-                <li key={i} className="grid grid-cols-[1fr_auto] gap-2 rounded-lg border border-border p-2 sm:grid-cols-[150px_1fr_140px_auto] sm:border-0 sm:p-0">
-                  <input type="date" value={r.due_date} aria-label={`${r.label} due date`} onChange={(ev) => setRow(i, { due_date: ev.target.value })} className="admin-input col-span-2 sm:col-span-1" />
+              {rows.map((r, i) => {
+                const paid = r.paid ?? 0, lock = paid > 0;
+                return (
+                <li key={r.id ?? `n${i}`} className={`grid grid-cols-[1fr_auto] gap-2 rounded-lg border border-border p-2 sm:grid-cols-[150px_1fr_140px_auto] sm:border-0 sm:p-0 ${lock ? "sm:bg-ivory/60" : ""}`}>
+                  <input type="date" value={r.due_date} disabled={lock} aria-label={`${r.label} due date`} onChange={(ev) => setRow(i, { due_date: ev.target.value })} className="admin-input col-span-2 disabled:opacity-70 sm:col-span-1" />
                   <input value={r.label} aria-label="Label" onChange={(ev) => setRow(i, { label: ev.target.value })} className="admin-input col-span-2 sm:col-span-1" />
-                  <input inputMode="numeric" value={String(r.amount)} aria-label={`${r.label} amount`} onChange={(ev) => setRow(i, { amount: num(ev.target.value) })} className="admin-input" />
-                  <button type="button" onClick={() => onChange({ ...value, rows: rows.filter((_, j) => j !== i), dirty: true })} className={btnDanger} aria-label={`Remove ${r.label}`}><Trash2 className="h-4 w-4" /></button>
+                  <div>
+                    <input inputMode="numeric" value={String(r.amount)} aria-label={`${r.label} amount`} aria-invalid={r.amount < paid} onChange={(ev) => setRow(i, { amount: num(ev.target.value) })} className="admin-input" />
+                    {lock && <p className={`mt-0.5 text-[11px] ${r.amount < paid ? "font-medium text-brand-red" : "text-muted-foreground"}`}>{r.amount < paid ? `Cannot be below ${taka(paid)} paid` : `${taka(paid)} paid`}</p>}
+                  </div>
+                  {lock
+                    ? <span title="Paid — locked" className="inline-flex h-9 w-9 items-center justify-center text-navy"><Lock className="h-4 w-4" aria-label="Paid — locked" /></span>
+                    : <button type="button" onClick={() => onChange({ ...value, rows: rows.filter((_, j) => j !== i), dirty: true })} className={btnDanger} aria-label={`Remove ${r.label}`}><Trash2 className="h-4 w-4" /></button>}
                 </li>
+                );
+              })}
               ))}
             </ul>
           )}
@@ -142,10 +154,10 @@ export function PaymentPlanForm({ value, onChange, bookingDate }: { value: PlanS
       <Dialog open={!!pending} onOpenChange={(o) => !o && setPending(null)}>
         <DialogContent>
           <DialogHeader><DialogTitle>Regenerate the schedule?</DialogTitle></DialogHeader>
-          <p className="text-sm text-muted-foreground">Your manual changes will be replaced.</p>
+          <p className="text-sm text-muted-foreground">{build ? "Unpaid instalments will be rebuilt from the fields above. Paid and partly-paid instalments are kept." : "Your manual changes will be replaced."}</p>
           <div className="mt-4 flex justify-end gap-2">
             <button type="button" onClick={() => { setKept(true); setPending(null); }} className={btnSm}>Keep my rows</button>
-            <button type="button" onClick={() => { setKept(false); if (pending) onChange({ plan: pending, rows: computePlan(pending, bookingDate).rows, dirty: false }); setPending(null); }} className="btn btn-primary !py-2">Regenerate</button>
+            <button type="button" onClick={() => { setKept(false); if (pending) onChange({ plan: pending, rows: gen(pending), dirty: !!build }); setPending(null); }} className="btn btn-primary !py-2">Regenerate</button>
           </div>
         </DialogContent>
       </Dialog>

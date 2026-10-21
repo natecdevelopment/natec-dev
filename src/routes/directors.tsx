@@ -23,8 +23,8 @@ export function DirectorsPage() {
       <section className="mx-auto grid max-w-7xl gap-6 px-5 py-20 sm:grid-cols-2 lg:grid-cols-3">
         {directors.map((d) => (
           <article key={d.name} className="flex flex-col border border-border bg-card p-7">
-            <div className="flex h-16 w-16 items-center justify-center bg-primary font-display text-2xl text-primary-foreground">
-              {d.name.replace("Md. ", "").split(" ").map((w) => w[0]).slice(0, 2).join("")}
+            <div className="flex h-16 w-16 items-center justify-center bg-primary text-primary-foreground">
+              {d.gender === "female" ? <PersonFemaleIcon className="h-8 w-8" /> : <PersonMaleIcon className="h-8 w-8" />}
             </div>
             <h2 className="mt-5 text-2xl font-semibold text-primary">{d.name}</h2>
             <p className="text-sm font-semibold text-accent">{d.role}</p>

@@ -150,7 +150,8 @@ function ClientDetail() {
       <Card>
         <h2 className="!text-xl text-navy">Admin notes</h2>
         <p className="text-xs text-muted-foreground">Only admins can see these.</p>
-        <textarea defaultValue={d.notes} rows={4} onBlur={async (e) => { const { error } = await supabase.from("client_notes").upsert({ client_id: c.id, notes: e.target.value, updated_at: new Date().toISOString() }); if (error) toast.error(error.message); else toast.success("Notes saved"); }} className="admin-input mt-3" />
+        {d.notes ? <div className="mt-3 whitespace-pre-wrap text-sm text-navy [&_ul]:list-disc [&_ul]:pl-5">{d.notes.replace(/<br\s*\/?>/gi, "\n").replace(/<\/(p|div|li)>/gi, "\n").replace(/<[^>]+>/g, "").trim()}</div> : <p className="mt-3 text-sm text-muted-foreground">No notes yet.</p>}
+        <Link to="/admin/accounts/clients/$id/edit" params={{ id: c.id }} className={`${btnSm} mt-3`}><Pencil className="h-4 w-4" /> Edit notes</Link>
       </Card>
 
       <Card className="border border-brand-red/30">

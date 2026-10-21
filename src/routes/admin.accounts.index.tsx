@@ -272,15 +272,16 @@ function Clients() {
       return { clients: c.data ?? [], balances: b.data ?? [], projects: p.data ?? [], users: u.data ?? [] };
     },
   });
-  const [term, setTerm] = useState(""); const [proj, setProj] = useState(""); const [status, setStatus] = useState("");
+  const [term, setTerm] = useState(""); const [proj, setProj] = useState(""); const [status, setStatus] = useState(""); const [hideDemo, setHideDemo] = useState(true);
   const rows = useMemo(() => {
     if (!q.data) return [];
     const t = term.trim().toLowerCase();
     return q.data.clients
-      .filter((c) => (!t || [c.full_name, c.phone, c.email, c.flat_no].some((v) => v.toLowerCase().includes(t))) && (!proj || c.project_id === proj) && (!status || c.status === status))
+      .filter((c) => (!hideDemo || !c.is_demo) && (!t || [c.full_name, c.phone, c.email, c.flat_no].some((v) => v.toLowerCase().includes(t))) && (!proj || c.project_id === proj) && (!status || c.status === status))
       .map((c) => ({ c, b: q.data.balances.find((x) => x.client_id === c.id), p: q.data.projects.find((x) => x.id === c.project_id) }));
-  }, [q.data, term, proj, status]);
-  const sum = (f: (r: (typeof rows)[number]) => number) => rows.reduce((s, r) => s + f(r), 0);
+  }, [q.data, term, proj, status, hideDemo]);
+  // demo clients never count towards business totals
+  const sum = (f: (r: (typeof rows)[number]) => number) => rows.filter((r) => !r.c.is_demo).reduce((s, r) => s + f(r), 0);
   const totals = [["Total sales value", sum((r) => Number(r.c.total_price))], ["Total collected", sum((r) => Number(r.b?.total_paid ?? 0))], ["Total due", sum((r) => Number(r.b?.amount_due ?? r.c.total_price))], ["Overdue", sum((r) => Number(r.b?.overdue_amount ?? 0))]] as const;
 
   return (

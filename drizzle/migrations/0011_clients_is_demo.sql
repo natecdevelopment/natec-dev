@@ -1,0 +1,1 @@
+ALTER TABLE public.clients ADD COLUMN is_demo boolean NOT NULL DEFAULT false;

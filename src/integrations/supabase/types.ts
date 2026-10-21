@@ -136,6 +136,7 @@ export type Database = {
           floor: string
           full_name: string
           id: string
+          is_demo: boolean
           parking: boolean
           payment_plan_note: string
           phone: string
@@ -156,6 +157,7 @@ export type Database = {
           floor?: string
           full_name: string
           id?: string
+          is_demo?: boolean
           parking?: boolean
           payment_plan_note?: string
           phone?: string
@@ -176,6 +178,7 @@ export type Database = {
           floor?: string
           full_name?: string
           id?: string
+          is_demo?: boolean
           parking?: boolean
           payment_plan_note?: string
           phone?: string

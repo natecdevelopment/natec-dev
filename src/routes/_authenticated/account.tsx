@@ -90,7 +90,7 @@ function AccountPage() {
   const active: Tab = items.some((m) => m.t === tab) ? tab : "overview";
 
   return (
-    <section className="min-h-screen bg-ivory pb-24 pt-20 md:pt-24 lg:pb-12">
+    <section className="min-h-screen bg-ivory pb-24 pt-6 md:pt-10 lg:pb-12">
       <div className="container-x grid gap-6 lg:grid-cols-[280px_minmax(0,1fr)] lg:gap-10">
         <aside className="hidden lg:block">
           <div className="sticky top-28 rounded-2xl bg-white p-6 shadow-sm">

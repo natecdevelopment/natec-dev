@@ -114,28 +114,28 @@ function General() {
           <div className="hidden lg:block" data-lenis-prevent>
             <table className="w-full table-fixed text-sm">
               <colgroup>
-                <col className="w-10" /><col className="w-[44%]" /><col className="w-[56%]" /><col className="w-[124px]" /><col className="w-[104px]" /><col className="w-[104px]" /><col className="w-[76px]" /><col className="w-[100px]" /><col className="w-[204px]" />
+                <col className="w-10" /><col className="w-[44%]" /><col className="w-[56%]" /><col className="w-[112px]" /><col className="w-[96px]" /><col className="w-[96px]" /><col className="w-[64px]" /><col className="w-[88px]" /><col className="w-[172px]" />
               </colgroup>
               <thead className="whitespace-nowrap border-b border-border text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                 <tr>
-                  <th className="px-3 py-3"><input type="checkbox" aria-label="Select all on this page" checked={deletable.length > 0 && deletable.every((a) => picked.has(a.id))} onChange={(e) => setPicked(e.target.checked ? new Set([...picked, ...deletable.map((a) => a.id)]) : new Set([...picked].filter((id) => !deletable.some((a) => a.id === id))))} /></th>
-                  <th className="px-3 py-3">Name</th><th className="px-3 py-3">Email</th><th className="px-3 py-3">Phone</th><th className="px-3 py-3">Joined</th><th className="px-3 py-3">Last seen</th><th className="px-3 py-3">Verified</th><th className="px-3 py-3">Status</th><th className="px-3 py-3 text-right">Actions</th>
+                  <th className="px-2 py-3"><input type="checkbox" aria-label="Select all on this page" checked={deletable.length > 0 && deletable.every((a) => picked.has(a.id))} onChange={(e) => setPicked(e.target.checked ? new Set([...picked, ...deletable.map((a) => a.id)]) : new Set([...picked].filter((id) => !deletable.some((a) => a.id === id))))} /></th>
+                  <th className="px-2 py-3">Name</th><th className="px-2 py-3">Email</th><th className="px-2 py-3">Phone</th><th className="px-2 py-3">Joined</th><th className="px-2 py-3">Last seen</th><th className="px-2 py-3">Verified</th><th className="px-2 py-3">Status</th><th className="px-2 py-3 text-right">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
                 {shown.map((a) => (
                   <tr key={a.id} className="align-middle">
-                    <td className="px-3 py-3"><input type="checkbox" aria-label={`Select ${a.email}`} disabled={locked(a)} title={locked(a) ? ADMIN_LOCK_TIP : undefined} checked={picked.has(a.id)} onChange={() => togglePick(a.id)} /></td>
-                    <td className="px-3 py-3">{nameCell(a)}</td>
-                    <td className="px-3 py-3"><span className="block truncate whitespace-nowrap text-muted-foreground" title={a.email}>{a.email}</span></td>
-                    <td className="px-3 py-3 whitespace-nowrap text-muted-foreground">{a.phone || muted}</td>
-                    <td className="px-3 py-3 whitespace-nowrap text-muted-foreground">{fmtDate(a.created_at)}</td>
-                    <td className="px-3 py-3 whitespace-nowrap text-muted-foreground">{a.last_seen_at ? fmtDate(a.last_seen_at) : muted}</td>
-                    <td className="px-3 py-3"><span className={a.email_verified ? "text-navy" : "text-brand-red"}>{a.email_verified ? "Yes" : "No"}</span></td>
-                    <td className="px-3 py-3"><StatusChip status={a.status} /></td>
-                    <td className="px-3 py-3">
-                      <span className="flex flex-nowrap justify-end gap-1.5">
-                        {actions(a).map((x) => <IconBtn key={x.key} label={`${x.label} ${a.email}`} title={x.tip ?? x.label} danger={!!x.danger} disabled={!!x.disabled} onClick={() => void x.run()}><x.icon className="h-4 w-4" /></IconBtn>)}
+                    <td className="px-2 py-3"><input type="checkbox" aria-label={`Select ${a.email}`} disabled={locked(a)} title={locked(a) ? ADMIN_LOCK_TIP : undefined} checked={picked.has(a.id)} onChange={() => togglePick(a.id)} /></td>
+                    <td className="px-2 py-3">{nameCell(a)}</td>
+                    <td className="px-2 py-3"><span className="block truncate whitespace-nowrap text-muted-foreground" title={a.email}>{a.email}</span></td>
+                    <td className="px-2 py-3 whitespace-nowrap text-muted-foreground">{a.phone || muted}</td>
+                    <td className="px-2 py-3 whitespace-nowrap text-muted-foreground">{fmtDate(a.created_at)}</td>
+                    <td className="px-2 py-3 whitespace-nowrap text-muted-foreground">{a.last_seen_at ? fmtDate(a.last_seen_at) : muted}</td>
+                    <td className="px-2 py-3"><span className={a.email_verified ? "text-navy" : "text-brand-red"}>{a.email_verified ? "Yes" : "No"}</span></td>
+                    <td className="px-2 py-3"><StatusChip status={a.status} /></td>
+                    <td className="px-2 py-3">
+                      <span className="flex flex-nowrap justify-end gap-1">
+                        {actions(a).map((x) => <IconBtn compact key={x.key} label={`${x.label} ${a.email}`} title={x.tip ?? x.label} danger={!!x.danger} disabled={!!x.disabled} onClick={() => void x.run()}><x.icon className="h-4 w-4" /></IconBtn>)}
                       </span>
                     </td>
                   </tr>

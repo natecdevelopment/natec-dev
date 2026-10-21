@@ -35,11 +35,11 @@ export function StatusChip({ status }: { status: string }) {
 }
 
 /** Square icon button with a native tooltip. */
-export function IconBtn({ label, onClick, danger, disabled, children, title }: { label: string; onClick?: () => void; danger?: boolean; disabled?: boolean; children: ReactNode; title?: string }) {
+export function IconBtn({ label, onClick, danger, disabled, children, title, compact }: { compact?: boolean; label: string; onClick?: () => void; danger?: boolean; disabled?: boolean; children: ReactNode; title?: string }) {
   return (
     <span title={title ?? label} className="inline-flex">
       <button type="button" onClick={onClick} disabled={disabled} aria-label={label}
-        className={`inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full border transition disabled:cursor-not-allowed disabled:opacity-35 ${danger ? "border-brand-red/30 text-brand-red hover:bg-brand-red/5" : "border-navy/20 text-navy hover:bg-navy/5"}`}>
+        className={`inline-flex ${compact ? "h-7 w-7" : "h-8 w-8"} shrink-0 items-center justify-center rounded-full border transition disabled:cursor-not-allowed disabled:opacity-35 ${danger ? "border-brand-red/30 text-brand-red hover:bg-brand-red/5" : "border-navy/20 text-navy hover:bg-navy/5"}`}>
         {children}
       </button>
     </span>

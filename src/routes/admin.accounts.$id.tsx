@@ -118,7 +118,7 @@ function ClientDetail() {
         <a href={`https://wa.me/${waPhone}?text=${encodeURIComponent(reminder)}`} target="_blank" rel="noreferrer" className={btnSm}><WhatsAppIcon /> WhatsApp reminder</a>
         <button onClick={() => printStatement({ client: c, projectName: d.project?.name ?? "", balance: d.b, instalments: d.inst, payments: d.payments })} className={btnSm}><Download className="h-4 w-4" /> Statement (PDF)</button>
         {!c.profile_id && <button onClick={sendInvite} disabled={!c.email} className={`${btnSm} disabled:opacity-40`} title={c.email ? "" : "Add an email first"}><Mail className="h-4 w-4" /> Invite to portal</button>}
-        <button onClick={() => setEditInfo(true)} className={btnSm}><Pencil className="h-4 w-4" /> Edit</button>
+        <Link to="/admin/accounts/clients/$id/edit" params={{ id: c.id }} className={btnSm}><Pencil className="h-4 w-4" /> Edit</Link>
         <Confirm title="Delete this client?" description="This removes the client with all payments, schedule and documents. It cannot be undone." onConfirm={deleteClient}>
           {(ask) => <button onClick={ask} className={btnDanger}><Trash2 className="h-4 w-4" /> Delete</button>}
         </Confirm>
@@ -150,7 +150,8 @@ function ClientDetail() {
       <Card>
         <h2 className="!text-xl text-navy">Admin notes</h2>
         <p className="text-xs text-muted-foreground">Only admins can see these.</p>
-        <textarea defaultValue={d.notes} rows={4} onBlur={async (e) => { const { error } = await supabase.from("client_notes").upsert({ client_id: c.id, notes: e.target.value, updated_at: new Date().toISOString() }); if (error) toast.error(error.message); else toast.success("Notes saved"); }} className="admin-input mt-3" />
+        {d.notes ? <div className="mt-3 whitespace-pre-wrap text-sm text-navy [&_ul]:list-disc [&_ul]:pl-5">{d.notes.replace(/<br\s*\/?>/gi, "\n").replace(/<\/(p|div|li)>/gi, "\n").replace(/<[^>]+>/g, "").trim()}</div> : <p className="mt-3 text-sm text-muted-foreground">No notes yet.</p>}
+        <Link to="/admin/accounts/clients/$id/edit" params={{ id: c.id }} className={`${btnSm} mt-3`}><Pencil className="h-4 w-4" /> Edit notes</Link>
       </Card>
 
       <Card className="border border-brand-red/30">

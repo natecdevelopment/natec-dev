@@ -907,6 +907,20 @@ export type Database = {
         }[]
       }
       admin_emails: { Args: never; Returns: string[] }
+      admin_reallocate_payments: {
+        Args: { _client_id: string }
+        Returns: undefined
+      }
+      admin_save_client: {
+        Args: {
+          _changes: Json
+          _client: Json
+          _client_id: string
+          _notes: string
+          _rows: Json
+        }
+        Returns: undefined
+      }
       is_admin: { Args: never; Returns: boolean }
       is_my_client: { Args: { _client_id: string }; Returns: boolean }
     }

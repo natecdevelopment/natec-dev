@@ -132,7 +132,7 @@ export function DeleteAccountDialog({ targets, onClose, onDeleted }: { targets: 
   );
 }
 
-const ACTION_LABEL: Record<string, string> = { delete_account: "Deleted account", suspend: "Suspended", reactivate: "Reactivated", make_client: "Made client" };
+const ACTION_LABEL: Record<string, string> = { update_client: "Updated client", update_login_email: "Changed login email", delete_account: "Deleted account", suspend: "Suspended", reactivate: "Reactivated", make_client: "Made client" };
 
 export function ActivityList() {
   const q = useQuery({

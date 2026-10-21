@@ -23,3 +23,4 @@
 - Portal invites run in a requireSupabaseAuth server function (src/lib/admin-accounts.functions.ts) that checks is_admin() before loading the service-role client; logins link to clients by email only after email confirmation.
 - /login and /register are children of the _authpage pathless layout so the animated screen persists across the switch.
 - Account deletion runs only in the deleteAccount server function (admin-checked, service role loaded in-handler); admin actions are logged to public.admin_audit_log.
+- Client edits save through the admin_save_client DB function (one transaction, is_admin-checked, audit-logged); payment changes re-apply via admin_reallocate_payments — so partial saves can't happen.

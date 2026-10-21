@@ -52,3 +52,21 @@ describe("payment plan builder", () => {
     expect(r.rows[1]!.due_date).toBe("2027-01-31"); expect(r.rows[2]!.due_date).toBe("2027-02-28");
   });
 });
+
+import { rebuildKeepingPaid as _rk } from "./money";
+describe("rebuildKeepingPaid", () => {
+  it("keeps paid rows and spreads the rest over new unpaid rows", () => {
+    const current = [
+      { id: "a", due_date: "2026-01-01", amount: 50000, label: "Booking money", paid: 50000 },
+      { id: "b", due_date: "2026-02-01", amount: 30000, label: "Instalment 1 of 10", paid: 10000 },
+      { id: "c", due_date: "2026-03-01", amount: 30000, label: "Instalment 2 of 10", paid: 0 },
+    ];
+    const plan = { total: 500000, booking: 50000, count: 4, freqMonths: 3 as const, firstDue: "2026-04-01", instAmount: null, downManual: null, downDue: "2026-01-31", round: 1000 as const };
+    const out = _rk(plan, "2026-01-01", current);
+    expect(out.filter((r) => r.id).map((r) => r.id)).toEqual(["a", "b"]);
+    const fresh = out.filter((r) => !r.id);
+    expect(fresh).toHaveLength(4);
+    expect(fresh.reduce((s, r) => s + r.amount, 0)).toBe(420000);
+    expect(out.reduce((s, r) => s + r.amount, 0)).toBe(500000);
+  });
+});

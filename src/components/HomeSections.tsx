@@ -7,6 +7,8 @@ import { Reveal, WhatsAppIcon } from "@/components/SiteChrome";
 import { InquiryForm } from "@/components/InquiryForm";
 import { frameSrc } from "@/components/CinematicHero";
 import { PROJECTS, SoldOut, UpcomingCards, WA_UPCOMING } from "@/components/ProjectsGrid";
+import { VintageKeyIcon } from "@/components/VintageKeyIcon";
+import homeSketch from "@/assets/home-sketch.png";
 
 function Eyebrow({ children, dark }: { children: React.ReactNode; dark?: boolean }) {
   return <p className={`eyebrow ${dark ? "text-muted-dark" : "text-brand-red"}`}>{children}</p>;
@@ -50,9 +52,20 @@ export function Intro() {
     <section className="section-pad bg-ivory">
       <div className="container-x">
         <Reveal className="grid gap-10 md:grid-cols-[1.2fr_1fr] md:gap-16">
-          <h2 className="text-navy">
-            We build homes the careful way — <em className="accent-light">so families can live in them for generations.</em>
-          </h2>
+          <div>
+            <h2 className="text-navy">
+              We build homes the careful way — <em className="accent-light">so families can live in them for generations.</em>
+            </h2>
+            <div className="mt-9 flex flex-wrap items-center gap-x-6 gap-y-5 md:mt-11">
+              <img src={homeSketch} alt="Hand-drawn sketch of a modern family home surrounded by trees" loading="lazy" width={973} height={509} className="w-[168px] shrink-0 md:w-[232px]" />
+              <div className="min-w-0 md:border-l md:border-border md:pl-6">
+                <p className="font-label text-[10px] font-medium uppercase leading-[1.9] tracking-[0.3em] text-navy md:text-[11px]">
+                  Building trust,<br /> generation after generation
+                </p>
+                <VintageKeyIcon className="mt-3 h-[15px] w-[30px] text-brand-red" />
+              </div>
+            </div>
+          </div>
           <div className="max-w-[62ch] space-y-4 text-muted-foreground">
             <Eyebrow>About Natec</Eyebrow>
             <p>Established in 2023, Natec Development Ltd. is a real estate development company based in Sreepur, Gazipur. We support clients through every key stage — land acquisition, project planning, building design, construction management, marketing, sales and property management.</p>

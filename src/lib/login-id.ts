@@ -13,7 +13,7 @@ export function parseLoginId(raw: string): LoginId {
 }
 
 /** Placeholder addresses used for accounts created without a real email. */
-export const isSyntheticEmail = (e: string) => !e || /@([a-z0-9-]+\.)*(local|invalid|example|internal)$/i.test(e);
+export const isSyntheticEmail = (e: string) => !e || /@([a-z0-9-]+\.)*(local|invalid|example|internal)$|@clients\.natecdev\.com$/i.test(e);
 
 export const USERNAME_RE = /^[a-z0-9._]{3,30}$/;
 

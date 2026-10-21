@@ -3,6 +3,7 @@ import { Building2, Home, MapPin } from "lucide-react";
 import { WhatsAppIcon } from "@/components/SiteChrome";
 import { waMessage } from "@/components/ProjectsGrid";
 import type { ProjectWithMedia } from "@/lib/projects-data";
+import { isListed } from "@/lib/construction-data";
 
 export function StatusBadge({ p, className = "" }: { p: ProjectWithMedia; className?: string }) {
   const upcoming = p.kind === "upcoming";
@@ -51,6 +52,9 @@ export function ProjectCard({ p }: { p: ProjectWithMedia }) {
             <Link to="/projects/$slug" params={{ slug: p.slug }} className="btn btn-primary">View details</Link>
           )}
         </div>
+        {isListed(p) && (
+          <Link to="/construction-status/$slug" params={{ slug: p.slug }} className="eyebrow mt-4 inline-flex min-h-[44px] items-center !text-[11px] text-brand-red hover:text-navy">Construction status →</Link>
+        )}
       </div>
     </article>
   );

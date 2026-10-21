@@ -10,7 +10,8 @@ export type PlanInput = {
   total: number; booking: number; down: number; count: number;
   frequency: "monthly" | "quarterly" | "custom"; firstDue: string; bookingDate?: string;
 };
-export type ScheduleRow = { due_date: string; amount: number; label: string };
+/** id/paid are set only for rows already saved (client editor); paid > 0 means the row is locked. */
+export type ScheduleRow = { due_date: string; amount: number; label: string; id?: string; paid?: number };
 
 function addMonths(iso: string, m: number) {
   const [y, mo, d] = iso.split("-").map(Number) as [number, number, number];

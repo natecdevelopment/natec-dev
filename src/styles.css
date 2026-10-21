@@ -63,6 +63,7 @@
   --color-steel: var(--steel);
   --color-caution: var(--caution);
   --color-success: var(--success);
+  --color-ok: var(--ok);
   --font-display: "Playfair Display", "Playfair Fallback", "Hind Siliguri", Georgia, serif;
   --font-label: "Marcellus", "Marcellus Fallback", "Hind Siliguri", Georgia, serif;
   --font-sans: "Jost", "Jost Fallback", "Hind Siliguri", system-ui, sans-serif;
@@ -124,6 +125,7 @@
   --steel: var(--muted-light);
   --caution: var(--red);
   --success: var(--navy);
+  --ok: #1F7A4D; /* admin status chips only */
   --chart-1: var(--navy); --chart-2: var(--red); --chart-3: var(--navy-deep); --chart-4: var(--muted-light); --chart-5: var(--muted-dark);
   --sidebar: var(--white); --sidebar-foreground: var(--ink-text); --sidebar-primary: var(--navy); --sidebar-primary-foreground: var(--white);
   --sidebar-accent: var(--ivory); --sidebar-accent-foreground: var(--navy); --sidebar-border: var(--line-light); --sidebar-ring: var(--navy);

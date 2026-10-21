@@ -14,6 +14,33 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_audit_log: {
+        Row: {
+          action: string
+          admin_email: string
+          created_at: string
+          details: Json
+          id: string
+          target_email: string
+        }
+        Insert: {
+          action: string
+          admin_email?: string
+          created_at?: string
+          details?: Json
+          id?: string
+          target_email?: string
+        }
+        Update: {
+          action?: string
+          admin_email?: string
+          created_at?: string
+          details?: Json
+          id?: string
+          target_email?: string
+        }
+        Relationships: []
+      }
       admins: {
         Row: {
           email: string
@@ -879,6 +906,7 @@ export type Database = {
           status: string
         }[]
       }
+      admin_emails: { Args: never; Returns: string[] }
       is_admin: { Args: never; Returns: boolean }
       is_my_client: { Args: { _client_id: string }; Returns: boolean }
     }

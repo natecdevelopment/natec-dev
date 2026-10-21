@@ -4,6 +4,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { ArrowLeft, Plus, Trash2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { logAudit } from "@/components/admin/AccountAdmin";
 import { Card, PageTitle, btnDanger, btnSm } from "@/components/admin/ui";
 import { normalizeBdPhone } from "@/components/InquiryForm";
 import { PAYMENT_METHODS, PAYMENT_TYPES, fmtDate } from "@/lib/account";
@@ -74,7 +75,7 @@ function NewClient() {
       const inst = rows.map((r, i) => ({ client_id: client.id, due_date: r.due_date, amount: Number(r.amount), label: r.label, paid_amount: allocations.find((a) => a.id === String(i))?.apply ?? 0 }));
       if (inst.length) { const r = await supabase.from("instalments").insert(inst); if (r.error) throw r.error; }
       if (pays.length) { const r = await supabase.from("payments").insert(pays.map((p) => ({ ...p, client_id: client.id }))); if (r.error) throw r.error; }
-      if (c.profile_id) await supabase.from("profiles").update({ account_type: "client" }).eq("id", c.profile_id);
+      if (c.profile_id) { await supabase.from("profiles").update({ account_type: "client" }).eq("id", c.profile_id); await logAudit("make_client", c.email, { client_id: client.id }); }
       toast.success("Client saved");
       qc.invalidateQueries({ queryKey: ["admin"] });
       navigate({ to: "/admin/accounts/$id", params: { id: client.id } });

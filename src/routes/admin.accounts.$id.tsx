@@ -13,6 +13,7 @@ import { PAYMENT_METHODS, PAYMENT_TYPES, fmtDate, printStatement, type ClientRow
 import { allocatePayment, taka, type PlanForm } from "@/lib/money";
 import { PaymentPlanForm, initialPlanState, planBlocker, type PlanState } from "@/components/admin/PaymentPlanForm";
 import { inviteClient } from "@/lib/admin-accounts.functions";
+import { ADMIN_LOCK_TIP, DeleteAccountDialog, useAdminEmails, type DeleteTarget } from "@/components/admin/AccountAdmin";
 
 export const Route = createFileRoute("/admin/accounts/$id")({ component: ClientDetail });
 
@@ -67,6 +68,8 @@ function ClientDetail() {
   const [payOpen, setPayOpen] = useState(false);
   const [editPay, setEditPay] = useState<PaymentRow | null>(null);
   const [editInfo, setEditInfo] = useState(false);
+  const [delAcc, setDelAcc] = useState<DeleteTarget[] | null>(null);
+  const admins = useAdminEmails();
 
   if (q.isLoading) return <ListSkeleton />;
   if (!q.data) return <Card><p>Client not found.</p><Link to="/admin/accounts" search={{ tab: "clients" }} className="btn btn-primary mt-4">Back</Link></Card>;
@@ -149,6 +152,17 @@ function ClientDetail() {
         <p className="text-xs text-muted-foreground">Only admins can see these.</p>
         <textarea defaultValue={d.notes} rows={4} onBlur={async (e) => { const { error } = await supabase.from("client_notes").upsert({ client_id: c.id, notes: e.target.value, updated_at: new Date().toISOString() }); if (error) toast.error(error.message); else toast.success("Notes saved"); }} className="admin-input mt-3" />
       </Card>
+
+      <Card className="border border-brand-red/30">
+        <h2 className="!text-xl text-brand-red">Danger zone</h2>
+        <p className="mt-1 text-sm text-muted-foreground">{c.profile_id ? `Login: ${d.loginEmail ?? "linked"}` : "This client has no portal login."}</p>
+        {(() => { const lock = admins.has((d.loginEmail ?? c.email).toLowerCase()); return (
+          <span title={lock ? ADMIN_LOCK_TIP : undefined} className="mt-3 inline-flex">
+            <button disabled={lock} onClick={() => setDelAcc([{ profileId: c.profile_id, clientId: c.id, name: c.full_name, email: d.loginEmail ?? (c.email || c.phone), isClient: true }])} className={`${btnDanger} disabled:cursor-not-allowed disabled:opacity-40`}><Trash2 className="h-4 w-4" /> Delete account</button>
+          </span>
+        ); })()}
+      </Card>
+      <DeleteAccountDialog targets={delAcc} onClose={() => setDelAcc(null)} onDeleted={(t) => { if (!t[0]?.profileId || !c.profile_id) navigate({ to: "/admin/accounts", search: { tab: "clients" } }); else refresh(); }} />
 
       <RecordPayment open={payOpen} onClose={() => setPayOpen(false)} clientId={c.id} inst={d.inst} onSaved={refresh} />
       <EditPayment p={editPay} onClose={() => setEditPay(null)} onSaved={async () => { await reallocate(c.id); refresh(); }} />

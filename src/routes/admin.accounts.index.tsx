@@ -1,8 +1,10 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { ChevronLeft, ChevronRight, Pencil, Plus, Search, UserCheck, UserX, Eye } from "lucide-react";
+import { ChevronLeft, ChevronRight, Pencil, Plus, Search, UserCheck, UserX, Eye, Trash2, MoreHorizontal, Briefcase } from "lucide-react";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { ActivityList, ADMIN_LOCK_TIP, DeleteAccountDialog, IconBtn, StatusChip, logAudit, muted, useAdminEmails, type DeleteTarget } from "@/components/admin/AccountAdmin";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, Empty, ListSkeleton, PageTitle, btnSm, btnDanger } from "@/components/admin/ui";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -26,6 +28,7 @@ function AccountsPage() {
         <Link to="/admin/accounts/new" search={{}} className="btn btn-primary !py-2"><Plus className="h-4 w-4" /> Add client</Link>
       </PageTitle>
       {tab === "general" ? <General /> : <Clients />}
+      <ActivityList />
     </div>
   );
 }
@@ -36,9 +39,14 @@ type Acc = { id: string; full_name: string; phone: string; email: string; accoun
 function General() {
   const qc = useQueryClient();
   const navigate = useNavigate();
+  const admins = useAdminEmails();
+  const [me, setMe] = useState<string | null>(null);
+  useEffect(() => { supabase.auth.getUser().then(({ data }) => setMe(data.user?.id ?? null)); }, []);
   const q = useQuery({ queryKey: ["admin", "accounts"], queryFn: async () => { const { data, error } = await supabase.rpc("admin_accounts"); if (error) throw error; return (data ?? []) as Acc[]; } });
   const [term, setTerm] = useState(""); const [filter, setFilter] = useState("all"); const [sort, setSort] = useState<"joined" | "name" | "seen">("joined"); const [page, setPage] = useState(0);
   const [view, setView] = useState<Acc | null>(null); const [edit, setEdit] = useState<Acc | null>(null);
+  const [del, setDel] = useState<DeleteTarget[] | null>(null);
+  const [picked, setPicked] = useState<Set<string>>(new Set());
   const rows = useMemo(() => {
     const t = term.trim().toLowerCase();
     let r = (q.data ?? []).filter((a) => !t || [a.full_name, a.email, a.phone].some((v) => v.toLowerCase().includes(t)));
@@ -50,13 +58,41 @@ function General() {
   }, [q.data, term, filter, sort]);
   const pages = Math.max(1, Math.ceil(rows.length / PAGE));
   const shown = rows.slice(page * PAGE, page * PAGE + PAGE);
+  const locked = (a: Acc) => admins.has(a.email.toLowerCase()) || a.id === me;
+  const target = (a: Acc): DeleteTarget => ({ profileId: a.id, clientId: null, name: a.full_name, email: a.email, isClient: a.account_type === "client" });
+  const deletable = shown.filter((a) => !locked(a));
 
   async function setStatus(a: Acc, status: "active" | "suspended") {
     const { error } = await supabase.from("profiles").update({ status }).eq("id", a.id);
     if (error) return void toast.error(error.message);
+    await logAudit(status === "suspended" ? "suspend" : "reactivate", a.email);
     toast.success(status === "suspended" ? "Account suspended" : "Account reactivated");
     qc.invalidateQueries({ queryKey: ["admin", "accounts"] });
+    qc.invalidateQueries({ queryKey: ["admin", "audit"] });
   }
+  function onDeleted(done: DeleteTarget[]) {
+    const ids = new Set(done.map((d) => d.profileId));
+    qc.setQueryData<Acc[]>(["admin", "accounts"], (old) => (old ?? []).filter((a) => !ids.has(a.id)));
+    setPicked((p) => new Set([...p].filter((id) => !ids.has(id))));
+    setView(null);
+  }
+  const togglePick = (id: string) => setPicked((p) => { const n = new Set(p); if (n.has(id)) n.delete(id); else n.add(id); return n; });
+
+  const actions = (a: Acc) => [
+    { key: "view", label: "View", icon: Eye, run: () => setView(a) },
+    { key: "edit", label: "Edit", icon: Pencil, run: () => setEdit(a) },
+    a.status === "active"
+      ? { key: "sus", label: "Suspend", icon: UserX, danger: true, run: () => setStatus(a, "suspended") }
+      : { key: "sus", label: "Reactivate", icon: UserCheck, run: () => setStatus(a, "active") },
+    ...(a.account_type !== "client" ? [{ key: "client", label: "Make client", icon: Briefcase, run: () => navigate({ to: "/admin/accounts/new", search: { profile: a.id } }) }] : []),
+    { key: "del", label: "Delete", icon: Trash2, danger: true, disabled: locked(a), tip: locked(a) ? ADMIN_LOCK_TIP : "Delete", run: () => setDel([target(a)]) },
+  ];
+  const nameCell = (a: Acc) => (
+    <span className="flex min-w-0 items-center gap-2">
+      {a.full_name ? <span className="truncate font-semibold text-navy">{a.full_name}</span> : <span className="truncate text-muted-foreground">{a.email.split("@")[0]}</span>}
+      {a.account_type === "client" && <span className="shrink-0 rounded-full bg-navy px-2 py-0.5 text-[10px] text-white">Client</span>}
+    </span>
+  );
 
   return (
     <div>
@@ -68,27 +104,63 @@ function General() {
         <select value={sort} onChange={(e) => setSort(e.target.value as typeof sort)} aria-label="Sort" className="admin-input !w-auto">
           <option value="joined">Newest first</option><option value="name">Name A–Z</option><option value="seen">Last seen</option>
         </select>
+        {picked.size > 0 && (
+          <button onClick={() => setDel((q.data ?? []).filter((a) => picked.has(a.id) && !locked(a)).map(target))} className={btnDanger}><Trash2 className="h-4 w-4" /> Delete selected ({picked.size})</button>
+        )}
       </div>
       {q.isLoading ? <ListSkeleton /> : q.error ? <Card><p className="text-brand-red">Could not load accounts.</p></Card> : !rows.length ? <Empty title="No accounts found" /> : (
         <Card className="!p-0 overflow-hidden">
-          <div className="hidden grid-cols-[1.4fr_1.6fr_1fr_100px_110px_90px_90px_auto] gap-3 border-b border-border px-4 py-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground lg:grid">
-            <span>Name</span><span>Email</span><span>Phone</span><span>Joined</span><span>Last seen</span><span>Verified</span><span>Status</span><span />
+          {/* Desktop: real table so columns line up */}
+          <div className="hidden lg:block" data-lenis-prevent>
+            <table className="w-full table-fixed text-sm">
+              <colgroup>
+                <col className="w-10" /><col className="w-[44%]" /><col className="w-[56%]" /><col className="w-[112px]" /><col className="w-[96px]" /><col className="w-[96px]" /><col className="w-[64px]" /><col className="w-[88px]" /><col className="w-[172px]" />
+              </colgroup>
+              <thead className="whitespace-nowrap border-b border-border text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                <tr>
+                  <th className="px-2 py-3"><input type="checkbox" aria-label="Select all on this page" checked={deletable.length > 0 && deletable.every((a) => picked.has(a.id))} onChange={(e) => setPicked(e.target.checked ? new Set([...picked, ...deletable.map((a) => a.id)]) : new Set([...picked].filter((id) => !deletable.some((a) => a.id === id))))} /></th>
+                  <th className="px-2 py-3">Name</th><th className="px-2 py-3">Email</th><th className="px-2 py-3">Phone</th><th className="px-2 py-3">Joined</th><th className="px-2 py-3">Last seen</th><th className="px-2 py-3">Verified</th><th className="px-2 py-3">Status</th><th className="px-2 py-3 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-border">
+                {shown.map((a) => (
+                  <tr key={a.id} className="align-middle">
+                    <td className="px-2 py-3"><input type="checkbox" aria-label={`Select ${a.email}`} disabled={locked(a)} title={locked(a) ? ADMIN_LOCK_TIP : undefined} checked={picked.has(a.id)} onChange={() => togglePick(a.id)} /></td>
+                    <td className="px-2 py-3">{nameCell(a)}</td>
+                    <td className="px-2 py-3"><span className="block truncate whitespace-nowrap text-muted-foreground" title={a.email}>{a.email}</span></td>
+                    <td className="px-2 py-3 whitespace-nowrap text-muted-foreground">{a.phone || muted}</td>
+                    <td className="px-2 py-3 whitespace-nowrap text-muted-foreground">{fmtDate(a.created_at)}</td>
+                    <td className="px-2 py-3 whitespace-nowrap text-muted-foreground">{a.last_seen_at ? fmtDate(a.last_seen_at) : muted}</td>
+                    <td className="px-2 py-3"><span className={a.email_verified ? "text-navy" : "text-brand-red"}>{a.email_verified ? "Yes" : "No"}</span></td>
+                    <td className="px-2 py-3"><StatusChip status={a.status} /></td>
+                    <td className="px-2 py-3">
+                      <span className="flex flex-nowrap justify-end gap-1">
+                        {actions(a).map((x) => <IconBtn compact key={x.key} label={`${x.label} ${a.email}`} title={x.tip ?? x.label} danger={!!x.danger} disabled={!!x.disabled} onClick={() => void x.run()}><x.icon className="h-4 w-4" /></IconBtn>)}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
-          <ul className="divide-y divide-border">
+          {/* Under 1024px: cards with a ⋯ menu */}
+          <ul className="divide-y divide-border lg:hidden">
             {shown.map((a) => (
-              <li key={a.id} className="grid gap-1 px-4 py-3 text-sm lg:grid-cols-[1.4fr_1.6fr_1fr_100px_110px_90px_90px_auto] lg:items-center lg:gap-3">
-                <span className="font-semibold text-navy">{a.full_name || "—"}{a.account_type === "client" && <span className="ml-2 rounded-full bg-navy px-2 py-0.5 text-[10px] text-white">Client</span>}</span>
-                <span className="break-all text-muted-foreground">{a.email}</span>
-                <span className="text-muted-foreground">{a.phone || "—"}</span>
-                <span className="text-muted-foreground">{fmtDate(a.created_at)}</span>
-                <span className="text-muted-foreground">{a.last_seen_at ? fmtDate(a.last_seen_at) : "Never"}</span>
-                <span className={a.email_verified ? "text-navy" : "text-brand-red"}>{a.email_verified ? "Yes" : "No"}</span>
-                <span className={a.status === "suspended" ? "font-semibold text-brand-red" : "text-navy"}>{a.status}</span>
-                <span className="flex flex-wrap gap-1.5 pt-2 lg:pt-0">
-                  <button onClick={() => setView(a)} className={btnSm} aria-label={`View ${a.email}`}><Eye className="h-4 w-4" /></button>
-                  <button onClick={() => setEdit(a)} className={btnSm} aria-label={`Edit ${a.email}`}><Pencil className="h-4 w-4" /></button>
-                  {a.status === "active" ? <button onClick={() => setStatus(a, "suspended")} className={btnDanger}><UserX className="h-4 w-4" /> Suspend</button> : <button onClick={() => setStatus(a, "active")} className={btnSm}><UserCheck className="h-4 w-4" /> Reactivate</button>}
-                  {a.account_type !== "client" && <button onClick={() => navigate({ to: "/admin/accounts/new", search: { profile: a.id } })} className={btnSm}>Make client</button>}
+              <li key={a.id} className="grid grid-cols-[minmax(0,1fr)_auto] gap-x-3 gap-y-1 px-4 py-3 text-sm">
+                <div className="min-w-0">{nameCell(a)}</div>
+                <DropdownMenu>
+                  <DropdownMenuTrigger className="row-span-3 flex h-9 w-9 items-center justify-center self-start rounded-full border border-navy/20 text-navy" aria-label={`Actions for ${a.email}`}><MoreHorizontal className="h-4 w-4" /></DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    {actions(a).map((x) => (
+                      <DropdownMenuItem key={x.key} disabled={!!x.disabled} onSelect={() => void x.run()} className={x.danger ? "text-brand-red" : ""} title={x.tip ?? x.label}>
+                        <x.icon className="h-4 w-4" /> {x.label}{x.disabled && <span className="ml-1 text-xs text-muted-foreground">(admin)</span>}
+                      </DropdownMenuItem>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+                <span className="truncate text-muted-foreground" title={a.email}>{a.email}</span>
+                <span className="flex flex-wrap items-center gap-x-3 gap-y-1 text-muted-foreground">
+                  <span>{a.phone || muted}</span><span>Joined {fmtDate(a.created_at)}</span><StatusChip status={a.status} />
                 </span>
               </li>
             ))}
@@ -103,13 +175,14 @@ function General() {
           </div>
         </Card>
       )}
-      <ViewDialog a={view} onClose={() => setView(null)} />
+      <ViewDialog a={view} onClose={() => setView(null)} locked={view ? locked(view) : true} onDelete={() => view && setDel([target(view)])} />
       <EditDialog a={edit} onClose={() => setEdit(null)} onSaved={() => qc.invalidateQueries({ queryKey: ["admin", "accounts"] })} />
+      <DeleteAccountDialog targets={del} onClose={() => setDel(null)} onDeleted={onDeleted} />
     </div>
   );
 }
 
-function ViewDialog({ a, onClose }: { a: Acc | null; onClose: () => void }) {
+function ViewDialog({ a, onClose, locked, onDelete }: { a: Acc | null; onClose: () => void; locked: boolean; onDelete: () => void }) {
   const saved = useQuery({
     queryKey: ["admin", "saved", a?.id], enabled: !!a,
     queryFn: async () => (await supabase.from("saved_projects").select("created_at, projects(name)").eq("user_id", a!.id)).data ?? [],
@@ -130,6 +203,12 @@ function ViewDialog({ a, onClose }: { a: Acc | null; onClose: () => void }) {
         {saved.isLoading ? <p className="text-sm text-muted-foreground">Loading…</p> : !saved.data?.length ? <p className="text-sm text-muted-foreground">None.</p> : (
           <ul className="list-disc pl-5 text-sm text-navy">{saved.data.map((s, i) => <li key={i}>{(s.projects as { name: string } | null)?.name}</li>)}</ul>
         )}
+        <div className="mt-4 rounded-xl border border-brand-red/30 p-3">
+          <p className="text-xs font-semibold uppercase tracking-wider text-brand-red">Danger zone</p>
+          <span title={locked ? ADMIN_LOCK_TIP : undefined} className="mt-2 inline-flex">
+            <button onClick={onDelete} disabled={locked} className={`${btnDanger} disabled:cursor-not-allowed disabled:opacity-40`}><Trash2 className="h-4 w-4" /> Delete account</button>
+          </span>
+        </div>
       </DialogContent>
     </Dialog>
   );
@@ -163,6 +242,9 @@ function EditDialog({ a, onClose, onSaved }: { a: Acc | null; onClose: () => voi
 }
 
 function Clients() {
+  const qc = useQueryClient();
+  const admins = useAdminEmails();
+  const [del, setDel] = useState<DeleteTarget[] | null>(null);
   const q = useQuery({
     queryKey: ["admin", "clients"],
     queryFn: async () => {
@@ -198,30 +280,37 @@ function Clients() {
       </div>
       {q.isLoading ? <ListSkeleton /> : !rows.length ? <Empty title="No clients yet"><Link to="/admin/accounts/new" search={{}} className="btn btn-primary !py-2"><Plus className="h-4 w-4" /> Add client</Link></Empty> : (
         <Card className="!p-0 overflow-hidden">
-          <div className="hidden grid-cols-[1.4fr_1fr_1.2fr_70px_1fr_1fr_1fr_110px] gap-3 border-b border-border px-4 py-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground lg:grid">
-            <span>Name</span><span>Phone</span><span>Project</span><span>Flat</span><span>Total</span><span>Paid</span><span>Due</span><span>Next due</span>
+          <div className="hidden grid-cols-[1.4fr_1fr_1.2fr_70px_1fr_1fr_1fr_110px_84px] gap-3 border-b border-border px-4 py-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground lg:grid">
+            <span>Name</span><span>Phone</span><span>Project</span><span>Flat</span><span>Total</span><span>Paid</span><span>Due</span><span>Next due</span><span className="text-right">Actions</span>
           </div>
           <ul className="divide-y divide-border">
             {rows.map(({ c, b, p }) => {
               const overdue = Number(b?.overdue_amount ?? 0) > 0;
               return (
-                <li key={c.id}>
-                  <Link to="/admin/accounts/$id" params={{ id: c.id }} className="grid gap-1 px-4 py-3 text-sm hover:bg-ivory lg:grid-cols-[1.4fr_1fr_1.2fr_70px_1fr_1fr_1fr_110px] lg:items-center lg:gap-3">
-                    <span className="font-semibold text-navy">{c.full_name}{overdue && <span className="ml-2 rounded-full bg-brand-red px-2 py-0.5 text-[10px] text-white">Overdue</span>}{c.status !== "active" && <span className="ml-2 text-xs text-muted-foreground">({c.status})</span>}</span>
-                    <span className="text-muted-foreground">{c.phone}</span>
-                    <span className="text-muted-foreground">{p?.name ?? "—"}</span>
-                    <span className="text-muted-foreground">{c.flat_no || "—"}</span>
+                <li key={c.id} className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-4 py-3 text-sm hover:bg-ivory lg:grid-cols-[1.4fr_1fr_1.2fr_70px_1fr_1fr_1fr_110px_84px]">
+                  <Link to="/admin/accounts/$id" params={{ id: c.id }} className="grid min-w-0 gap-1 lg:col-span-8 lg:grid-cols-subgrid lg:items-center">
+                    <span className="min-w-0 truncate font-semibold text-navy">{c.full_name}{overdue && <span className="ml-2 rounded-full bg-brand-red px-2 py-0.5 text-[10px] text-white">Overdue</span>}{c.status !== "active" && <span className="ml-2 text-xs text-muted-foreground">({c.status})</span>}</span>
+                    <span className="text-muted-foreground">{c.phone || muted}</span>
+                    <span className="truncate text-muted-foreground">{p?.name ?? muted}</span>
+                    <span className="text-muted-foreground">{c.flat_no || muted}</span>
                     <span className="text-navy">{taka(c.total_price)}</span>
                     <span className="text-navy">{taka(b?.total_paid ?? 0)}</span>
                     <span className="text-navy">{taka(b?.amount_due ?? c.total_price)}</span>
-                    <span className={overdue ? "font-semibold text-brand-red" : "text-muted-foreground"}>{fmtDate(b?.next_due_date)}</span>
+                    <span className={overdue ? "font-semibold text-brand-red" : "text-muted-foreground"}>{b?.next_due_date ? fmtDate(b.next_due_date) : muted}</span>
                   </Link>
+                  <span className="flex flex-nowrap justify-end gap-1.5 self-start lg:self-center">
+                    <Link to="/admin/accounts/$id" params={{ id: c.id }} title="View" aria-label={`View ${c.full_name}`} className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-navy/20 text-navy hover:bg-navy/5"><Eye className="h-4 w-4" /></Link>
+                    {(() => { const lock = admins.has(c.email.toLowerCase()); return (
+                      <IconBtn label={`Delete ${c.full_name}`} title={lock ? ADMIN_LOCK_TIP : "Delete"} danger disabled={lock} onClick={() => setDel([{ profileId: c.profile_id, clientId: c.id, name: c.full_name, email: c.email || c.phone, isClient: true }])}><Trash2 className="h-4 w-4" /></IconBtn>
+                    ); })()}
+                  </span>
                 </li>
               );
             })}
           </ul>
         </Card>
       )}
+      <DeleteAccountDialog targets={del} onClose={() => setDel(null)} onDeleted={() => qc.invalidateQueries({ queryKey: ["admin", "clients"] })} />
     </div>
   );
 }

@@ -50,7 +50,7 @@ export const Route = createFileRoute("/about")({
           address: {
             "@type": "PostalAddress",
             streetAddress: "1st Floor, Vai Vai Market, opposite Walton showroom, Dhaka–Kapasia Road, Rajendrapur Bazar",
-            addressLocality: "Sreepur, Gazipur",
+            addressLocality: "Sreepur", addressRegion: "Gazipur",
             postalCode: "1741",
             addressCountry: "BD",
           },
@@ -128,7 +128,7 @@ function AboutHero() {
           <Link to="/" className="hover:text-white">Home</Link> <span aria-hidden>›</span> <span aria-current="page" className="text-white/80">About</span>
         </nav>
         <p className="eyebrow hero-in mt-8 text-white/70 md:mt-10" style={{ animationDelay: "120ms" }}>About us</p>
-        <h1 className="hero-in mt-4 max-w-[20ch]" style={{ animationDelay: "220ms" }}>Building lasting homes in <em className="accent-dark">Sreepur, Gazipur</em></h1>
+        <h1 className="hero-in mt-4 max-w-[20ch]" style={{ animationDelay: "220ms" }}>Building lasting homes in <em className="accent-dark">Rajendrapur, Sreepur, Gazipur</em></h1>
         <p className="hero-in mt-6 max-w-[54ch] text-lg text-white/85" style={{ animationDelay: "340ms" }}>
           Natec Development Ltd. is a real estate developer founded in 2023 at Rajendrapur Bazar. We plan, build and hand over residential buildings for families who want a well-built home close to Dhaka.
         </p>
@@ -157,7 +157,7 @@ export function AboutPage() {
           <Reveal className="space-y-5 text-muted-foreground">
             <p className="eyebrow text-brand-red">Since 2023</p>
             <h2 className="text-primary">Our story</h2>
-            <p>Natec Development Ltd. started in 2023 with a simple idea: families in Sreepur and Gazipur deserve homes that are planned carefully, built honestly and handed over as promised.</p>
+            <p>Natec Development Ltd. started in 2023 with a simple idea: families in Rajendrapur, Sreepur and across Gazipur deserve homes that are planned carefully, built honestly and handed over as promised.</p>
             <p>Our first project, Shobuj Angon at Padma Gate, Rajendrapur Bazar, is complete and every one of its 28 flats is sold. Shobuj Aloy and Shobuj Digonto are rising now, and they are fully sold too. Together that is 75 homes, delivered or under construction.</p>
             <p>We work across the whole development journey — finding and acquiring land, planning and design, permits, construction and sales — so our clients deal with one accountable team from the first meeting to handover.</p>
           </Reveal>

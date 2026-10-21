@@ -121,7 +121,7 @@ export function Footer() {
       <div className="container-x grid gap-12 py-16 md:grid-cols-[1.4fr_1fr_1.4fr] md:py-20">
         <div>
           <img src={fullLogoUrl} alt="Natec Development Ltd. logo" width={120} height={144} loading="lazy" className="h-28 w-auto md:h-32" />
-          <p className="mt-5 max-w-xs text-sm text-muted-foreground">Well-planned homes in Sreepur, Gazipur — built floor by floor since 2023.</p>
+          <p className="mt-5 max-w-xs text-sm text-muted-foreground">Well-planned homes in {company.locationShort} — built floor by floor since 2023.</p>
           <div className="mt-6 flex gap-3">
             <a href={company.facebook} target="_blank" rel="noreferrer" aria-label="Facebook" className={social}><FacebookIcon /></a>
             <a href={company.whatsappLink} target="_blank" rel="noreferrer" aria-label="WhatsApp" className={social}><WhatsAppIcon /></a>

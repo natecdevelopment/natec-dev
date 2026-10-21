@@ -3,6 +3,7 @@ export const company = {
   founded: 2023,
   address:
     "1st Floor, Vai Vai Market, opposite Walton showroom, Dhaka–Kapasia Road, Rajendrapur Bazar, Sreepur, Gazipur 1741, Bangladesh",
+  locationShort: "Rajendrapur, Sreepur, Gazipur",
   whatsapp: "+880 1990-665923",
   whatsappLink: "https://wa.me/8801990665923",
   phone: "01354-252400",

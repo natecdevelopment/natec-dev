@@ -10,7 +10,7 @@ import { company } from "@/lib/site";
 
 const SITE = "https://natec-dev.lovable.app";
 const TITLE = "Construction Status | Natec Development Ltd., Gazipur";
-const DESC = "Live construction progress of Natec Development's residential projects in Sreepur and Rajendrapur, Gazipur — work-by-work updates and site photos.";
+const DESC = "Live construction progress of Natec Development's residential projects in Rajendrapur, Sreepur, Gazipur — work-by-work updates and site photos.";
 
 export const Route = createFileRoute("/construction-status")({
   loader: ({ context }) => context.queryClient.ensureQueryData(publicProjectsQuery),
@@ -60,7 +60,7 @@ function StatusIndex() {
     <>
       <PageHero
         image="/hero-natec/d/0040.webp"
-        imageAlt="Natec Development construction site in Sreepur, Gazipur"
+        imageAlt="Natec Development construction site in Rajendrapur, Sreepur, Gazipur"
         imagePosition="center 55%"
         crumbs={[{ label: "Home", to: "/" }, { label: "Construction Status" }]}
         eyebrow="Construction status"

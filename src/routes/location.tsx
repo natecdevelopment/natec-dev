@@ -80,7 +80,7 @@ const NEARBY = [
   { icon: Shield, name: "Rajendrapur Cantonment", distance: "[distance]" },
 ];
 const WHY = [
-  { icon: Leaf, title: "Green surroundings", body: "Sreepur sits among the forests of the Bhawal area, with trees and open land around the town." },
+  { icon: Leaf, title: "Green surroundings", body: "Rajendrapur and Sreepur sit among the forests of the Bhawal area, with trees and open land around them." },
   { icon: TrendingUp, title: "A growing town", body: "Rajendrapur Bazar is an active local market town with daily shops and services close by." },
   { icon: Car, title: "Road access to Dhaka", body: "The Dhaka–Mymensingh Highway connects the area to Gazipur and Dhaka by road." },
 ];
@@ -95,7 +95,7 @@ function LocationPage() {
     <>
       <PageHero
         image="/hero-natec/d/0030.webp"
-        imageAlt="Morning drone view over green Sreepur, Gazipur"
+        imageAlt="Morning drone view over green Rajendrapur, Sreepur, Gazipur"
         imagePosition="center 55%"
         crumbs={[{ label: "Home", to: "/" }, { label: "Location" }]}
         eyebrow="Location"

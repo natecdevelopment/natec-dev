@@ -8,14 +8,14 @@ export const frameSrc = (dir: "d" | "m", i: number) => `/hero-natec/${dir}/${Str
 
 type Chapter = { range: [number, number]; eyebrow?: string; title: React.ReactNode; body?: string; cta?: "intro" | "end"; still?: number };
 const CHAPTERS: Chapter[] = [
-  { range: [1, 24], eyebrow: "Natec Development Ltd. · Est. 2023", title: <>From bare land <em className="accent-dark block">to lasting homes.</em></>, body: "Homes in Sreepur, Gazipur — built floor by floor.", cta: "intro" },
+  { range: [1, 24], eyebrow: "Natec Development Ltd. · Est. 2023", title: <>From bare land <em className="accent-dark block">to lasting homes.</em></>, body: `Homes in ${company.locationShort} — built floor by floor.`, cta: "intro" },
   { range: [25, 59], title: "Rise above the noise.", body: "Green surroundings, open rooftops, fresh morning air." },
   { range: [60, 82], eyebrow: "Project 03", title: "Meet Shobuj Digonto.", body: "Pepsi Gate, Rajendrapur Bazar, Sreepur, Gazipur · B+G+6 · 26 flats", still: 70 },
   { range: [83, 118], eyebrow: "Step inside", title: "Bright, airy living.", body: "Tiled floors, false ceilings and cross-ventilation in every home.", still: 100 },
   { range: [119, 141], title: "Made for family meals.", body: "An open dining area with a fitted kitchen.", still: 130 },
   { range: [142, 165], title: "Rest easy.", body: "Quiet bedrooms with built-in wardrobes and big windows.", still: 153 },
   { range: [166, 182], title: "Your own green view.", body: "Every home has a private balcony." },
-  { range: [183, 200], title: "Your home in Sreepur starts here.", cta: "end", still: 197 },
+  { range: [183, 200], title: "Your home in Rajendrapur starts here.", cta: "end", still: 197 },
 ];
 const BRIGHT: [number, number][] = [[21, 29], [40, 47], [48, 66], [174, 187]];
 const inRange = (f: number, [a, b]: [number, number]) => f >= a && f <= b;
@@ -305,7 +305,7 @@ function StaticHero() {
       <div className="relative h-[100svh]">
         <picture>
           <source media="(max-width: 767px)" srcSet={frameSrc("m", 1)} />
-          <img src={frameSrc("d", 1)} alt="Natec Development homes in Sreepur, Gazipur" width={1920} height={1080} className="absolute inset-0 h-full w-full object-cover" />
+          <img src={frameSrc("d", 1)} alt={`Natec Development homes in ${company.locationShort}`} width={1920} height={1080} className="absolute inset-0 h-full w-full object-cover" />
         </picture>
         <div className="absolute inset-x-0 bottom-0 h-[55%] md:hidden" style={{ background: M_BOTTOM }} />
         <div className="absolute inset-0 hidden md:block" style={{ background: SCRIM }} />

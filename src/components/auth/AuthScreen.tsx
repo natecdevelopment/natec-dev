@@ -1,3 +1,4 @@
+import { company } from "@/lib/site";
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
@@ -113,7 +114,7 @@ function BrandPanel({ mode }: { mode: Mode }) {
             </ul>
           </motion.div>
         </AnimatePresence>
-        <p className="text-sm text-white/60">Natec Development Ltd. · Rajendrapur, Sreepur, Gazipur</p>
+        <p className="text-sm text-white/60">Natec Development Ltd. · {company.locationShort}</p>
       </div>
     </div>
   );

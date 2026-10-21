@@ -82,7 +82,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: "Natec Development Ltd." },
-      { name: "description", content: "Real estate development in Sreepur, Gazipur, Bangladesh." },
+      { name: "description", content: "Real estate development in Rajendrapur, Sreepur, Gazipur, Bangladesh." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],

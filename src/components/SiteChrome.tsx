@@ -75,8 +75,8 @@ export function Header() {
               <Link
                 key={n.to}
                 to={n.to}
-                className="eyebrow !text-[12px] text-navy/70 transition hover:text-navy"
-                activeProps={{ className: "!text-navy underline decoration-brand-red decoration-2 underline-offset-8" }}
+                className="relative whitespace-nowrap rounded-sm py-2 font-sans text-[13px] font-semibold uppercase tracking-[0.1em] text-navy transition-colors hover:text-brand-red focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-red/40"
+                activeProps={{ className: "!text-brand-red after:absolute after:inset-x-0 after:-bottom-0.5 after:h-[2px] after:rounded-full after:bg-brand-red" }}
                 activeOptions={{ exact: true }}
               >
                 {n.label}
@@ -234,7 +234,7 @@ function AccountLink({ mobile, onNavigate }: { mobile?: boolean; onNavigate?: ()
   }
   if (!user) {
     return (
-      <Link to="/login" onClick={onNavigate} className={mobile ? "border-b border-navy/10 py-4 font-display text-3xl hover:text-brand-red" : "eyebrow !text-[12px] inline-flex min-h-[44px] items-center whitespace-nowrap px-2 text-navy/80 hover:text-navy"}>
+      <Link to="/login" onClick={onNavigate} className={mobile ? "border-b border-navy/10 py-4 font-display text-3xl hover:text-brand-red" : "inline-flex min-h-[44px] items-center whitespace-nowrap px-2 font-sans text-[13px] font-semibold uppercase tracking-[0.1em] text-navy transition-colors hover:text-brand-red"}>
         Login
       </Link>
     );

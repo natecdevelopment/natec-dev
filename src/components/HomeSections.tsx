@@ -467,7 +467,7 @@ export function VideosSection() {
               tabIndex={0}
               aria-label="Site videos"
               onKeyDown={onListKey}
-              className="video-list max-h-[440px] space-y-3 overflow-y-auto overscroll-contain py-3 pr-1 outline-none focus-visible:ring-2 focus-visible:ring-navy/40 rounded-xl"
+              className="video-list max-h-[440px] space-y-3 overflow-y-auto py-3 pr-1 outline-none focus-visible:ring-2 focus-visible:ring-navy/40 rounded-xl"
             >
               {data.map((v, i) => (
                 <li key={v.id}>

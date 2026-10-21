@@ -13,6 +13,7 @@ const nav = [
   { to: "/", label: "Home" },
   { to: "/about", label: "About" },
   { to: "/projects", label: "Projects" },
+  { to: "/construction-status", label: "Construction Status" },
   { to: "/floor-plan", label: "Floor Plan" },
   { to: "/location", label: "Location" },
   { to: "/contact", label: "Contact" },
@@ -66,7 +67,7 @@ export function Header() {
             </span>
             <span className="sr-only">Natec Development Ltd. — home</span>
           </Link>
-          <nav className="hidden items-center gap-7 lg:flex">
+          <nav className="hidden items-center gap-5 lg:flex xl:gap-7">
             {nav.map((n) => (
               <Link
                 key={n.to}
@@ -141,7 +142,7 @@ export function Footer() {
   );
 }
 
-export type Crumb = { label: string; to?: "/" | "/projects" | "/about" };
+export type Crumb = { label: string; to?: "/" | "/projects" | "/about" | "/construction-status" };
 
 /** Shared page hero. With `image` it renders full-bleed (photo + navy veil, copy bottom-left, scroll parallax). */
 export function PageHero({ eyebrow, title, intro, image, imageAlt = "", imagePosition = "center", crumbs, children, heightClass = "min-h-[78svh] md:min-h-[76svh]" }: {

@@ -34,9 +34,9 @@ export const values = [
 ];
 
 export const directors = [
-  { name: "Md. Nazim Uddin", role: "Chairman", bio: "Provides leadership and strategic direction, supporting responsible decision-making and the company's long-term goals.", email: "asmmusa6984@gmail.com", phone: "+880 1927-080648" },
-  { name: "Musa", role: "Managing Director", bio: "Leads day-to-day operations and works with the team to advance the company's business and development objectives.", email: "asmmusa6984@gmail.com", phone: "+880 1738-614256" },
-  { name: "Sanjida Akter", role: "Director", bio: "Contributes to company governance and strategic planning, supporting the effective delivery of its services.", email: "asmmusa6984@gmail.com", phone: "+880 1990-665923" },
-  { name: "Mahamudul Hasan Khan", role: "Director", bio: "Supports company planning and decision-making in line with its business goals and development priorities.", email: "mahamudulhasankhan247@gmail.com", phone: "+880 1626-653992" },
-  { name: "Shahin", role: "Director, Technical Support & Business Development", bio: "Supports technical coordination and business development, helping identify opportunities and strengthen the company's project capabilities.", email: "10shahin28@gmail.com", phone: "+880 1949-675132" },
+  { name: "Md. Nazim Uddin", gender: "male", role: "Chairman", bio: "Provides leadership and strategic direction, supporting responsible decision-making and the company's long-term goals.", email: "asmmusa6984@gmail.com", phone: "+880 1927-080648" },
+  { name: "Musa", gender: "male", role: "Managing Director", bio: "Leads day-to-day operations and works with the team to advance the company's business and development objectives.", email: "asmmusa6984@gmail.com", phone: "+880 1738-614256" },
+  { name: "Sanjida Akter", gender: "female", role: "Director", bio: "Contributes to company governance and strategic planning, supporting the effective delivery of its services.", email: "asmmusa6984@gmail.com", phone: "+880 1990-665923" },
+  { name: "Mahamudul Hasan Khan", gender: "male", role: "Director", bio: "Supports company planning and decision-making in line with its business goals and development priorities.", email: "mahamudulhasankhan247@gmail.com", phone: "+880 1626-653992" },
+  { name: "Shahin", gender: "male", role: "Director, Technical Support & Business Development", bio: "Supports technical coordination and business development, helping identify opportunities and strengthen the company's project capabilities.", email: "10shahin28@gmail.com", phone: "+880 1949-675132" },
 ];

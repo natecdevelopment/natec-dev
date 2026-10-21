@@ -43,6 +43,8 @@ function General() {
   const [me, setMe] = useState<string | null>(null);
   useEffect(() => { supabase.auth.getUser().then(({ data }) => setMe(data.user?.id ?? null)); }, []);
   const q = useQuery({ queryKey: ["admin", "accounts"], queryFn: async () => { const { data, error } = await supabase.rpc("admin_accounts"); if (error) throw error; return (data ?? []) as Acc[]; } });
+  const links = useQuery({ queryKey: ["admin", "client-links"], queryFn: async () => (await supabase.from("clients").select("id, profile_id").not("profile_id", "is", null)).data ?? [] });
+  const clientOf = (a: Acc) => links.data?.find((l) => l.profile_id === a.id)?.id;
   const [term, setTerm] = useState(""); const [filter, setFilter] = useState("all"); const [sort, setSort] = useState<"joined" | "name" | "seen">("joined"); const [page, setPage] = useState(0);
   const [view, setView] = useState<Acc | null>(null); const [edit, setEdit] = useState<Acc | null>(null);
   const [del, setDel] = useState<DeleteTarget[] | null>(null);
@@ -80,7 +82,7 @@ function General() {
 
   const actions = (a: Acc) => [
     { key: "view", label: "View", icon: Eye, run: () => setView(a) },
-    { key: "edit", label: "Edit", icon: Pencil, run: () => setEdit(a) },
+    { key: "edit", label: "Edit", icon: Pencil, run: () => { const cid = a.account_type === "client" ? clientOf(a) : undefined; if (cid) navigate({ to: "/admin/accounts/clients/$id/edit", params: { id: cid } }); else setEdit(a); } },
     a.status === "active"
       ? { key: "sus", label: "Suspend", icon: UserX, danger: true, run: () => setStatus(a, "suspended") }
       : { key: "sus", label: "Reactivate", icon: UserCheck, run: () => setStatus(a, "active") },
@@ -215,13 +217,20 @@ function ViewDialog({ a, onClose, locked, onDelete }: { a: Acc | null; onClose: 
 }
 
 function EditDialog({ a, onClose, onSaved }: { a: Acc | null; onClose: () => void; onSaved: () => void }) {
+  const [name, setName] = useState(""); const [phone, setPhone] = useState(""); const [busy, setBusy] = useState(false);
+  useEffect(() => {
+    if (!a) return;
+    setName(a.full_name ?? ""); setPhone(a.phone ?? "");
+    // load the latest saved values in case the list is out of date
+    supabase.from("profiles").select("full_name, phone").eq("id", a.id).maybeSingle().then(({ data }) => { if (data) { setName(data.full_name ?? ""); setPhone(data.phone ?? ""); } });
+  }, [a]);
   async function save(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    const f = new FormData(e.currentTarget);
-    const phoneRaw = String(f.get("phone") || "").trim();
-    const phone = phoneRaw ? normalizeBdPhone(phoneRaw) : "";
-    if (phone === null) return void toast.error("Enter a valid Bangladesh mobile number.");
-    const { error } = await supabase.from("profiles").update({ full_name: String(f.get("full_name") || "").trim(), phone }).eq("id", a!.id);
+    const p = phone.trim() ? normalizeBdPhone(phone.trim()) : "";
+    if (p === null) return void toast.error("Enter a valid Bangladesh mobile number.");
+    setBusy(true);
+    const { error } = await supabase.from("profiles").update({ full_name: name.trim(), phone: p }).eq("id", a!.id);
+    setBusy(false);
     if (error) return void toast.error(error.message);
     toast.success("Saved"); onSaved(); onClose();
   }
@@ -231,9 +240,10 @@ function EditDialog({ a, onClose, onSaved }: { a: Acc | null; onClose: () => voi
         <DialogHeader><DialogTitle>Edit account</DialogTitle></DialogHeader>
         {a && (
           <form onSubmit={save} className="space-y-3">
-            <label className="block text-sm font-medium text-navy">Full name<input name="full_name" defaultValue={a.full_name} className="admin-input mt-1" /></label>
-            <label className="block text-sm font-medium text-navy">Phone<input name="phone" defaultValue={a.phone} className="admin-input mt-1" /></label>
-            <button className="btn btn-primary">Save</button>
+            <p className="break-all text-sm text-muted-foreground">{a.email}</p>
+            <label className="block text-sm font-medium text-navy">Full name<input value={name} onChange={(e) => setName(e.target.value)} className="admin-input mt-1" /></label>
+            <label className="block text-sm font-medium text-navy">Phone<input value={phone} onChange={(e) => setPhone(e.target.value)} inputMode="tel" className="admin-input mt-1" /></label>
+            <button disabled={busy} className="btn btn-primary disabled:opacity-60">{busy ? "Saving…" : "Save"}</button>
           </form>
         )}
       </DialogContent>
@@ -280,14 +290,14 @@ function Clients() {
       </div>
       {q.isLoading ? <ListSkeleton /> : !rows.length ? <Empty title="No clients yet"><Link to="/admin/accounts/new" search={{}} className="btn btn-primary !py-2"><Plus className="h-4 w-4" /> Add client</Link></Empty> : (
         <Card className="!p-0 overflow-hidden">
-          <div className="hidden grid-cols-[1.4fr_1fr_1.2fr_70px_1fr_1fr_1fr_110px_84px] gap-3 border-b border-border px-4 py-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground lg:grid">
+          <div className="hidden grid-cols-[1.4fr_1fr_1.2fr_70px_1fr_1fr_1fr_110px_120px] gap-3 border-b border-border px-4 py-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground lg:grid">
             <span>Name</span><span>Phone</span><span>Project</span><span>Flat</span><span>Total</span><span>Paid</span><span>Due</span><span>Next due</span><span className="text-right">Actions</span>
           </div>
           <ul className="divide-y divide-border">
             {rows.map(({ c, b, p }) => {
               const overdue = Number(b?.overdue_amount ?? 0) > 0;
               return (
-                <li key={c.id} className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-4 py-3 text-sm hover:bg-ivory lg:grid-cols-[1.4fr_1fr_1.2fr_70px_1fr_1fr_1fr_110px_84px]">
+                <li key={c.id} className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-4 py-3 text-sm hover:bg-ivory lg:grid-cols-[1.4fr_1fr_1.2fr_70px_1fr_1fr_1fr_110px_120px]">
                   <Link to="/admin/accounts/$id" params={{ id: c.id }} className="grid min-w-0 gap-1 lg:col-span-8 lg:grid-cols-subgrid lg:items-center">
                     <span className="min-w-0 truncate font-semibold text-navy">{c.full_name}{overdue && <span className="ml-2 rounded-full bg-brand-red px-2 py-0.5 text-[10px] text-white">Overdue</span>}{c.status !== "active" && <span className="ml-2 text-xs text-muted-foreground">({c.status})</span>}</span>
                     <span className="text-muted-foreground">{c.phone || muted}</span>
@@ -299,6 +309,7 @@ function Clients() {
                     <span className={overdue ? "font-semibold text-brand-red" : "text-muted-foreground"}>{b?.next_due_date ? fmtDate(b.next_due_date) : muted}</span>
                   </Link>
                   <span className="flex flex-nowrap justify-end gap-1.5 self-start lg:self-center">
+                    <Link to="/admin/accounts/clients/$id/edit" params={{ id: c.id }} title="Edit" aria-label={`Edit ${c.full_name}`} className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-navy/20 text-navy hover:bg-navy/5"><Pencil className="h-4 w-4" /></Link>
                     <Link to="/admin/accounts/$id" params={{ id: c.id }} title="View" aria-label={`View ${c.full_name}`} className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-navy/20 text-navy hover:bg-navy/5"><Eye className="h-4 w-4" /></Link>
                     {(() => { const lock = admins.has(c.email.toLowerCase()); return (
                       <IconBtn label={`Delete ${c.full_name}`} title={lock ? ADMIN_LOCK_TIP : "Delete"} danger disabled={lock} onClick={() => setDel([{ profileId: c.profile_id, clientId: c.id, name: c.full_name, email: c.email || c.phone, isClient: true }])}><Trash2 className="h-4 w-4" /></IconBtn>

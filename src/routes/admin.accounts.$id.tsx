@@ -118,7 +118,7 @@ function ClientDetail() {
         <a href={`https://wa.me/${waPhone}?text=${encodeURIComponent(reminder)}`} target="_blank" rel="noreferrer" className={btnSm}><WhatsAppIcon /> WhatsApp reminder</a>
         <button onClick={() => printStatement({ client: c, projectName: d.project?.name ?? "", balance: d.b, instalments: d.inst, payments: d.payments })} className={btnSm}><Download className="h-4 w-4" /> Statement (PDF)</button>
         {!c.profile_id && <button onClick={sendInvite} disabled={!c.email} className={`${btnSm} disabled:opacity-40`} title={c.email ? "" : "Add an email first"}><Mail className="h-4 w-4" /> Invite to portal</button>}
-        <button onClick={() => setEditInfo(true)} className={btnSm}><Pencil className="h-4 w-4" /> Edit</button>
+        <Link to="/admin/accounts/clients/$id/edit" params={{ id: c.id }} className={btnSm}><Pencil className="h-4 w-4" /> Edit</Link>
         <Confirm title="Delete this client?" description="This removes the client with all payments, schedule and documents. It cannot be undone." onConfirm={deleteClient}>
           {(ask) => <button onClick={ask} className={btnDanger}><Trash2 className="h-4 w-4" /> Delete</button>}
         </Confirm>

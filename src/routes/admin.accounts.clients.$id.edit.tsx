@@ -186,8 +186,8 @@ function ClientEditor() {
         catch (e) { toast.error(`Client saved, but the login email was not changed: ${e instanceof Error ? e.message : "error"}`); }
       }
       toast.success("Client updated");
-      setInit(f); setF(null);
       await refresh();
+      setInit(null); setF(null);
       qc.invalidateQueries({ queryKey: ["admin", "accounts"] }); qc.invalidateQueries({ queryKey: ["admin", "audit"] }); qc.invalidateQueries({ queryKey: ["account"] });
     } catch (e) { toast.error(e instanceof Error ? e.message : "Could not save. Nothing was changed."); }
     finally { setSaving(false); }

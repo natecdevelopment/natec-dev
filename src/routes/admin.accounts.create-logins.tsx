@@ -1,3 +1,4 @@
+import { downloadText } from "@/lib/download";
 import { useEffect, useMemo, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -91,8 +92,7 @@ function CreateLogins() {
     const share = ok.map((r) => { const c = byId(r.clientId)!; return { flat: c.flat_no, name: c.full_name, phone: c.phone, username: r.username, password: r.password }; });
     const all = share.map((s) => shareMessage(s)).join("\n\n────────────\n\n");
     function csv() {
-      const url = URL.createObjectURL(new Blob(["\uFEFF" + loginsCsv(share)], { type: "text/csv;charset=utf-8" }));
-      const a = document.createElement("a"); a.href = url; a.download = "natec-client-logins.csv"; a.click(); URL.revokeObjectURL(url);
+      downloadText(loginsCsv(share), "natec-client-logins.csv");
     }
     return (
       <div className="space-y-4">

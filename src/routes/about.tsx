@@ -254,7 +254,7 @@ export function AboutPage() {
           <ol className="relative mt-12 grid gap-8 border-l border-primary/25 pl-6 md:grid-cols-5 md:gap-6 md:border-l-0 md:border-t md:pl-0 md:pt-8">
             {[
               { y: "2023", t: "Natec Development Ltd. founded" },
-              { y: "[year]", t: "Shobuj Angon (Project 01) completed and sold out" },
+              { y: "2026", t: "Shobuj Angon (Project 01) completed and sold out" },
               { y: "Now", t: "Shobuj Aloy (Project 02) under construction, sold out" },
               { y: "Now", t: "Shobuj Digonto (Project 03) under construction, sold out" },
               { y: "Next", t: "Upcoming projects at Rajendrapur Bazar and Gazipur" },

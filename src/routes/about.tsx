@@ -95,31 +95,61 @@ function initials(name: string) {
   return name.replace(/^Md\.\s*/, "").split(/\s+/).map((w) => w[0]).slice(0, 2).join("").toUpperCase();
 }
 
+function AboutHero() {
+  const ref = useRef<HTMLElement | null>(null);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    let raf = 0;
+    const write = () => {
+      raf = 0;
+      const p = Math.min(1, Math.max(0, window.scrollY / (el.offsetHeight || 1)));
+      el.style.setProperty("--hp", p.toFixed(3));
+    };
+    const onScroll = () => { if (!raf) raf = requestAnimationFrame(write); };
+    write();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+      if (raf) cancelAnimationFrame(raf);
+    };
+  }, []);
+
+  return (
+    <section ref={ref} className="relative isolate flex min-h-[88svh] items-end overflow-hidden bg-navy text-white md:min-h-[84svh]">
+      <img src="/projects/shobuj-angon/side.webp" alt="Shobuj Angon residential building by Natec Development at Rajendrapur Bazar, Sreepur" width={1200} height={900} className="about-hero-img absolute inset-0 h-full w-full object-cover" />
+      <div className="about-hero-veil absolute inset-0" aria-hidden />
+      <div className="about-hero-copy container-x relative z-10 pb-14 pt-10 md:pb-20">
+        <nav aria-label="Breadcrumb" className="eyebrow hero-in !text-[11px] text-white/55">
+          <Link to="/" className="hover:text-white">Home</Link> <span aria-hidden>›</span> <span aria-current="page" className="text-white/80">About</span>
+        </nav>
+        <p className="eyebrow hero-in mt-8 text-white/70 md:mt-10" style={{ animationDelay: "120ms" }}>About us</p>
+        <h1 className="hero-in mt-4 max-w-[20ch]" style={{ animationDelay: "220ms" }}>Building lasting homes in <em className="accent-dark">Sreepur, Gazipur</em></h1>
+        <p className="hero-in mt-6 max-w-[54ch] text-lg text-white/85" style={{ animationDelay: "340ms" }}>
+          Natec Development Ltd. is a real estate developer founded in 2023 at Rajendrapur Bazar. We plan, build and hand over residential buildings for families who want a well-built home close to Dhaka.
+        </p>
+        <div className="hero-in mt-9 flex flex-wrap gap-3" style={{ animationDelay: "460ms" }}>
+          <Link to="/projects" className="btn btn-primary">View projects</Link>
+          <a href={WA_VISIT} target="_blank" rel="noreferrer" className="btn btn-ghost-dark">Book a site visit</a>
+        </div>
+      </div>
+      <div className="pointer-events-none absolute bottom-5 right-5 z-10 hidden items-center gap-3 md:flex" aria-hidden>
+        <span className="eyebrow !text-[10px] text-white/50">Scroll</span>
+        <span className="block h-10 w-px overflow-hidden bg-white/20"><span className="scroll-hint-line block h-full w-full bg-white/70" /></span>
+      </div>
+    </section>
+  );
+}
+
 export function AboutPage() {
   return (
     <>
       {/* 1. Hero */}
-      <section className="bg-navy text-white">
-        <div className="container-x py-12 md:py-20">
-          <nav aria-label="Breadcrumb" className="eyebrow !text-[11px] text-muted-dark">
-            <Link to="/" className="hover:text-white">Home</Link> <span aria-hidden>›</span> <span aria-current="page" className="text-white">About</span>
-          </nav>
-          <div className="mt-8 grid items-center gap-10 md:grid-cols-2 md:gap-14">
-            <div>
-              <p className="eyebrow text-muted-dark">About us</p>
-              <h1 className="mt-4">Building lasting homes in <em className="accent-dark">Sreepur, Gazipur</em></h1>
-              <p className="mt-6 max-w-[62ch] text-lg text-muted-dark">
-                Natec Development Ltd. is a real estate developer founded in 2023 at Rajendrapur Bazar. We plan, build and hand over residential buildings for families who want a well-built home close to Dhaka.
-              </p>
-              <div className="mt-8 grid grid-cols-2 gap-3 sm:flex">
-                <Link to="/projects" className="btn btn-primary">View projects</Link>
-                <a href={WA_VISIT} target="_blank" rel="noreferrer" className="btn btn-ghost-dark">Book a site visit</a>
-              </div>
-            </div>
-            <img src="/projects/shobuj-angon/side.webp" alt="Shobuj Angon residential building by Natec Development at Rajendrapur Bazar, Sreepur" width={1200} height={900} className="aspect-[4/3] w-full rounded-2xl object-cover" />
-          </div>
-        </div>
-      </section>
+      <AboutHero />
 
       {/* 2. Story */}
       <section className="section-pad bg-ivory">

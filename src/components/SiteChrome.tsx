@@ -153,7 +153,7 @@ export function PageHero({ eyebrow, title, intro }: { eyebrow: string; title: st
   );
 }
 
-export function Reveal({ children, className = "", as: Tag = "div" }: { children: React.ReactNode; className?: string; as?: "div" | "section" }) {
+export function Reveal({ children, className = "", delay = 0, as: Tag = "div" }: { children: React.ReactNode; className?: string; delay?: number; as?: "div" | "section" }) {
   const [el, setEl] = useState<HTMLElement | null>(null);
   useEffect(() => {
     if (!el) return;
@@ -163,7 +163,7 @@ export function Reveal({ children, className = "", as: Tag = "div" }: { children
     io.observe(el);
     return () => io.disconnect();
   }, [el]);
-  return <Tag ref={setEl as never} className={`reveal ${className}`}>{children}</Tag>;
+  return <Tag ref={setEl as never} className={`reveal ${className}`} style={delay ? { transitionDelay: `${delay}ms` } : undefined}>{children}</Tag>;
 }
 
 function AccountLink() {

@@ -186,6 +186,33 @@
 .reveal[data-in] { opacity: 1; transform: none; }
 .chapter { opacity: 0; visibility: hidden; transform: translateY(16px); transition: opacity .4s ease, transform .4s ease, visibility .4s; }
 .chapter[data-on] { opacity: 1; visibility: visible; transform: none; }
+/* About hero: the building photo is the background, the copy floats over a navy veil.
+   --hp is the hero's scroll progress (0 → 1), written by JS on each animation frame. */
+.about-hero-img {
+  transform: translate3d(0, calc(var(--hp, 0) * 14%), 0) scale(calc(1.08 + var(--hp, 0) * 0.06));
+  will-change: transform;
+  animation: hero-fade 1.5s ease both;
+}
+.about-hero-veil {
+  background:
+    linear-gradient(to top,
+      color-mix(in oklab, var(--navy-deep) 95%, transparent) 0%,
+      color-mix(in oklab, var(--navy-deep) 76%, transparent) 42%,
+      color-mix(in oklab, var(--navy-deep) 42%, transparent) 80%,
+      color-mix(in oklab, var(--navy-deep) 34%, transparent) 100%),
+    linear-gradient(to right,
+      color-mix(in oklab, var(--navy-deep) 82%, transparent) 0%,
+      color-mix(in oklab, var(--navy-deep) 45%, transparent) 55%,
+      color-mix(in oklab, var(--navy-deep) 10%, transparent) 100%);
+  opacity: calc(.9 + var(--hp, 0) * .1);
+}
+.about-hero-copy {
+  transform: translate3d(0, calc(var(--hp, 0) * -28px), 0);
+  opacity: calc(1 - var(--hp, 0) * .85);
+}
+@keyframes hero-fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes hero-rise { from { opacity: 0; transform: translate3d(0, 26px, 0); } to { opacity: 1; transform: none; } }
+.hero-in { opacity: 0; animation: hero-rise .95s cubic-bezier(.16, .84, .36, 1) both; }
 @keyframes scroll-hint { 0% { transform: scaleY(0); transform-origin: top; } 50% { transform: scaleY(1); transform-origin: top; } 51% { transform-origin: bottom; } 100% { transform: scaleY(0); transform-origin: bottom; } }
 .scroll-hint-line { animation: scroll-hint 2s ease-in-out infinite; }
 /* Hero: two seamless cloud strips drifting at different speeds (parallax). Each strip is
@@ -198,6 +225,10 @@
 @media (max-width: 767px) { .cloud-far { animation-duration: 70s; } .cloud-near { animation-duration: 38s; } }
 @media (prefers-reduced-motion: reduce) {
   .reveal { opacity: 1; transform: none; transition: none; }
+  .about-hero-img { transform: none; animation: none; }
+  .about-hero-copy { transform: none; opacity: 1; }
+  .about-hero-veil { opacity: 1; }
+  .hero-in { opacity: 1; animation: none; }
   .scroll-hint-line { animation: none; }
   .cloud-layer { animation: none; }
 }

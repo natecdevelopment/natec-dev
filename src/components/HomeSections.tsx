@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { ArrowRight, MapPin, ShieldCheck, ArrowUpDown, Trees, Car, Lock, Phone, Mail, BedDouble, Bath, Sofa, UtensilsCrossed, CookingPot, Fence, Ruler } from "lucide-react";
 import { company, directors } from "@/lib/site";
+import { PersonFemaleIcon, PersonMaleIcon } from "@/components/PersonIcons";
 import { Reveal, WhatsAppIcon } from "@/components/SiteChrome";
 import { InquiryForm } from "@/components/InquiryForm";
 import { frameSrc } from "@/components/CinematicHero";
@@ -292,8 +293,8 @@ export function Board() {
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {directors.map((d) => (
             <Reveal key={d.name} className="flex flex-col rounded-2xl border border-border bg-ivory p-7">
-              <div className="flex aspect-square w-20 items-center justify-center rounded-full bg-navy font-display text-3xl text-white">
-                {d.name.replace("Md. ", "").split(" ").map((w) => w[0]).slice(0, 2).join("")}
+              <div className="flex aspect-square w-20 items-center justify-center rounded-full bg-navy text-white">
+                {d.gender === "female" ? <PersonFemaleIcon className="h-10 w-10" /> : <PersonMaleIcon className="h-10 w-10" />}
               </div>
               <h3 className="mt-5 text-navy">{d.name}</h3>
               <p className="eyebrow mt-1 !text-[11px] text-brand-red">{d.role}</p>

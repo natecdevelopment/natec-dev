@@ -242,6 +242,9 @@ function EditDialog({ a, onClose, onSaved }: { a: Acc | null; onClose: () => voi
 }
 
 function Clients() {
+  const qc = useQueryClient();
+  const admins = useAdminEmails();
+  const [del, setDel] = useState<DeleteTarget[] | null>(null);
   const q = useQuery({
     queryKey: ["admin", "clients"],
     queryFn: async () => {
@@ -277,30 +280,37 @@ function Clients() {
       </div>
       {q.isLoading ? <ListSkeleton /> : !rows.length ? <Empty title="No clients yet"><Link to="/admin/accounts/new" search={{}} className="btn btn-primary !py-2"><Plus className="h-4 w-4" /> Add client</Link></Empty> : (
         <Card className="!p-0 overflow-hidden">
-          <div className="hidden grid-cols-[1.4fr_1fr_1.2fr_70px_1fr_1fr_1fr_110px] gap-3 border-b border-border px-4 py-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground lg:grid">
-            <span>Name</span><span>Phone</span><span>Project</span><span>Flat</span><span>Total</span><span>Paid</span><span>Due</span><span>Next due</span>
+          <div className="hidden grid-cols-[1.4fr_1fr_1.2fr_70px_1fr_1fr_1fr_110px_84px] gap-3 border-b border-border px-4 py-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground lg:grid">
+            <span>Name</span><span>Phone</span><span>Project</span><span>Flat</span><span>Total</span><span>Paid</span><span>Due</span><span>Next due</span><span className="text-right">Actions</span>
           </div>
           <ul className="divide-y divide-border">
             {rows.map(({ c, b, p }) => {
               const overdue = Number(b?.overdue_amount ?? 0) > 0;
               return (
-                <li key={c.id}>
-                  <Link to="/admin/accounts/$id" params={{ id: c.id }} className="grid gap-1 px-4 py-3 text-sm hover:bg-ivory lg:grid-cols-[1.4fr_1fr_1.2fr_70px_1fr_1fr_1fr_110px] lg:items-center lg:gap-3">
-                    <span className="font-semibold text-navy">{c.full_name}{overdue && <span className="ml-2 rounded-full bg-brand-red px-2 py-0.5 text-[10px] text-white">Overdue</span>}{c.status !== "active" && <span className="ml-2 text-xs text-muted-foreground">({c.status})</span>}</span>
-                    <span className="text-muted-foreground">{c.phone}</span>
-                    <span className="text-muted-foreground">{p?.name ?? "—"}</span>
-                    <span className="text-muted-foreground">{c.flat_no || "—"}</span>
+                <li key={c.id} className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-4 py-3 text-sm hover:bg-ivory lg:grid-cols-[1.4fr_1fr_1.2fr_70px_1fr_1fr_1fr_110px_84px]">
+                  <Link to="/admin/accounts/$id" params={{ id: c.id }} className="grid min-w-0 gap-1 lg:col-span-8 lg:grid-cols-subgrid lg:items-center">
+                    <span className="min-w-0 truncate font-semibold text-navy">{c.full_name}{overdue && <span className="ml-2 rounded-full bg-brand-red px-2 py-0.5 text-[10px] text-white">Overdue</span>}{c.status !== "active" && <span className="ml-2 text-xs text-muted-foreground">({c.status})</span>}</span>
+                    <span className="text-muted-foreground">{c.phone || muted}</span>
+                    <span className="truncate text-muted-foreground">{p?.name ?? muted}</span>
+                    <span className="text-muted-foreground">{c.flat_no || muted}</span>
                     <span className="text-navy">{taka(c.total_price)}</span>
                     <span className="text-navy">{taka(b?.total_paid ?? 0)}</span>
                     <span className="text-navy">{taka(b?.amount_due ?? c.total_price)}</span>
-                    <span className={overdue ? "font-semibold text-brand-red" : "text-muted-foreground"}>{fmtDate(b?.next_due_date)}</span>
+                    <span className={overdue ? "font-semibold text-brand-red" : "text-muted-foreground"}>{b?.next_due_date ? fmtDate(b.next_due_date) : muted}</span>
                   </Link>
+                  <span className="flex flex-nowrap justify-end gap-1.5 self-start lg:self-center">
+                    <Link to="/admin/accounts/$id" params={{ id: c.id }} title="View" aria-label={`View ${c.full_name}`} className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-navy/20 text-navy hover:bg-navy/5"><Eye className="h-4 w-4" /></Link>
+                    {(() => { const lock = admins.has(c.email.toLowerCase()); return (
+                      <IconBtn label={`Delete ${c.full_name}`} title={lock ? ADMIN_LOCK_TIP : "Delete"} danger disabled={lock} onClick={() => setDel([{ profileId: c.profile_id, clientId: c.id, name: c.full_name, email: c.email || c.phone, isClient: true }])}><Trash2 className="h-4 w-4" /></IconBtn>
+                    ); })()}
+                  </span>
                 </li>
               );
             })}
           </ul>
         </Card>
       )}
+      <DeleteAccountDialog targets={del} onClose={() => setDel(null)} onDeleted={() => qc.invalidateQueries({ queryKey: ["admin", "clients"] })} />
     </div>
   );
 }

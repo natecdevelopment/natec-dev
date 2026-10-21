@@ -22,6 +22,7 @@ import { Route as ProjectsRouteImport } from './routes/projects'
 import { Route as ServicesRouteImport } from './routes/services'
 import { Route as AuthenticatedAccountRouteImport } from './routes/_authenticated/account'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
+import { Route as AdminMediaRouteImport } from './routes/admin.media'
 import { Route as AdminUpcomingRouteImport } from './routes/admin.upcoming'
 import { Route as AdminVideosRouteImport } from './routes/admin.videos'
 import { Route as ProjectsSlugRouteImport } from './routes/projects_.$slug'
@@ -93,6 +94,11 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminMediaRoute = AdminMediaRouteImport.update({
+  id: '/media',
+  path: '/media',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminUpcomingRoute = AdminUpcomingRouteImport.update({
   id: '/upcoming',
   path: '/upcoming',
@@ -136,6 +142,7 @@ export interface FileRoutesByFullPath {
   '/projects': typeof ProjectsRoute
   '/services': typeof ServicesRoute
   '/account': typeof AuthenticatedAccountRoute
+  '/admin/media': typeof AdminMediaRoute
   '/admin/upcoming': typeof AdminUpcomingRoute
   '/admin/videos': typeof AdminVideosRoute
   '/projects/$slug': typeof ProjectsSlugRoute
@@ -155,6 +162,7 @@ export interface FileRoutesByTo {
   '/projects': typeof ProjectsRoute
   '/services': typeof ServicesRoute
   '/account': typeof AuthenticatedAccountRoute
+  '/admin/media': typeof AdminMediaRoute
   '/admin/upcoming': typeof AdminUpcomingRoute
   '/admin/videos': typeof AdminVideosRoute
   '/projects/$slug': typeof ProjectsSlugRoute
@@ -177,6 +185,7 @@ export interface FileRoutesById {
   '/projects': typeof ProjectsRoute
   '/services': typeof ServicesRoute
   '/_authenticated/account': typeof AuthenticatedAccountRoute
+  '/admin/media': typeof AdminMediaRoute
   '/admin/upcoming': typeof AdminUpcomingRoute
   '/admin/videos': typeof AdminVideosRoute
   '/projects_/$slug': typeof ProjectsSlugRoute
@@ -199,6 +208,7 @@ export interface FileRouteTypes {
     | '/projects'
     | '/services'
     | '/account'
+    | '/admin/media'
     | '/admin/upcoming'
     | '/admin/videos'
     | '/projects/$slug'
@@ -218,6 +228,7 @@ export interface FileRouteTypes {
     | '/projects'
     | '/services'
     | '/account'
+    | '/admin/media'
     | '/admin/upcoming'
     | '/admin/videos'
     | '/projects/$slug'
@@ -239,6 +250,7 @@ export interface FileRouteTypes {
     | '/projects'
     | '/services'
     | '/_authenticated/account'
+    | '/admin/media'
     | '/admin/upcoming'
     | '/admin/videos'
     | '/projects_/$slug'
@@ -356,6 +368,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminIndexRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/media': {
+      id: '/admin/media'
+      path: '/media'
+      fullPath: '/admin/media'
+      preLoaderRoute: typeof AdminMediaRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/upcoming': {
       id: '/admin/upcoming'
       path: '/upcoming'
@@ -413,6 +432,7 @@ const AuthenticatedRouteRouteWithChildren =
   AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
 interface AdminRouteChildren {
+  AdminMediaRoute: typeof AdminMediaRoute
   AdminUpcomingRoute: typeof AdminUpcomingRoute
   AdminVideosRoute: typeof AdminVideosRoute
   AdminIndexRoute: typeof AdminIndexRoute
@@ -422,6 +442,7 @@ interface AdminRouteChildren {
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
+  AdminMediaRoute: AdminMediaRoute,
   AdminUpcomingRoute: AdminUpcomingRoute,
   AdminVideosRoute: AdminVideosRoute,
   AdminIndexRoute: AdminIndexRoute,

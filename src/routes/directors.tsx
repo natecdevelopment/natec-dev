@@ -25,7 +25,7 @@ export function DirectorsPage() {
         {directors.map((d) => (
           <article key={d.name} className="flex flex-col border border-border bg-card p-7">
             <div className="flex h-16 w-16 items-center justify-center bg-primary text-primary-foreground">
-              {d.gender === "female" ? <PersonFemaleIcon className="h-8 w-8" /> : <PersonMaleIcon className="h-8 w-8" />}
+              {d.gender === "female" ? <PersonFemaleIcon className="h-11 w-11" /> : <PersonMaleIcon className="h-11 w-11" />}
             </div>
             <h2 className="mt-5 text-2xl font-semibold text-primary">{d.name}</h2>
             <p className="text-sm font-semibold text-accent">{d.role}</p>

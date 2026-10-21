@@ -1,5 +1,5 @@
 import { company } from "@/lib/site";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { Bell, Building2, CalendarClock, Heart, LineChart, Wallet } from "lucide-react";
@@ -62,18 +62,22 @@ export function AuthScreen({ mode, next }: { mode: Mode; next?: string | undefin
   const form = mode === "login" ? <LoginForm key="login" onDone={finish} next={next} /> : <RegisterForm key="register" next={next} />;
 
   return (
-    <section className="relative min-h-[calc(100vh-72px)] bg-ivory">
+    <section className="relative bg-ivory pb-14 pt-6 lg:min-h-[calc(100svh-72px)]">
       {desktop ? (
-        <div className="relative mx-auto min-h-[calc(100vh-72px)] w-full overflow-hidden">
-          <motion.div className="absolute inset-y-0 w-1/2 bg-white" initial={false} animate={{ left: mode === "login" ? "0%" : "50%" }} transition={{ duration: dur, ease: EASE }}>
-            <div className="flex h-full items-center justify-center px-10 py-14">
-              <div className="w-full max-w-md">
-                <AnimatePresence mode="wait" initial={false}>{form}</AnimatePresence>
+        <div className="relative mx-auto grid w-full grid-cols-2">
+          <motion.div className="relative z-10 bg-white" initial={false} animate={{ x: mode === "login" ? "0%" : "100%" }} transition={{ duration: dur, ease: EASE }}>
+            <AutoHeight dur={dur}>
+              <div className="flex min-h-[calc(100svh-152px)] items-center justify-center px-10 py-12">
+                <div className="w-full max-w-md">
+                  <AnimatePresence mode="wait" initial={false}>{form}</AnimatePresence>
+                </div>
               </div>
-            </div>
+            </AutoHeight>
           </motion.div>
-          <motion.aside className="absolute inset-y-0 w-1/2 overflow-hidden text-white" initial={false} animate={{ left: mode === "login" ? "50%" : "0%" }} transition={{ duration: dur, ease: EASE }}>
-            <BrandPanel mode={mode} />
+          <motion.aside className="absolute inset-y-0 w-1/2 text-white [overflow:clip]" initial={false} animate={{ left: mode === "login" ? "50%" : "0%" }} transition={{ duration: dur, ease: EASE }}>
+            <div className="sticky top-[96px] h-[calc(100svh-120px)] max-h-full">
+              <BrandPanel mode={mode} />
+            </div>
           </motion.aside>
         </div>
       ) : (
@@ -99,10 +103,10 @@ export function AuthScreen({ mode, next }: { mode: Mode; next?: string | undefin
 function BrandPanel({ mode }: { mode: Mode }) {
   const reduce = useReducedMotion();
   return (
-    <div className="relative h-full">
+    <div className="relative h-full overflow-hidden">
       <img src="/projects/shobuj-angon/front.webp" alt="" aria-hidden className="absolute inset-0 h-full w-full object-cover" />
       <div className="absolute inset-0" style={{ background: "linear-gradient(160deg, rgba(4,26,56,0.92), rgba(7,47,99,0.75))" }} />
-      <div className="relative flex h-full flex-col justify-between p-12 xl:p-16">
+      <div className="relative box-border flex h-full min-w-0 flex-col justify-between gap-6 px-6 py-10 md:px-12">
         <img src="/brand/natec-logo-transparent.png" alt="Natec Development Ltd." width={90} height={108} className="h-24 w-auto self-start rounded-xl bg-white/95 p-2" />
         <AnimatePresence mode="wait" initial={false}>
           <motion.div key={mode} initial={{ opacity: 0, y: reduce ? 0 : 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: reduce ? 0.15 : 0.45, ease: EASE }}>
@@ -114,10 +118,21 @@ function BrandPanel({ mode }: { mode: Mode }) {
             </ul>
           </motion.div>
         </AnimatePresence>
-        <p className="text-sm text-white/60">Natec Development Ltd. · {company.locationShort}</p>
+        <p className="min-w-0 break-words text-sm text-white/60">Natec Development Ltd. · {company.locationShort}</p>
       </div>
     </div>
   );
+}
+
+function AutoHeight({ children, dur }: { children: React.ReactNode; dur: number }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [h, setH] = useState<number | "auto">("auto");
+  useEffect(() => {
+    const el = ref.current; if (!el) return;
+    const ro = new ResizeObserver(() => setH(el.offsetHeight));
+    ro.observe(el); return () => ro.disconnect();
+  }, []);
+  return <motion.div initial={false} animate={{ height: h }} transition={{ duration: dur * 0.5, ease: EASE }} className="overflow-hidden"><div ref={ref}>{children}</div></motion.div>;
 }
 
 function Stagger({ children }: { children: React.ReactNode[] }) {

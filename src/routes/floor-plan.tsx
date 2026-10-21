@@ -12,7 +12,7 @@ import { supabase } from "@/integrations/supabase/client";
 
 const SITE = "https://natec-dev.lovable.app";
 const TITLE = "Apartment Floor Plans | Natec Development, Gazipur";
-const DESC = "Sample Natec apartment floor plans in Rajendrapur, Sreepur, Gazipur: 3D and 2D views, bright rooms, cross-ventilation and a private balcony. Request a project's plan.";
+const DESC = "Sample Natec apartment floor plans in Rajendrapur, Sreepur, Gazipur: 3D and 2D views, bright rooms, cross-ventilation and a private balcony.";
 const WA_VISIT = waMessage("Hi Natec, I'd like to book a site visit at Rajendrapur Bazar.");
 
 export const Route = createFileRoute("/floor-plan")({

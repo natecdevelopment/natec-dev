@@ -356,3 +356,188 @@ export function ContactCTA() {
     </section>
   );
 }
+
+/* ---------- Videos ---------- */
+function thumbOf(v: VideoRow) {
+  return v.thumbnail_url || (v.provider === "youtube" ? youtubeThumb(v.video_id) : null);
+}
+function embedOf(v: VideoRow) {
+  return v.provider === "youtube"
+    ? `https://www.youtube-nocookie.com/embed/${v.video_id}?autoplay=1&rel=0`
+    : `https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(v.url)}&show_text=false&autoplay=true`;
+}
+
+function VideoPoster({ v, small }: { v: VideoRow; small?: boolean }) {
+  const t = thumbOf(v);
+  return t ? (
+    <img src={t} alt={`${v.title || "Natec project video"} — video thumbnail`} loading="lazy" width={480} height={270} className="absolute inset-0 h-full w-full object-cover" />
+  ) : (
+    <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-navy p-4 text-center text-white">
+      <img src="/brand/natec-mark.png" alt="" aria-hidden width={44} height={44} loading="lazy" className={small ? "h-7 w-auto" : "h-12 w-auto"} />
+      {!small && <span className="font-display text-lg">{v.title}</span>}
+    </div>
+  );
+}
+
+/** Lite embed: poster + red play button; the iframe loads only after a click. */
+function LiteVideo({ v, autoplay = false }: { v: VideoRow; autoplay?: boolean }) {
+  const [on, setOn] = useState(autoplay);
+  useEffect(() => setOn(autoplay), [v.id, autoplay]);
+  return (
+    <div className="relative aspect-video overflow-hidden rounded-2xl bg-navy-deep">
+      {on ? (
+        <iframe src={embedOf(v)} title={v.title || "Natec project video"} allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowFullScreen className="absolute inset-0 h-full w-full border-0" />
+      ) : (
+        <button type="button" onClick={() => setOn(true)} className="group absolute inset-0" aria-label={`Play video: ${v.title || "Natec project video"}`}>
+          <VideoPoster v={v} />
+          <span className="absolute left-1/2 top-1/2 flex h-16 w-16 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-brand-red text-white shadow-xl transition group-hover:scale-110">
+            <Play className="ml-1 h-7 w-7 fill-current" />
+          </span>
+        </button>
+      )}
+    </div>
+  );
+}
+
+export function VideosSection() {
+  const { data } = useQuery(publicVideosQuery);
+  const [active, setActive] = useState(0);
+  const [played, setPlayed] = useState(false);
+  const [slide, setSlide] = useState(0);
+  const track = useRef<HTMLDivElement>(null);
+  if (!data?.length) return null;
+  const featured = data[Math.min(active, data.length - 1)]!;
+  const goto = (i: number) => {
+    const el = track.current?.children[i] as HTMLElement | undefined;
+    el?.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "start" });
+  };
+  return (
+    <section className="section-pad bg-white" aria-labelledby="videos-h">
+      <div className="container-x">
+        <Reveal className="mb-10 flex flex-wrap items-end justify-between gap-6">
+          <div>
+            <Eyebrow>Site videos</Eyebrow>
+            <h2 id="videos-h" className="mt-3 text-navy">See our projects <em className="accent-light">on video.</em></h2>
+          </div>
+          <a href={company.facebook} target="_blank" rel="noreferrer" className="btn btn-ghost-light">More on Facebook</a>
+        </Reveal>
+
+        {/* Desktop: featured + list */}
+        <div className="hidden gap-6 md:grid md:grid-cols-[1.7fr_1fr]">
+          <div>
+            <LiteVideo v={featured} autoplay={played} />
+            {featured.title && <p className="mt-3 font-display text-xl text-navy">{featured.title}</p>}
+          </div>
+          {data.length > 1 && (
+            <ul className="max-h-[440px] space-y-3 overflow-y-auto pr-1">
+              {data.map((v, i) => (
+                <li key={v.id}>
+                  <button type="button" onClick={() => { setActive(i); setPlayed(true); }} aria-current={i === active} className={`flex w-full items-center gap-3 rounded-xl p-2 text-left transition ${i === active ? "bg-ivory ring-1 ring-brand-red/40" : "hover:bg-ivory"}`}>
+                    <span className="relative block aspect-video w-32 shrink-0 overflow-hidden rounded-lg"><VideoPoster v={v} small /></span>
+                    <span className="line-clamp-2 text-sm font-medium text-navy">{v.title || "Natec project video"}</span>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+
+        {/* Mobile: swipe carousel */}
+        <div className="md:hidden">
+          <div
+            ref={track}
+            onScroll={(e) => { const el = e.currentTarget; setSlide(Math.round(el.scrollLeft / Math.max(1, el.clientWidth * 0.88))); }}
+            className="-mx-5 flex snap-x snap-mandatory gap-4 overflow-x-auto scroll-px-5 px-5 pb-2 [scrollbar-width:none]"
+          >
+            {data.map((v) => (
+              <div key={v.id} className="w-[88%] shrink-0 snap-start">
+                <LiteVideo v={v} />
+                {v.title && <p className="mt-2 text-sm font-medium text-navy">{v.title}</p>}
+              </div>
+            ))}
+          </div>
+          {data.length > 1 && (
+            <div className="mt-2 flex justify-center">
+              {data.map((v, i) => (
+                <button key={v.id} type="button" onClick={() => goto(i)} aria-label={`Show video ${i + 1}`} className="flex h-11 w-11 items-center justify-center">
+                  <span className={`h-2 rounded-full transition-all ${i === slide ? "w-6 bg-brand-red" : "w-2 bg-navy/25"}`} />
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ---------- Buying with Natec ---------- */
+const BUY = [
+  { i: MessageCircle, t: "Talk to us", b: "Message us on WhatsApp or call the office." },
+  { i: MapPin, t: "Visit the site", b: "See the building and the neighbourhood in Rajendrapur Bazar." },
+  { i: LayoutGrid, t: "Choose your flat", b: "Pick the floor and layout that suits your family." },
+  { i: FileText, t: "Booking and documents", b: "We guide you through booking and the paperwork." },
+];
+export const WA_SITE_VISIT = `${company.whatsappLink}?text=${encodeURIComponent("Hi Natec, I'd like to book a site visit.")}`;
+
+export function BuyingSteps() {
+  return (
+    <section className="section-pad bg-white">
+      <div className="container-x">
+        <Reveal className="mb-12 max-w-2xl">
+          <Eyebrow>Buying with Natec</Eyebrow>
+          <h2 className="mt-3 text-navy">Buying your flat in Sreepur, <em className="accent-light">in four steps.</em></h2>
+        </Reveal>
+        <ol className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          {BUY.map((s, n) => (
+            <Reveal key={s.t} className="rounded-2xl border border-border bg-ivory p-7">
+              <li className="list-none">
+                <div className="flex items-center justify-between">
+                  <s.i className="h-7 w-7 text-navy" strokeWidth={1.3} />
+                  <span className="num text-3xl text-brand-red">{n + 1}</span>
+                </div>
+                <h3 className="mt-5 text-navy">{s.t}</h3>
+                <p className="mt-2 text-[15px] text-muted-foreground">{s.b}</p>
+              </li>
+            </Reveal>
+          ))}
+        </ol>
+        <a href={WA_SITE_VISIT} target="_blank" rel="noreferrer" className="btn btn-primary mt-10"><WhatsAppIcon /> Book a site visit</a>
+      </div>
+    </section>
+  );
+}
+
+/* ---------- FAQ ---------- */
+export const FAQS = [
+  { q: "Where are Natec's projects located?", a: "Our projects are in Rajendrapur Bazar, Sreepur, Gazipur: Shobuj Angon and Shobuj Aloy at Padma Gate, and Shobuj Digonto at Pepsi Gate. Our two upcoming projects are in Rajendrapur Bazar and Gazipur." },
+  { q: "Are there flats available now?", a: "All 75 flats in our three current projects are sold out. Register your interest for our upcoming projects in Gazipur and we will contact you first." },
+  { q: "How do I book a site visit?", a: `Message us on WhatsApp at ${company.whatsapp} or call ${company.phone}, and we will arrange a time to show you the site.` },
+  { q: "What sizes are the flats?", a: "Flat sizes in our projects range from [sizes]. Contact us for the exact size and layout of each flat." },
+  { q: "Do you help with documents and registration?", a: "Yes. We guide buyers through booking and the documents involved. [confirm: details of the registration support you offer]" },
+  { q: "How can I contact Natec?", a: `Visit our office at ${company.address}, call ${company.phone}, WhatsApp ${company.whatsapp} or email ${company.email}.` },
+];
+
+export function Faq() {
+  return (
+    <section className="section-pad bg-white">
+      <div className="container-x grid gap-10 md:grid-cols-[1fr_1.6fr]">
+        <Reveal>
+          <Eyebrow>FAQ</Eyebrow>
+          <h2 className="mt-3 text-navy">Frequently asked <em className="accent-light">questions.</em></h2>
+          <p lang="bn" className="mt-4 font-display text-lg text-navy">শ্রীপুর, গাজীপুরে ফ্ল্যাট ও অ্যাপার্টমেন্ট</p>
+        </Reveal>
+        <Reveal>
+          <Accordion type="single" collapsible className="border-t border-border">
+            {FAQS.map((f, i) => (
+              <AccordionItem key={f.q} value={`f${i}`}>
+                <AccordionTrigger className="min-h-[44px] py-5 text-left font-display text-lg text-navy hover:no-underline">{f.q}</AccordionTrigger>
+                <AccordionContent className="text-[16px] leading-relaxed text-muted-foreground">{f.a}</AccordionContent>
+              </AccordionItem>
+            ))}
+          </Accordion>
+        </Reveal>
+      </div>
+    </section>
+  );
+}

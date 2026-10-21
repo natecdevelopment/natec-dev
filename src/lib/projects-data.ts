@@ -42,3 +42,10 @@ async function fetchPublishedProjects(): Promise<ProjectWithMedia[]> {
 }
 
 export const publicProjectsQuery = queryOptions({ queryKey: ["public-projects"], queryFn: fetchPublishedProjects, staleTime: 30_000 });
+
+async function fetchPublishedVideos(): Promise<VideoRow[]> {
+  const { data, error } = await supabase.from("videos").select("*").eq("published", true).order("sort_order").order("created_at", { ascending: false });
+  if (error) throw error;
+  return data ?? [];
+}
+export const publicVideosQuery = queryOptions({ queryKey: ["public-videos"], queryFn: fetchPublishedVideos, staleTime: 30_000 });

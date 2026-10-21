@@ -174,7 +174,7 @@ function FlyHero() {
     for (let k = 0; k < 6; k++) pump();
 
     import("lenis").then(({ default: Lenis }) => {
-      if (alive) lenis = new Lenis({ lerp: 0.1, smoothWheel: true, syncTouch: false, autoRaf: false }) as never;
+      if (alive) lenis = new Lenis({ prevent: (node: HTMLElement) => !!node.closest?.("[data-lenis-prevent]"), lerp: 0.1, smoothWheel: true, syncTouch: false, autoRaf: false }) as never;
     });
     window.addEventListener("resize", sizeCanvas);
 

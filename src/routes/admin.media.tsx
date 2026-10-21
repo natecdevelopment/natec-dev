@@ -112,7 +112,7 @@ function MediaPanel({ media, projects, onClose, onChanged }: { media: MediaRow |
   const altLen = f.alt_text.length;
   return (
     <Sheet open onOpenChange={(o) => !o && onClose()}>
-      <SheetContent className="w-full overflow-y-auto sm:max-w-md">
+      <SheetContent data-lenis-prevent className="w-full overflow-y-auto sm:max-w-md">
         <SheetHeader><SheetTitle>Media details</SheetTitle></SheetHeader>
         <div className="mt-4 space-y-4 text-sm">
           <img src={media.public_url} alt={media.alt_text} className="w-full rounded-xl bg-muted object-contain" />

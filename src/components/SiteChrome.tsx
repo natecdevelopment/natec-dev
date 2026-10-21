@@ -98,7 +98,7 @@ export function Header() {
         </div>
       </div>
       {open && (
-        <nav className="fixed inset-0 -z-10 flex flex-col gap-1 overflow-y-auto bg-white px-6 pb-8 pt-24 text-navy md:pt-28 xl:hidden">
+        <nav data-lenis-prevent className="fixed inset-0 -z-10 flex flex-col gap-1 overflow-y-auto bg-white px-6 pb-8 pt-24 text-navy md:pt-28 xl:hidden">
           {nav.map((n) => (
             <Link key={n.to} to={n.to} onClick={() => setOpen(false)} className="border-b border-navy/10 py-4 font-display text-3xl hover:text-brand-red" activeProps={{ className: "!text-brand-red" }} activeOptions={{ exact: true }}>
               {n.label}

@@ -135,7 +135,7 @@ function General() {
                     <td className="px-3 py-3"><StatusChip status={a.status} /></td>
                     <td className="px-3 py-3">
                       <span className="flex flex-nowrap justify-end gap-1.5">
-                        {actions(a).map((x) => <IconBtn key={x.key} label={`${x.label} ${a.email}`} title={x.tip ?? x.label} danger={x.danger} disabled={x.disabled} onClick={x.run}><x.icon className="h-4 w-4" /></IconBtn>)}
+                        {actions(a).map((x) => <IconBtn key={x.key} label={`${x.label} ${a.email}`} title={x.tip ?? x.label} danger={!!x.danger} disabled={!!x.disabled} onClick={() => void x.run()}><x.icon className="h-4 w-4" /></IconBtn>)}
                       </span>
                     </td>
                   </tr>
@@ -152,7 +152,7 @@ function General() {
                   <DropdownMenuTrigger className="row-span-3 flex h-9 w-9 items-center justify-center self-start rounded-full border border-navy/20 text-navy" aria-label={`Actions for ${a.email}`}><MoreHorizontal className="h-4 w-4" /></DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
                     {actions(a).map((x) => (
-                      <DropdownMenuItem key={x.key} disabled={x.disabled} onSelect={x.run} className={x.danger ? "text-brand-red" : ""} title={x.tip}>
+                      <DropdownMenuItem key={x.key} disabled={!!x.disabled} onSelect={() => void x.run()} className={x.danger ? "text-brand-red" : ""} title={x.tip ?? x.label}>
                         <x.icon className="h-4 w-4" /> {x.label}{x.disabled && <span className="ml-1 text-xs text-muted-foreground">(admin)</span>}
                       </DropdownMenuItem>
                     ))}

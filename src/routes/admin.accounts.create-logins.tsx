@@ -231,7 +231,7 @@ function CreateLogins() {
     <div className="space-y-4 pb-24">
       <Link to="/admin/accounts" search={{ tab: "clients" }} className="inline-flex items-center gap-1 text-sm text-navy"><ArrowLeft className="h-4 w-4" /> Clients</Link>
       <PageTitle title="Client logins" />
-      <div role="tablist" className="flex flex-wrap gap-1 rounded-full border border-border bg-white p-1 text-sm w-fit">
+      <div role="tablist" className="flex w-fit flex-wrap gap-1 rounded-2xl border border-border bg-white p-1 text-sm">
         {tabs.map(([t, l]) => <button key={t} role="tab" aria-selected={tab === t} onClick={() => setTab(t)} className={`rounded-full px-4 py-1.5 font-medium ${tab === t ? "bg-navy text-white" : "text-navy hover:bg-navy/5"}`}>{l} <span className="opacity-70">({countOf(t)})</span></button>)}
       </div>
       <div className="flex flex-wrap gap-2">

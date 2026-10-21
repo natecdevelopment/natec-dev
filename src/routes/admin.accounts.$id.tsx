@@ -70,6 +70,8 @@ function ClientDetail() {
   const [editPay, setEditPay] = useState<PaymentRow | null>(null);
   const [editInfo, setEditInfo] = useState(false);
   const [delAcc, setDelAcc] = useState<DeleteTarget[] | null>(null);
+  const [delLogin, setDelLogin] = useState<LoginTarget[] | null>(null);
+  const lock = admins.has((d.loginEmail ?? c.email).toLowerCase());
   const admins = useAdminEmails();
 
   if (q.isLoading) return <ListSkeleton />;

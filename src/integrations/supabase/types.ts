@@ -26,6 +26,156 @@ export type Database = {
         }
         Relationships: []
       }
+      client_documents: {
+        Row: {
+          client_id: string
+          id: string
+          storage_path: string
+          title: string
+          uploaded_at: string
+        }
+        Insert: {
+          client_id: string
+          id?: string
+          storage_path: string
+          title: string
+          uploaded_at?: string
+        }
+        Update: {
+          client_id?: string
+          id?: string
+          storage_path?: string
+          title?: string
+          uploaded_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "client_documents_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "client_balances"
+            referencedColumns: ["client_id"]
+          },
+          {
+            foreignKeyName: "client_documents_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      client_notes: {
+        Row: {
+          client_id: string
+          notes: string
+          updated_at: string
+        }
+        Insert: {
+          client_id: string
+          notes?: string
+          updated_at?: string
+        }
+        Update: {
+          client_id?: string
+          notes?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "client_notes_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: true
+            referencedRelation: "client_balances"
+            referencedColumns: ["client_id"]
+          },
+          {
+            foreignKeyName: "client_notes_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: true
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      clients: {
+        Row: {
+          address: string
+          agreement_date: string | null
+          booking_date: string | null
+          created_at: string
+          email: string
+          flat_no: string
+          floor: string
+          full_name: string
+          id: string
+          parking: boolean
+          payment_plan_note: string
+          phone: string
+          profile_id: string | null
+          project_id: string | null
+          size_sft: number | null
+          status: string
+          total_price: number
+          updated_at: string
+        }
+        Insert: {
+          address?: string
+          agreement_date?: string | null
+          booking_date?: string | null
+          created_at?: string
+          email?: string
+          flat_no?: string
+          floor?: string
+          full_name: string
+          id?: string
+          parking?: boolean
+          payment_plan_note?: string
+          phone?: string
+          profile_id?: string | null
+          project_id?: string | null
+          size_sft?: number | null
+          status?: string
+          total_price?: number
+          updated_at?: string
+        }
+        Update: {
+          address?: string
+          agreement_date?: string | null
+          booking_date?: string | null
+          created_at?: string
+          email?: string
+          flat_no?: string
+          floor?: string
+          full_name?: string
+          id?: string
+          parking?: boolean
+          payment_plan_note?: string
+          phone?: string
+          profile_id?: string | null
+          project_id?: string | null
+          size_sft?: number | null
+          status?: string
+          total_price?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "clients_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "clients_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       construction_items: {
         Row: {
           category: string
@@ -183,6 +333,9 @@ export type Database = {
           phone: string
           read_at: string | null
           service: string | null
+          status: string
+          subject: string
+          user_id: string | null
           visit_date: string | null
         }
         Insert: {
@@ -194,6 +347,9 @@ export type Database = {
           phone: string
           read_at?: string | null
           service?: string | null
+          status?: string
+          subject?: string
+          user_id?: string | null
           visit_date?: string | null
         }
         Update: {
@@ -205,9 +361,57 @@ export type Database = {
           phone?: string
           read_at?: string | null
           service?: string | null
+          status?: string
+          subject?: string
+          user_id?: string | null
           visit_date?: string | null
         }
         Relationships: []
+      }
+      instalments: {
+        Row: {
+          amount: number
+          client_id: string
+          due_date: string
+          id: string
+          label: string
+          paid_amount: number
+          status: string
+        }
+        Insert: {
+          amount: number
+          client_id: string
+          due_date: string
+          id?: string
+          label?: string
+          paid_amount?: number
+          status?: string
+        }
+        Update: {
+          amount?: number
+          client_id?: string
+          due_date?: string
+          id?: string
+          label?: string
+          paid_amount?: number
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "instalments_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "client_balances"
+            referencedColumns: ["client_id"]
+          },
+          {
+            foreignKeyName: "instalments_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       media: {
         Row: {
@@ -264,6 +468,96 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      payments: {
+        Row: {
+          amount: number
+          client_id: string
+          created_at: string
+          id: string
+          method: string
+          note: string
+          paid_on: string
+          recorded_by: string | null
+          reference: string
+          type: string
+          updated_at: string
+        }
+        Insert: {
+          amount: number
+          client_id: string
+          created_at?: string
+          id?: string
+          method?: string
+          note?: string
+          paid_on?: string
+          recorded_by?: string | null
+          reference?: string
+          type?: string
+          updated_at?: string
+        }
+        Update: {
+          amount?: number
+          client_id?: string
+          created_at?: string
+          id?: string
+          method?: string
+          note?: string
+          paid_on?: string
+          recorded_by?: string | null
+          reference?: string
+          type?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payments_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "client_balances"
+            referencedColumns: ["client_id"]
+          },
+          {
+            foreignKeyName: "payments_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          account_type: string
+          created_at: string
+          email: string
+          full_name: string
+          id: string
+          last_seen_at: string | null
+          phone: string
+          status: string
+        }
+        Insert: {
+          account_type?: string
+          created_at?: string
+          email?: string
+          full_name?: string
+          id: string
+          last_seen_at?: string | null
+          phone?: string
+          status?: string
+        }
+        Update: {
+          account_type?: string
+          created_at?: string
+          email?: string
+          full_name?: string
+          id?: string
+          last_seen_at?: string | null
+          phone?: string
+          status?: string
+        }
+        Relationships: []
       }
       project_stages: {
         Row: {
@@ -445,6 +739,32 @@ export type Database = {
           },
         ]
       }
+      saved_projects: {
+        Row: {
+          created_at: string
+          project_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          project_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          project_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "saved_projects_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       videos: {
         Row: {
           created_at: string
@@ -483,10 +803,84 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      client_balances: {
+        Row: {
+          amount_due: number | null
+          client_id: string | null
+          last_payment_amount: number | null
+          last_payment_on: string | null
+          next_due_amount: number | null
+          next_due_date: string | null
+          overdue_amount: number | null
+          pct_paid: number | null
+          total_paid: number | null
+          total_price: number | null
+        }
+        Relationships: []
+      }
+      instalments_live: {
+        Row: {
+          amount: number | null
+          client_id: string | null
+          due_date: string | null
+          id: string | null
+          label: string | null
+          paid_amount: number | null
+          status: string | null
+        }
+        Insert: {
+          amount?: number | null
+          client_id?: string | null
+          due_date?: string | null
+          id?: string | null
+          label?: string | null
+          paid_amount?: number | null
+          status?: never
+        }
+        Update: {
+          amount?: number | null
+          client_id?: string | null
+          due_date?: string | null
+          id?: string | null
+          label?: string | null
+          paid_amount?: number | null
+          status?: never
+        }
+        Relationships: [
+          {
+            foreignKeyName: "instalments_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "client_balances"
+            referencedColumns: ["client_id"]
+          },
+          {
+            foreignKeyName: "instalments_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
+      admin_accounts: {
+        Args: never
+        Returns: {
+          account_type: string
+          created_at: string
+          email: string
+          email_verified: boolean
+          full_name: string
+          id: string
+          last_seen_at: string
+          phone: string
+          status: string
+        }[]
+      }
       is_admin: { Args: never; Returns: boolean }
+      is_my_client: { Args: { _client_id: string }; Returns: boolean }
     }
     Enums: {
       [_ in never]: never

@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthRouteImport } from './routes/_auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as AdminRouteImport } from './routes/admin'
@@ -18,9 +19,15 @@ import { Route as ConstructionStatusRouteImport } from './routes/construction-st
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as DirectorsRouteImport } from './routes/directors'
 import { Route as FloorPlanRouteImport } from './routes/floor-plan'
+import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as LocationRouteImport } from './routes/location'
+import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as ProjectsRouteImport } from './routes/projects'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as ServicesRouteImport } from './routes/services'
+import { Route as TermsRouteImport } from './routes/terms'
+import { Route as AuthLoginRouteImport } from './routes/_auth.login'
+import { Route as AuthRegisterRouteImport } from './routes/_auth.register'
 import { Route as AuthenticatedAccountRouteImport } from './routes/_authenticated/account'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as AdminConstructionRouteImport } from './routes/admin.construction'
@@ -30,6 +37,9 @@ import { Route as AdminUpcomingRouteImport } from './routes/admin.upcoming'
 import { Route as AdminVideosRouteImport } from './routes/admin.videos'
 import { Route as ConstructionStatusSlugRouteImport } from './routes/construction-status_.$slug'
 import { Route as ProjectsSlugRouteImport } from './routes/projects_.$slug'
+import { Route as AdminAccountsIndexRouteImport } from './routes/admin.accounts.index'
+import { Route as AdminAccountsIdRouteImport } from './routes/admin.accounts.$id'
+import { Route as AdminAccountsNewRouteImport } from './routes/admin.accounts.new'
 import { Route as AdminProjectsIndexRouteImport } from './routes/admin.projects.index'
 import { Route as AdminProjectsIdRouteImport } from './routes/admin.projects.$id'
 import { Route as AdminProjectsNewRouteImport } from './routes/admin.projects.new'
@@ -37,6 +47,10 @@ import { Route as AdminProjectsNewRouteImport } from './routes/admin.projects.ne
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/_auth',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
@@ -78,9 +92,19 @@ const FloorPlanRoute = FloorPlanRouteImport.update({
   path: '/floor-plan',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
+  id: '/forgot-password',
+  path: '/forgot-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LocationRoute = LocationRouteImport.update({
   id: '/location',
   path: '/location',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ProjectsRoute = ProjectsRouteImport.update({
@@ -88,10 +112,30 @@ const ProjectsRoute = ProjectsRouteImport.update({
   path: '/projects',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ServicesRoute = ServicesRouteImport.update({
   id: '/services',
   path: '/services',
   getParentRoute: () => rootRouteImport,
+} as any)
+const TermsRoute = TermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthLoginRoute = AuthLoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => AuthRoute,
+} as any)
+const AuthRegisterRoute = AuthRegisterRouteImport.update({
+  id: '/register',
+  path: '/register',
+  getParentRoute: () => AuthRoute,
 } as any)
 const AuthenticatedAccountRoute = AuthenticatedAccountRouteImport.update({
   id: '/account',
@@ -138,6 +182,21 @@ const ProjectsSlugRoute = ProjectsSlugRouteImport.update({
   path: '/projects/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminAccountsIndexRoute = AdminAccountsIndexRouteImport.update({
+  id: '/accounts/',
+  path: '/accounts/',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminAccountsIdRoute = AdminAccountsIdRouteImport.update({
+  id: '/accounts/$id',
+  path: '/accounts/$id',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminAccountsNewRoute = AdminAccountsNewRouteImport.update({
+  id: '/accounts/new',
+  path: '/accounts/new',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminProjectsIndexRoute = AdminProjectsIndexRouteImport.update({
   id: '/projects/',
   path: '/projects/',
@@ -163,9 +222,15 @@ export interface FileRoutesByFullPath {
   '/contact': typeof ContactRoute
   '/directors': typeof DirectorsRoute
   '/floor-plan': typeof FloorPlanRoute
+  '/forgot-password': typeof ForgotPasswordRoute
   '/location': typeof LocationRoute
+  '/privacy': typeof PrivacyRoute
   '/projects': typeof ProjectsRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/services': typeof ServicesRoute
+  '/terms': typeof TermsRoute
+  '/login': typeof AuthLoginRoute
+  '/register': typeof AuthRegisterRoute
   '/account': typeof AuthenticatedAccountRoute
   '/admin/construction': typeof AdminConstructionRoute
   '/admin/media': typeof AdminMediaRoute
@@ -175,8 +240,11 @@ export interface FileRoutesByFullPath {
   '/construction-status/$slug': typeof ConstructionStatusSlugRoute
   '/projects/$slug': typeof ProjectsSlugRoute
   '/admin/': typeof AdminIndexRoute
+  '/admin/accounts/$id': typeof AdminAccountsIdRoute
+  '/admin/accounts/new': typeof AdminAccountsNewRoute
   '/admin/projects/$id': typeof AdminProjectsIdRoute
   '/admin/projects/new': typeof AdminProjectsNewRoute
+  '/admin/accounts/': typeof AdminAccountsIndexRoute
   '/admin/projects/': typeof AdminProjectsIndexRoute
 }
 export interface FileRoutesByTo {
@@ -187,9 +255,15 @@ export interface FileRoutesByTo {
   '/contact': typeof ContactRoute
   '/directors': typeof DirectorsRoute
   '/floor-plan': typeof FloorPlanRoute
+  '/forgot-password': typeof ForgotPasswordRoute
   '/location': typeof LocationRoute
+  '/privacy': typeof PrivacyRoute
   '/projects': typeof ProjectsRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/services': typeof ServicesRoute
+  '/terms': typeof TermsRoute
+  '/login': typeof AuthLoginRoute
+  '/register': typeof AuthRegisterRoute
   '/account': typeof AuthenticatedAccountRoute
   '/admin/construction': typeof AdminConstructionRoute
   '/admin/media': typeof AdminMediaRoute
@@ -199,14 +273,18 @@ export interface FileRoutesByTo {
   '/construction-status/$slug': typeof ConstructionStatusSlugRoute
   '/projects/$slug': typeof ProjectsSlugRoute
   '/admin': typeof AdminIndexRoute
+  '/admin/accounts/$id': typeof AdminAccountsIdRoute
+  '/admin/accounts/new': typeof AdminAccountsNewRoute
   '/admin/projects/$id': typeof AdminProjectsIdRoute
   '/admin/projects/new': typeof AdminProjectsNewRoute
+  '/admin/accounts': typeof AdminAccountsIndexRoute
   '/admin/projects': typeof AdminProjectsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/_auth': typeof AuthRouteWithChildren
   '/about': typeof AboutRoute
   '/admin': typeof AdminRouteWithChildren
   '/auth': typeof AuthRoute
@@ -214,9 +292,15 @@ export interface FileRoutesById {
   '/contact': typeof ContactRoute
   '/directors': typeof DirectorsRoute
   '/floor-plan': typeof FloorPlanRoute
+  '/forgot-password': typeof ForgotPasswordRoute
   '/location': typeof LocationRoute
+  '/privacy': typeof PrivacyRoute
   '/projects': typeof ProjectsRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/services': typeof ServicesRoute
+  '/terms': typeof TermsRoute
+  '/_auth/login': typeof AuthLoginRoute
+  '/_auth/register': typeof AuthRegisterRoute
   '/_authenticated/account': typeof AuthenticatedAccountRoute
   '/admin/construction': typeof AdminConstructionRoute
   '/admin/media': typeof AdminMediaRoute
@@ -226,8 +310,11 @@ export interface FileRoutesById {
   '/construction-status_/$slug': typeof ConstructionStatusSlugRoute
   '/projects_/$slug': typeof ProjectsSlugRoute
   '/admin/': typeof AdminIndexRoute
+  '/admin/accounts/$id': typeof AdminAccountsIdRoute
+  '/admin/accounts/new': typeof AdminAccountsNewRoute
   '/admin/projects/$id': typeof AdminProjectsIdRoute
   '/admin/projects/new': typeof AdminProjectsNewRoute
+  '/admin/accounts/': typeof AdminAccountsIndexRoute
   '/admin/projects/': typeof AdminProjectsIndexRoute
 }
 export interface FileRouteTypes {
@@ -241,9 +328,15 @@ export interface FileRouteTypes {
     | '/contact'
     | '/directors'
     | '/floor-plan'
+    | '/forgot-password'
     | '/location'
+    | '/privacy'
     | '/projects'
+    | '/reset-password'
     | '/services'
+    | '/terms'
+    | '/login'
+    | '/register'
     | '/account'
     | '/admin/construction'
     | '/admin/media'
@@ -253,8 +346,11 @@ export interface FileRouteTypes {
     | '/construction-status/$slug'
     | '/projects/$slug'
     | '/admin/'
+    | '/admin/accounts/$id'
+    | '/admin/accounts/new'
     | '/admin/projects/$id'
     | '/admin/projects/new'
+    | '/admin/accounts/'
     | '/admin/projects/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -265,9 +361,15 @@ export interface FileRouteTypes {
     | '/contact'
     | '/directors'
     | '/floor-plan'
+    | '/forgot-password'
     | '/location'
+    | '/privacy'
     | '/projects'
+    | '/reset-password'
     | '/services'
+    | '/terms'
+    | '/login'
+    | '/register'
     | '/account'
     | '/admin/construction'
     | '/admin/media'
@@ -277,13 +379,17 @@ export interface FileRouteTypes {
     | '/construction-status/$slug'
     | '/projects/$slug'
     | '/admin'
+    | '/admin/accounts/$id'
+    | '/admin/accounts/new'
     | '/admin/projects/$id'
     | '/admin/projects/new'
+    | '/admin/accounts'
     | '/admin/projects'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
+    | '/_auth'
     | '/about'
     | '/admin'
     | '/auth'
@@ -291,9 +397,15 @@ export interface FileRouteTypes {
     | '/contact'
     | '/directors'
     | '/floor-plan'
+    | '/forgot-password'
     | '/location'
+    | '/privacy'
     | '/projects'
+    | '/reset-password'
     | '/services'
+    | '/terms'
+    | '/_auth/login'
+    | '/_auth/register'
     | '/_authenticated/account'
     | '/admin/construction'
     | '/admin/media'
@@ -303,14 +415,18 @@ export interface FileRouteTypes {
     | '/construction-status_/$slug'
     | '/projects_/$slug'
     | '/admin/'
+    | '/admin/accounts/$id'
+    | '/admin/accounts/new'
     | '/admin/projects/$id'
     | '/admin/projects/new'
+    | '/admin/accounts/'
     | '/admin/projects/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  AuthRoute: typeof AuthRouteWithChildren
   AboutRoute: typeof AboutRoute
   AdminRoute: typeof AdminRouteWithChildren
   AuthRoute: typeof AuthRoute
@@ -318,9 +434,13 @@ export interface RootRouteChildren {
   ContactRoute: typeof ContactRoute
   DirectorsRoute: typeof DirectorsRoute
   FloorPlanRoute: typeof FloorPlanRoute
+  ForgotPasswordRoute: typeof ForgotPasswordRoute
   LocationRoute: typeof LocationRoute
+  PrivacyRoute: typeof PrivacyRoute
   ProjectsRoute: typeof ProjectsRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
   ServicesRoute: typeof ServicesRoute
+  TermsRoute: typeof TermsRoute
   ConstructionStatusSlugRoute: typeof ConstructionStatusSlugRoute
   ProjectsSlugRoute: typeof ProjectsSlugRoute
 }
@@ -332,6 +452,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_auth': {
+      id: '/_auth'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated': {
@@ -390,11 +517,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof FloorPlanRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/forgot-password': {
+      id: '/forgot-password'
+      path: '/forgot-password'
+      fullPath: '/forgot-password'
+      preLoaderRoute: typeof ForgotPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/location': {
       id: '/location'
       path: '/location'
       fullPath: '/location'
       preLoaderRoute: typeof LocationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/projects': {
@@ -404,12 +545,40 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProjectsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/services': {
       id: '/services'
       path: '/services'
       fullPath: '/services'
       preLoaderRoute: typeof ServicesRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_auth/login': {
+      id: '/_auth/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof AuthLoginRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/_auth/register': {
+      id: '/_auth/register'
+      path: '/register'
+      fullPath: '/register'
+      preLoaderRoute: typeof AuthRegisterRouteImport
+      parentRoute: typeof AuthRoute
     }
     '/_authenticated/account': {
       id: '/_authenticated/account'
@@ -474,6 +643,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProjectsSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/accounts/': {
+      id: '/admin/accounts/'
+      path: '/accounts'
+      fullPath: '/admin/accounts/'
+      preLoaderRoute: typeof AdminAccountsIndexRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/accounts/$id': {
+      id: '/admin/accounts/$id'
+      path: '/accounts/$id'
+      fullPath: '/admin/accounts/$id'
+      preLoaderRoute: typeof AdminAccountsIdRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/accounts/new': {
+      id: '/admin/accounts/new'
+      path: '/accounts/new'
+      fullPath: '/admin/accounts/new'
+      preLoaderRoute: typeof AdminAccountsNewRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/projects/': {
       id: '/admin/projects/'
       path: '/projects'
@@ -509,6 +699,18 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
 const AuthenticatedRouteRouteWithChildren =
   AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
+interface AuthRouteChildren {
+  AuthLoginRoute: typeof AuthLoginRoute
+  AuthRegisterRoute: typeof AuthRegisterRoute
+}
+
+const AuthRouteChildren: AuthRouteChildren = {
+  AuthLoginRoute: AuthLoginRoute,
+  AuthRegisterRoute: AuthRegisterRoute,
+}
+
+const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
+
 interface AdminRouteChildren {
   AdminConstructionRoute: typeof AdminConstructionRoute
   AdminMediaRoute: typeof AdminMediaRoute
@@ -516,8 +718,11 @@ interface AdminRouteChildren {
   AdminUpcomingRoute: typeof AdminUpcomingRoute
   AdminVideosRoute: typeof AdminVideosRoute
   AdminIndexRoute: typeof AdminIndexRoute
+  AdminAccountsIdRoute: typeof AdminAccountsIdRoute
+  AdminAccountsNewRoute: typeof AdminAccountsNewRoute
   AdminProjectsIdRoute: typeof AdminProjectsIdRoute
   AdminProjectsNewRoute: typeof AdminProjectsNewRoute
+  AdminAccountsIndexRoute: typeof AdminAccountsIndexRoute
   AdminProjectsIndexRoute: typeof AdminProjectsIndexRoute
 }
 
@@ -528,8 +733,11 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminUpcomingRoute: AdminUpcomingRoute,
   AdminVideosRoute: AdminVideosRoute,
   AdminIndexRoute: AdminIndexRoute,
+  AdminAccountsIdRoute: AdminAccountsIdRoute,
+  AdminAccountsNewRoute: AdminAccountsNewRoute,
   AdminProjectsIdRoute: AdminProjectsIdRoute,
   AdminProjectsNewRoute: AdminProjectsNewRoute,
+  AdminAccountsIndexRoute: AdminAccountsIndexRoute,
   AdminProjectsIndexRoute: AdminProjectsIndexRoute,
 }
 
@@ -538,6 +746,7 @@ const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  AuthRoute: AuthRouteWithChildren,
   AboutRoute: AboutRoute,
   AdminRoute: AdminRouteWithChildren,
   AuthRoute: AuthRoute,
@@ -545,9 +754,13 @@ const rootRouteChildren: RootRouteChildren = {
   ContactRoute: ContactRoute,
   DirectorsRoute: DirectorsRoute,
   FloorPlanRoute: FloorPlanRoute,
+  ForgotPasswordRoute: ForgotPasswordRoute,
   LocationRoute: LocationRoute,
+  PrivacyRoute: PrivacyRoute,
   ProjectsRoute: ProjectsRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
   ServicesRoute: ServicesRoute,
+  TermsRoute: TermsRoute,
   ConstructionStatusSlugRoute: ConstructionStatusSlugRoute,
   ProjectsSlugRoute: ProjectsSlugRoute,
 }

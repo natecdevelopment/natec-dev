@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { ChevronLeft, ChevronRight, Pencil, Plus, Search, UserCheck, UserX, Eye, Trash2, MoreHorizontal, Briefcase, FileSpreadsheet } from "lucide-react";
+import { ChevronLeft, ChevronRight, Pencil, Plus, Search, UserCheck, UserX, Eye, Trash2, MoreHorizontal, Briefcase, FileSpreadsheet, KeyRound } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { ActivityList, ADMIN_LOCK_TIP, DeleteAccountDialog, IconBtn, StatusChip, logAudit, muted, useAdminEmails, type DeleteTarget } from "@/components/admin/AccountAdmin";
 import { supabase } from "@/integrations/supabase/client";
@@ -26,6 +26,7 @@ function AccountsPage() {
         <Link to="/admin/accounts" search={{}} className={`${btnSm} ${tab === "general" ? "!bg-navy !text-white" : ""}`}>General accounts</Link>
         <Link to="/admin/accounts" search={{ tab: "clients" }} className={`${btnSm} ${tab === "clients" ? "!bg-navy !text-white" : ""}`}>Client accounts</Link>
         <Link to="/admin/accounts/import" className={btnSm}><FileSpreadsheet className="h-3.5 w-3.5" /> Import from Excel</Link>
+        <Link to="/admin/accounts/create-logins" className={btnSm}><KeyRound className="h-3.5 w-3.5" /> Create logins</Link>
         <Link to="/admin/accounts/new" search={{}} className="btn btn-primary !py-2"><Plus className="h-4 w-4" /> Add client</Link>
       </PageTitle>
       {tab === "general" ? <General /> : <Clients />}
@@ -259,13 +260,14 @@ function Clients() {
   const q = useQuery({
     queryKey: ["admin", "clients"],
     queryFn: async () => {
-      const [c, b, p] = await Promise.all([
+      const [c, b, p, u] = await Promise.all([
         supabase.from("clients").select("*").order("created_at", { ascending: false }),
         supabase.from("client_balances").select("*"),
         supabase.from("projects").select("id, name").order("sort_order"),
+        supabase.from("profiles").select("id, username").eq("account_type", "client"),
       ]);
       if (c.error) throw c.error;
-      return { clients: c.data ?? [], balances: b.data ?? [], projects: p.data ?? [] };
+      return { clients: c.data ?? [], balances: b.data ?? [], projects: p.data ?? [], users: u.data ?? [] };
     },
   });
   const [term, setTerm] = useState(""); const [proj, setProj] = useState(""); const [status, setStatus] = useState("");
@@ -300,7 +302,8 @@ function Clients() {
               return (
                 <li key={c.id} className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-4 py-3 text-sm hover:bg-ivory lg:grid-cols-[1.4fr_1fr_1.2fr_70px_1fr_1fr_1fr_110px_120px]">
                   <Link to="/admin/accounts/$id" params={{ id: c.id }} className="grid min-w-0 gap-1 lg:col-span-8 lg:grid-cols-subgrid lg:items-center">
-                    <span className="min-w-0 truncate font-semibold text-navy">{c.full_name}{overdue && <span className="ml-2 rounded-full bg-brand-red px-2 py-0.5 text-[10px] text-white">Overdue</span>}{c.status !== "active" && <span className="ml-2 text-xs text-muted-foreground">({c.status})</span>}</span>
+                    <span className="min-w-0 truncate font-semibold text-navy">{c.full_name}{overdue && <span className="ml-2 rounded-full bg-brand-red px-2 py-0.5 text-[10px] text-white">Overdue</span>}{c.status !== "active" && <span className="ml-2 text-xs text-muted-foreground">({c.status})</span>}
+                      <span className="block truncate text-xs font-normal text-muted-foreground">{c.profile_id ? `@${q.data?.users.find((x) => x.id === c.profile_id)?.username ?? "login"}` : "No login"}</span></span>
                     <span className="text-muted-foreground">{c.phone || muted}</span>
                     <span className="truncate text-muted-foreground">{p?.name ?? muted}</span>
                     <span className="text-muted-foreground">{c.flat_no || muted}</span>

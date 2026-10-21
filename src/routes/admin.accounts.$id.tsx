@@ -13,6 +13,7 @@ import { PAYMENT_METHODS, PAYMENT_TYPES, fmtDate, printStatement, type ClientRow
 import { allocatePayment, taka, type PlanForm } from "@/lib/money";
 import { PaymentPlanForm, initialPlanState, planBlocker, type PlanState } from "@/components/admin/PaymentPlanForm";
 import { inviteClient } from "@/lib/admin-accounts.functions";
+import { ResetPortalPassword } from "@/components/admin/PortalLogins";
 import { ADMIN_LOCK_TIP, DeleteAccountDialog, useAdminEmails, type DeleteTarget } from "@/components/admin/AccountAdmin";
 
 export const Route = createFileRoute("/admin/accounts/$id")({ component: ClientDetail });
@@ -55,12 +56,12 @@ function ClientDetail() {
         supabase.from("client_documents").select("*").eq("client_id", id).order("uploaded_at", { ascending: false }),
         supabase.from("client_notes").select("notes").eq("client_id", id).maybeSingle(),
         c.project_id ? supabase.from("projects").select("id, name, slug").eq("id", c.project_id).maybeSingle() : Promise.resolve({ data: null }),
-        c.profile_id ? supabase.from("profiles").select("email").eq("id", c.profile_id).maybeSingle() : Promise.resolve({ data: null }),
+        c.profile_id ? supabase.from("profiles").select("email, username").eq("id", c.profile_id).maybeSingle() : Promise.resolve({ data: null }),
       ]);
       return {
         c: c as ClientRow, b: b.data, payments: (pay.data ?? []) as PaymentRow[], docs: docs.data ?? [], notes: notes.data?.notes ?? "",
         inst: (inst.data ?? []).map((r) => ({ ...r, status: live.data?.find((l) => l.id === r.id)?.status ?? r.status })),
-        project: proj.data as { id: string; name: string; slug: string } | null, loginEmail: (prof.data as { email: string } | null)?.email ?? null,
+        project: proj.data as { id: string; name: string; slug: string } | null, loginEmail: (prof.data as { email: string } | null)?.email ?? null, username: (prof.data as { username: string } | null)?.username ?? null,
       };
     },
   });
@@ -118,13 +119,14 @@ function ClientDetail() {
         <a href={`https://wa.me/${waPhone}?text=${encodeURIComponent(reminder)}`} target="_blank" rel="noreferrer" className={btnSm}><WhatsAppIcon /> WhatsApp reminder</a>
         <button onClick={() => printStatement({ client: c, projectName: d.project?.name ?? "", balance: d.b, instalments: d.inst, payments: d.payments })} className={btnSm}><Download className="h-4 w-4" /> Statement (PDF)</button>
         {!c.profile_id && <button onClick={sendInvite} disabled={!c.email} className={`${btnSm} disabled:opacity-40`} title={c.email ? "" : "Add an email first"}><Mail className="h-4 w-4" /> Invite to portal</button>}
+        {c.profile_id && <ResetPortalPassword clientId={c.id} name={c.full_name} phone={c.phone} flat={c.flat_no} />}
         <Link to="/admin/accounts/clients/$id/edit" params={{ id: c.id }} className={btnSm}><Pencil className="h-4 w-4" /> Edit</Link>
         <Confirm title="Delete this client?" description="This removes the client with all payments, schedule and documents. It cannot be undone." onConfirm={deleteClient}>
           {(ask) => <button onClick={ask} className={btnDanger}><Trash2 className="h-4 w-4" /> Delete</button>}
         </Confirm>
       </PageTitle>
       <Card className="grid gap-3 text-sm sm:grid-cols-2 lg:grid-cols-4">
-        {[["Project", d.project?.name ?? "—"], ["Flat / floor", `${c.flat_no || "—"} / ${c.floor || "—"}`], ["Size", c.size_sft ? `${c.size_sft.toLocaleString("en-IN")} sft` : "—"], ["Parking", c.parking ? "Yes" : "No"], ["Phone", c.phone], ["Email", c.email || "—"], ["Login", d.loginEmail ?? "No login yet"], ["Status", c.status], ["Booking", fmtDate(c.booking_date)], ["Agreement", fmtDate(c.agreement_date)], ["Address", c.address || "—"], ["Plan note", c.payment_plan_note || "—"]].map(([k, v]) => (
+        {[["Project", d.project?.name ?? "—"], ["Flat / floor", `${c.flat_no || "—"} / ${c.floor || "—"}`], ["Size", c.size_sft ? `${c.size_sft.toLocaleString("en-IN")} sft` : "—"], ["Parking", c.parking ? "Yes" : "No"], ["Phone", c.phone], ["Email", c.email || "—"], ["Login", d.username ? `Username: ${d.username}` : d.loginEmail ?? "No login yet"], ["Status", c.status], ["Booking", fmtDate(c.booking_date)], ["Agreement", fmtDate(c.agreement_date)], ["Address", c.address || "—"], ["Plan note", c.payment_plan_note || "—"]].map(([k, v]) => (
           <div key={k}><p className="text-xs uppercase tracking-wider text-muted-foreground">{k}</p><p className="break-words font-medium text-navy">{v}</p></div>
         ))}
       </Card>

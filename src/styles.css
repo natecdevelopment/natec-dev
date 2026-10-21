@@ -240,3 +240,13 @@
 }
 
 @media (prefers-reduced-motion: reduce) { .cs-anim { transition: none !important; } }
+
+.video-list {
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in oklab, var(--navy) 30%, transparent) transparent;
+  mask-image: linear-gradient(to bottom, transparent 0, #000 18px, #000 calc(100% - 18px), transparent 100%);
+}
+.video-list::-webkit-scrollbar { width: 6px; }
+.video-list::-webkit-scrollbar-track { background: transparent; }
+.video-list::-webkit-scrollbar-thumb { background: color-mix(in oklab, var(--navy) 30%, transparent); border-radius: 999px; }

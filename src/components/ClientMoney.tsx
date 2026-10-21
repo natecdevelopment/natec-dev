@@ -31,7 +31,7 @@ export function SummaryCards({ c, b }: { c: ClientRow; b: BalanceRow | null }) {
       {cards.map(([k, v, sub, red]) => (
         <div key={k} className={`rounded-2xl bg-white p-5 shadow-sm ${red ? "ring-2 ring-brand-red" : ""}`}>
           <p className="eyebrow !text-[10px] text-muted-foreground">{k}</p>
-          <p className={`mt-2 font-display text-xl md:text-2xl ${red ? "text-brand-red" : "text-navy"}`}>{v}</p>
+          <p className={`mt-2 whitespace-nowrap font-display text-lg md:text-xl 2xl:text-2xl ${red ? "text-brand-red" : "text-navy"}`}>{v}</p>
           {sub && <p className={`mt-1 text-xs ${red ? "font-semibold text-brand-red" : "text-muted-foreground"}`}>{sub}</p>}
         </div>
       ))}

@@ -26,7 +26,7 @@ export function Lightbox({ items, index, onIndex, onClose, label }: { items: Med
   if (!m) return null;
   const caption = m.caption || m.alt_text || `${label} — photo ${index + 1}`;
   return (
-    <div role="dialog" aria-modal="true" aria-label={`${label} gallery`} className="fixed inset-0 z-[100] flex flex-col bg-navy-deep/95 text-white"
+    <div data-lenis-prevent role="dialog" aria-modal="true" aria-label={`${label} gallery`} className="fixed inset-0 z-[100] flex flex-col bg-navy-deep/95 text-white"
       onTouchStart={(e) => { startX.current = e.touches[0]?.clientX ?? null; }}
       onTouchEnd={(e) => {
         if (startX.current == null) return;

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type KeyboardEvent as ReactKeyboardEvent } from "react";
 import { Link } from "@tanstack/react-router";
 import { ArrowRight, MapPin, Building2, ArrowUpDown, Trees, Car, HardHat, Play, MessageCircle, LayoutGrid, FileText, Phone, Mail, BedDouble, Bath, Sofa, UtensilsCrossed, CookingPot, Fence, Ruler, Facebook } from "lucide-react";
 import { company, directors } from "@/lib/site";
@@ -369,13 +369,25 @@ function embedOf(v: VideoRow) {
 
 function VideoPoster({ v, small }: { v: VideoRow; small?: boolean }) {
   const t = thumbOf(v);
-  return t ? (
-    <img src={t} alt={`${v.title || "Natec project video"} — video thumbnail`} loading="lazy" width={480} height={270} className="absolute inset-0 h-full w-full object-cover" />
-  ) : (
-    <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-navy p-4 text-center text-white">
-      <img src="/brand/natec-mark.png" alt="" aria-hidden width={44} height={44} loading="lazy" className={small ? "h-7 w-auto" : "h-12 w-auto"} />
-      {!small && <span className="font-display text-lg">{v.title}</span>}
-    </div>
+  const [state, setState] = useState<"load" | "ok" | "fail">(t ? "load" : "fail");
+  useEffect(() => {
+    if (state !== "load") return;
+    const id = setTimeout(() => setState((s) => (s === "load" ? "fail" : s)), 6000);
+    return () => clearTimeout(id);
+  }, [state]);
+  if (!t || state === "fail") {
+    return (
+      <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-navy p-3 text-center text-white">
+        <img src="/brand/natec-mark.png" alt="" aria-hidden width={44} height={44} loading="lazy" className={small ? "h-6 w-auto" : "h-12 w-auto"} />
+        {small && <span className="flex h-5 w-5 items-center justify-center rounded-full bg-brand-red"><Play className="ml-0.5 h-2.5 w-2.5 fill-current" /></span>}
+        {!small && <span className="font-display text-lg">{v.title}</span>}
+      </div>
+    );
+  }
+  return (
+    <img src={t} alt={`${v.title || "Natec project video"} — video thumbnail`} loading="lazy" width={480} height={270}
+      onLoad={() => setState("ok")} onError={() => setState("fail")} ref={(el) => { if (el?.complete && el.naturalWidth) setState("ok"); }}
+      className="absolute inset-0 h-full w-full object-cover" />
   );
 }
 
@@ -405,7 +417,19 @@ export function VideosSection() {
   const [played, setPlayed] = useState(false);
   const [slide, setSlide] = useState(0);
   const track = useRef<HTMLDivElement>(null);
+  const listRef = useRef<HTMLUListElement>(null);
+  const [focusIdx, setFocusIdx] = useState(-1);
   if (!data?.length) return null;
+  const reveal = (i: number) => (listRef.current?.children[i] as HTMLElement | undefined)?.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "nearest" });
+  const pick = (i: number) => { setActive(i); setPlayed(true); setFocusIdx(i); reveal(i); };
+  const onListKey = (e: ReactKeyboardEvent) => {
+    const cur = focusIdx < 0 ? active : focusIdx;
+    if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+      e.preventDefault();
+      const n = Math.max(0, Math.min(data.length - 1, cur + (e.key === "ArrowDown" ? 1 : -1)));
+      setFocusIdx(n); reveal(n);
+    } else if (e.key === "Enter" || e.key === " ") { e.preventDefault(); pick(cur); }
+  };
   const featured = data[Math.min(active, data.length - 1)]!;
   const goto = (i: number) => {
     const el = track.current?.children[i] as HTMLElement | undefined;
@@ -437,10 +461,17 @@ export function VideosSection() {
             {featured.title && <p className="mt-3 font-display text-xl text-navy">{featured.title}</p>}
           </div>
           {data.length > 1 && (
-            <ul className="max-h-[440px] space-y-3 overflow-y-auto pr-1">
+            <ul
+              ref={listRef}
+              data-lenis-prevent
+              tabIndex={0}
+              aria-label="Site videos"
+              onKeyDown={onListKey}
+              className="video-list max-h-[440px] space-y-3 overflow-y-auto py-3 pr-1 outline-none focus-visible:ring-2 focus-visible:ring-navy/40 rounded-xl"
+            >
               {data.map((v, i) => (
                 <li key={v.id}>
-                  <button type="button" onClick={() => { setActive(i); setPlayed(true); }} aria-current={i === active} className={`flex w-full items-center gap-3 rounded-xl p-2 text-left transition ${i === active ? "bg-ivory ring-1 ring-brand-red/40" : "hover:bg-ivory"}`}>
+                  <button type="button" tabIndex={-1} onClick={() => pick(i)} aria-current={i === active} className={`flex w-full items-center gap-3 rounded-xl border-l-4 p-2 text-left transition ${i === active ? "border-brand-red bg-ivory" : "border-transparent hover:bg-ivory"} ${i === focusIdx ? "ring-1 ring-navy/30" : ""}`}>
                     <span className="relative block aspect-video w-32 shrink-0 overflow-hidden rounded-lg"><VideoPoster v={v} small /></span>
                     <span className="line-clamp-2 text-sm font-medium text-navy">{v.title || "Natec project video"}</span>
                   </button>

@@ -225,7 +225,7 @@ function Schedule({ clientId, rows, total, bookingDate, onChange }: { clientId: 
         <button onClick={openEdit} className={btnSm}><Pencil className="h-4 w-4" /> Edit schedule</button>
       </div>
       <Dialog open={!!edit} onOpenChange={(o) => !o && setEdit(null)}>
-        <DialogContent className="max-h-[92svh] max-w-5xl overflow-y-auto">
+        <DialogContent data-lenis-prevent className="max-h-[92svh] max-w-5xl overflow-y-auto">
           <DialogHeader><DialogTitle>Edit schedule</DialogTitle></DialogHeader>
           {edit && <PaymentPlanForm value={edit} onChange={setEdit} bookingDate={bookingDate} />}
           <p className="text-xs text-muted-foreground">Saving replaces all schedule rows; payments already received are re-applied to the oldest rows first.</p>
@@ -277,7 +277,7 @@ function RecordPayment({ open, onClose, clientId, inst, onSaved }: { open: boole
   }
   return (
     <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
-      <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-2xl">
+      <DialogContent data-lenis-prevent className="max-h-[90vh] overflow-y-auto sm:max-w-2xl">
         <DialogHeader><DialogTitle>Record payment</DialogTitle></DialogHeader>
         <form onSubmit={submit} onChange={(e) => { const t = e.target as unknown as HTMLInputElement; if (t.name === "amount") { setAmount(Number(t.value) || 0); setAlloc({}); } }} className="space-y-4">
           <PaymentFields />
@@ -313,7 +313,7 @@ function EditPayment({ p, onClose, onSaved }: { p: PaymentRow | null; onClose: (
   }
   return (
     <Dialog open={!!p} onOpenChange={(o) => !o && onClose()}>
-      <DialogContent className="sm:max-w-2xl">
+      <DialogContent data-lenis-prevent className="sm:max-w-2xl">
         <DialogHeader><DialogTitle>Edit payment</DialogTitle></DialogHeader>
         {p && <form onSubmit={submit} className="space-y-4"><PaymentFields p={p} /><p className="text-xs text-muted-foreground">Saving re-applies all payments to the schedule, oldest first.</p><button className="btn btn-primary">Save</button></form>}
       </DialogContent>
@@ -337,7 +337,7 @@ function EditInfo({ open, c, onClose, onSaved }: { open: boolean; c: ClientRow; 
   const L = ({ k, l, t = "text", v }: { k: string; l: string; t?: string; v: string | number | null }) => <label className="text-sm font-medium text-navy">{l}<input name={k} type={t} defaultValue={v ?? ""} className="admin-input mt-1" /></label>;
   return (
     <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
-      <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-2xl">
+      <DialogContent data-lenis-prevent className="max-h-[90vh] overflow-y-auto sm:max-w-2xl">
         <DialogHeader><DialogTitle>Edit client</DialogTitle></DialogHeader>
         <form onSubmit={submit} className="grid gap-3 sm:grid-cols-2">
           <L k="full_name" l="Full name" v={c.full_name} /><L k="phone" l="Phone" v={c.phone} /><L k="email" l="Email" t="email" v={c.email} /><L k="address" l="Address" v={c.address} />

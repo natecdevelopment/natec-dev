@@ -71,6 +71,13 @@
       "when": 1792598799066,
       "tag": "0009_login_identifiers",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1792603852029,
+      "tag": "0010_admin_revoke_sessions",
+      "breakpoints": true
     }
   ]
 }

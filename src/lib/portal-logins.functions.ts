@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { internalEmail, normPhone, tempPassword, validUsername } from "@/lib/portal-logins";
+import { INTERNAL_EMAIL_DOMAIN, internalEmail, normPhone, tempPassword, validUsername } from "@/lib/portal-logins";
 
 type Item = { clientId: string; username: string; password: string };
 export type CreateResult =
@@ -111,4 +111,81 @@ export const resetPortalPassword = createServerFn({ method: "POST" })
     await db.from("profiles").update({ must_change_password: true }).eq("id", c.profile_id);
     await db.from("admin_audit_log").insert({ admin_email: String(context.claims["email"] ?? ""), action: "reset_password", target_email: p?.email ?? "", details: { client_id: data.clientId } });
     return { username: p?.username ?? "", password };
+  });
+
+export type ResetResult =
+  | { clientId: string; status: "reset"; username: string; password: string }
+  | { clientId: string; status: "missing"; reason: string }
+  | { clientId: string; status: "failed"; reason: string };
+
+async function isAdminEmail(db: Awaited<typeof import("@/integrations/supabase/client.server")>["supabaseAdmin"], email: string) {
+  const { data } = await db.from("admins").select("email");
+  return (data ?? []).some((a) => a.email.toLowerCase() === email.toLowerCase());
+}
+
+/** Admin-only: new temp password (and optionally new username) for one client's existing login; signs them out everywhere. */
+export const resetPortalLogin = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((i: { clientId: string; username: string; password: string }) => {
+    if (!uuid.test(i.clientId)) throw new Error("Invalid client");
+    return { clientId: i.clientId, username: String(i.username).trim().toLowerCase(), password: String(i.password) };
+  })
+  .handler(async ({ data, context }): Promise<ResetResult> => {
+    await requireAdmin(context);
+    const fail = (reason: string): ResetResult => ({ clientId: data.clientId, status: "failed", reason });
+    if (!validUsername(data.username)) return fail("Username must be 3–30 lowercase letters, numbers, dot or underscore");
+    if (data.password.length < 8) return fail("Password must be at least 8 characters");
+    const { supabaseAdmin: db } = await import("@/integrations/supabase/client.server");
+    const { data: c } = await db.from("clients").select("id, full_name, profile_id").eq("id", data.clientId).maybeSingle();
+    if (!c) return fail("Client not found");
+    if (!c.profile_id) return { clientId: c.id, status: "missing", reason: "Login missing — create again" };
+    const uid = c.profile_id;
+    if (uid === context.userId) return fail("You can't reset your own login here.");
+    const { data: u } = await db.auth.admin.getUserById(uid);
+    if (!u?.user) {
+      await db.from("clients").update({ profile_id: null }).eq("id", c.id);
+      await db.from("profiles").delete().eq("id", uid);
+      return { clientId: c.id, status: "missing", reason: "Login missing — create again" };
+    }
+    const email = (u.user.email ?? "").toLowerCase();
+    if (await isAdminEmail(db, email)) return fail("Admin accounts can't be reset here.");
+    const { data: prof } = await db.from("profiles").select("username").eq("id", uid).maybeSingle();
+    const changed = prof?.username !== data.username;
+    let newEmail = email;
+    if (changed) {
+      const { data: taken } = await db.from("profiles").select("id").eq("username", data.username).neq("id", uid).limit(1);
+      if (taken?.[0]) return fail("That username is taken");
+      if (email.endsWith(`@${INTERNAL_EMAIL_DOMAIN}`)) newEmail = internalEmail(data.username);
+    }
+    const { error } = await db.auth.admin.updateUserById(uid, { password: data.password, ...(newEmail !== email ? { email: newEmail, email_confirm: true } : {}), app_metadata: { must_change_password: true } });
+    if (error) return fail(/pwned|weak/i.test(error.message) ? "Password is too common — edit it" : error.message);
+    const { error: pErr } = await db.from("profiles").update({ username: data.username, email: newEmail, must_change_password: true }).eq("id", uid);
+    if (pErr) return fail(pErr.message);
+    await db.rpc("admin_revoke_sessions", { _uid: uid });
+    await db.from("admin_audit_log").insert({ admin_email: String(context.claims["email"] ?? ""), action: "reset_login", target_email: newEmail, details: { client_id: c.id, client_name: c.full_name, username: data.username, ...(changed ? { old_username: prof?.username ?? null } : {}) } });
+    return { clientId: c.id, status: "reset", username: data.username, password: data.password };
+  });
+
+/** Admin-only: deletes one client's login (auth user, profile, saved projects); the client record and money stay. */
+export const deletePortalLogin = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((i: { clientId: string }) => { if (!uuid.test(i.clientId)) throw new Error("Invalid client"); return i; })
+  .handler(async ({ data, context }) => {
+    await requireAdmin(context);
+    const { supabaseAdmin: db } = await import("@/integrations/supabase/client.server");
+    const { data: c } = await db.from("clients").select("id, full_name, profile_id").eq("id", data.clientId).maybeSingle();
+    if (!c) throw new Error("Client not found");
+    if (!c.profile_id) return { ok: true, note: "Had no login" };
+    const uid = c.profile_id;
+    if (uid === context.userId) throw new Error("You can't delete your own login.");
+    const { data: u } = await db.auth.admin.getUserById(uid);
+    const email = (u?.user?.email ?? "").toLowerCase();
+    if (email && (await isAdminEmail(db, email))) throw new Error("Admin accounts can't be deleted here.");
+    const { error: lErr } = await db.from("clients").update({ profile_id: null }).eq("profile_id", uid);
+    if (lErr) throw new Error(lErr.message);
+    await db.from("saved_projects").delete().eq("user_id", uid);
+    if (u?.user) { const { error } = await db.auth.admin.deleteUser(uid); if (error) throw new Error(error.message); }
+    await db.from("profiles").delete().eq("id", uid);
+    await db.from("admin_audit_log").insert({ admin_email: String(context.claims["email"] ?? ""), action: "delete_login", target_email: email, details: { client_id: c.id, client_name: c.full_name } });
+    return { ok: true, note: "" };
   });

@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { Copy, KeyRound } from "lucide-react";
+import { Copy, KeyRound, Trash2 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { WhatsAppIcon } from "@/components/SiteChrome";
 import { Confirm, btnSm } from "@/components/admin/ui";
-import { resetPortalPassword } from "@/lib/portal-logins.functions";
+import { deletePortalLogin, resetPortalPassword } from "@/lib/portal-logins.functions";
 import { shareMessage, waLink } from "@/lib/portal-logins";
 
 export async function copyText(t: string) {
@@ -52,5 +52,66 @@ export function ResetPortalPassword({ clientId, name, phone, flat }: { clientId:
         </DialogContent>
       </Dialog>
     </>
+  );
+}
+
+export type LoginTarget = { clientId: string; name: string };
+
+/** Progress bar + per-client outcome list for one-by-one batch actions. */
+export function BatchProgress({ done, total, log }: { done: number; total: number; log: { name: string; ok: boolean; msg: string }[] }) {
+  return (
+    <div className="space-y-2">
+      <div className="h-2 overflow-hidden rounded-full bg-navy/10" role="progressbar" aria-valuemin={0} aria-valuemax={total} aria-valuenow={done}><div className="h-full bg-navy transition-all" style={{ width: `${total ? (done / total) * 100 : 0}%` }} /></div>
+      <p className="text-xs text-muted-foreground">{done} / {total}</p>
+      <ul className="max-h-48 space-y-1 overflow-auto text-sm" data-lenis-prevent>
+        {log.map((l, i) => <li key={i} className={l.ok ? "text-navy" : "text-brand-red"}>{l.ok ? "✓" : "✕"} {l.name} — {l.msg}</li>)}
+      </ul>
+    </div>
+  );
+}
+
+/** Type-DELETE confirmation; deletes each client's login one by one (client records stay). */
+export function DeleteLoginsDialog({ targets, onClose, onDone }: { targets: LoginTarget[] | null; onClose: () => void; onDone: () => void }) {
+  const del = useServerFn(deletePortalLogin);
+  const [typed, setTyped] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [log, setLog] = useState<{ name: string; ok: boolean; msg: string }[] | null>(null);
+  const n = targets?.length ?? 0;
+  function close() { if (busy) return; setTyped(""); setLog(null); onClose(); }
+  async function go() {
+    if (!targets) return;
+    setBusy(true); const out: { name: string; ok: boolean; msg: string }[] = []; setLog([]);
+    for (const t of targets) {
+      try { const r = await del({ data: { clientId: t.clientId } }); out.push({ name: t.name, ok: true, msg: r.note || "Login deleted" }); }
+      catch (e) { out.push({ name: t.name, ok: false, msg: e instanceof Error ? e.message : "Failed" }); }
+      setLog([...out]);
+    }
+    setBusy(false);
+    const ok = out.filter((o) => o.ok).length;
+    if (ok) toast.success(`${ok} login${ok === 1 ? "" : "s"} deleted`);
+    onDone();
+  }
+  return (
+    <Dialog open={!!targets} onOpenChange={(o) => { if (!o) close(); }}>
+      <DialogContent className="max-w-lg">
+        <DialogHeader><DialogTitle>Delete {n} client login{n === 1 ? "" : "s"}?</DialogTitle></DialogHeader>
+        {log ? (
+          <>
+            <BatchProgress done={log.length} total={n} log={log} />
+            {!busy && <button onClick={close} className="btn btn-primary !py-2">Close</button>}
+          </>
+        ) : (
+          <>
+            <p className="text-sm text-navy">They will be signed out and can no longer log in. Their client records, flats, instalments, payments and documents are <strong>KEPT</strong>.</p>
+            {n <= 6 && <p className="text-xs text-muted-foreground">{targets?.map((t) => t.name).join(", ")}</p>}
+            <label className="block text-sm font-medium text-navy">Type DELETE to confirm<input value={typed} onChange={(e) => setTyped(e.target.value)} className="admin-input mt-1 font-mono" autoComplete="off" /></label>
+            <div className="flex justify-end gap-2">
+              <button onClick={close} className={btnSm}>Cancel</button>
+              <button onClick={go} disabled={typed !== "DELETE"} className="inline-flex items-center gap-1.5 rounded-full bg-brand-red px-4 py-2 text-sm font-medium text-white disabled:opacity-40"><Trash2 className="h-4 w-4" /> Delete {n} login{n === 1 ? "" : "s"}</button>
+            </div>
+          </>
+        )}
+      </DialogContent>
+    </Dialog>
   );
 }

@@ -3,7 +3,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { ArrowLeft, Download, FileText, Mail, Pencil, Plus, Trash2, Upload, Wallet } from "lucide-react";
+import { ArrowLeft, Download, KeyRound, UserX, FileText, Mail, Pencil, Plus, Trash2, Upload, Wallet } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, Confirm, ListSkeleton, PageTitle, btnDanger, btnSm } from "@/components/admin/ui";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -13,7 +13,7 @@ import { PAYMENT_METHODS, PAYMENT_TYPES, fmtDate, printStatement, type ClientRow
 import { allocatePayment, taka, type PlanForm } from "@/lib/money";
 import { PaymentPlanForm, initialPlanState, planBlocker, type PlanState } from "@/components/admin/PaymentPlanForm";
 import { inviteClient } from "@/lib/admin-accounts.functions";
-import { ResetPortalPassword } from "@/components/admin/PortalLogins";
+import { DeleteLoginsDialog, type LoginTarget } from "@/components/admin/PortalLogins";
 import { ADMIN_LOCK_TIP, DeleteAccountDialog, useAdminEmails, type DeleteTarget } from "@/components/admin/AccountAdmin";
 
 export const Route = createFileRoute("/admin/accounts/$id")({ component: ClientDetail });
@@ -70,11 +70,13 @@ function ClientDetail() {
   const [editPay, setEditPay] = useState<PaymentRow | null>(null);
   const [editInfo, setEditInfo] = useState(false);
   const [delAcc, setDelAcc] = useState<DeleteTarget[] | null>(null);
+  const [delLogin, setDelLogin] = useState<LoginTarget[] | null>(null);
   const admins = useAdminEmails();
 
   if (q.isLoading) return <ListSkeleton />;
   if (!q.data) return <Card><p>Client not found.</p><Link to="/admin/accounts" search={{ tab: "clients" }} className="btn btn-primary mt-4">Back</Link></Card>;
   const d = q.data, c = d.c;
+  const lock = admins.has((d.loginEmail ?? c.email).toLowerCase());
 
   const waPhone = c.phone.replace(/\D/g, "").replace(/^0/, "880");
   const reminder = d.b?.next_due_date
@@ -119,7 +121,8 @@ function ClientDetail() {
         <a href={`https://wa.me/${waPhone}?text=${encodeURIComponent(reminder)}`} target="_blank" rel="noreferrer" className={btnSm}><WhatsAppIcon /> WhatsApp reminder</a>
         <button onClick={() => printStatement({ client: c, projectName: d.project?.name ?? "", balance: d.b, instalments: d.inst, payments: d.payments })} className={btnSm}><Download className="h-4 w-4" /> Statement (PDF)</button>
         {!c.profile_id && <button onClick={sendInvite} disabled={!c.email} className={`${btnSm} disabled:opacity-40`} title={c.email ? "" : "Add an email first"}><Mail className="h-4 w-4" /> Invite to portal</button>}
-        {c.profile_id && <ResetPortalPassword clientId={c.id} name={c.full_name} phone={c.phone} flat={c.flat_no} />}
+        {c.profile_id && !lock && <Link to="/admin/accounts/create-logins" search={{ reset: c.id }} className={btnSm}><KeyRound className="h-4 w-4" /> Reset login</Link>}
+        {c.profile_id && !lock && <button onClick={() => setDelLogin([{ clientId: c.id, name: c.full_name }])} className={btnDanger}><UserX className="h-4 w-4" /> Delete login</button>}
         <Link to="/admin/accounts/clients/$id/edit" params={{ id: c.id }} className={btnSm}><Pencil className="h-4 w-4" /> Edit</Link>
         <Confirm title="Delete this client?" description="This removes the client with all payments, schedule and documents. It cannot be undone." onConfirm={deleteClient}>
           {(ask) => <button onClick={ask} className={btnDanger}><Trash2 className="h-4 w-4" /> Delete</button>}
@@ -159,12 +162,13 @@ function ClientDetail() {
       <Card className="border border-brand-red/30">
         <h2 className="!text-xl text-brand-red">Danger zone</h2>
         <p className="mt-1 text-sm text-muted-foreground">{c.profile_id ? `Login: ${d.loginEmail ?? "linked"}` : "This client has no portal login."}</p>
-        {(() => { const lock = admins.has((d.loginEmail ?? c.email).toLowerCase()); return (
+        {(() => { return (
           <span title={lock ? ADMIN_LOCK_TIP : undefined} className="mt-3 inline-flex">
             <button disabled={lock} onClick={() => setDelAcc([{ profileId: c.profile_id, clientId: c.id, name: c.full_name, email: d.loginEmail ?? (c.email || c.phone), isClient: true }])} className={`${btnDanger} disabled:cursor-not-allowed disabled:opacity-40`}><Trash2 className="h-4 w-4" /> Delete account</button>
           </span>
         ); })()}
       </Card>
+      <DeleteLoginsDialog targets={delLogin} onClose={() => setDelLogin(null)} onDone={refresh} />
       <DeleteAccountDialog targets={delAcc} onClose={() => setDelAcc(null)} onDeleted={(t) => { if (!t[0]?.profileId || !c.profile_id) navigate({ to: "/admin/accounts", search: { tab: "clients" } }); else refresh(); }} />
 
       <RecordPayment open={payOpen} onClose={() => setPayOpen(false)} clientId={c.id} inst={d.inst} onSaved={refresh} />

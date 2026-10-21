@@ -3,6 +3,7 @@ import { Link, useNavigate } from "@tanstack/react-router";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { Bell, Building2, CalendarClock, Heart, LineChart, Wallet } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { lovable } from "@/integrations/lovable/index";
 import { normalizeBdPhone } from "@/components/InquiryForm";
 import { passwordScore } from "@/lib/money";
 import { safeNext } from "@/lib/account";
@@ -33,7 +34,15 @@ export function AuthScreen({ mode, next }: { mode: Mode; next?: string | undefin
   const target = safeNext(next);
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => { if (data.user) navigate({ to: target as "/account", replace: true }); });
+    const go = () => supabase.auth.getUser().then(({ data }) => {
+      if (!data.user) return;
+      const saved = sessionStorage.getItem("natec-oauth-next");
+      sessionStorage.removeItem("natec-oauth-next");
+      navigate({ to: (saved ? safeNext(saved) : target) as "/account", replace: true });
+    });
+    go();
+    const { data: sub } = supabase.auth.onAuthStateChange((e) => { if (e === "SIGNED_IN") go(); });
+    return () => sub.subscription.unsubscribe();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -161,6 +170,7 @@ function LoginForm({ onDone, next }: { onDone: () => void; next?: string | undef
             <Link to="/forgot-password" className="text-navy underline-offset-4 hover:text-brand-red hover:underline">Forgot password?</Link>
           </div>,
           <SubmitButton key="s" state={state}>Login →</SubmitButton>,
+          <GoogleButton key="g" label="Continue with Google" next={next} />,
           <p key="l" className="text-center text-sm text-muted-foreground">Don't have an account? <Link to="/register" search={next ? { redirect: next } : {}} className="font-semibold text-brand-red hover:underline">Register</Link></p>,
         ]}
       </Stagger>
@@ -232,9 +242,35 @@ function RegisterForm({ next }: { next?: string | undefined }) {
             {errs["terms"] && <p role="alert" className="text-sm text-brand-red">{errs["terms"]}</p>}
           </div>,
           <SubmitButton key="s" state={state}>Create account →</SubmitButton>,
+          <GoogleButton key="g" label="Sign up with Google" next={next} />,
           <p key="l" className="text-center text-sm text-muted-foreground">Already have an account? <Link to="/login" search={next ? { redirect: next } : {}} className="font-semibold text-brand-red hover:underline">Login</Link></p>,
         ]}
       </Stagger>
     </motion.form>
+  );
+}
+
+function GoogleButton({ label, next }: { label: string; next?: string | undefined }) {
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState("");
+  const navigate = useNavigate();
+  async function go() {
+    setBusy(true); setErr("");
+    const dest = safeNext(next) || "/account";
+    sessionStorage.setItem("natec-oauth-next", dest);
+    const r = await lovable.auth.signInWithOAuth("google", { redirect_uri: `${window.location.origin}/login` });
+    if (r.error) { setBusy(false); setErr("Google sign-in failed. Please try again."); return; }
+    if (r.redirected) return;
+    navigate({ to: dest as "/account" });
+  }
+  return (
+    <div>
+      <div className="my-1 flex items-center gap-3 text-xs uppercase tracking-widest text-muted-foreground"><span className="h-px flex-1 bg-navy/15" />or<span className="h-px flex-1 bg-navy/15" /></div>
+      <button type="button" onClick={go} disabled={busy} className="mt-3 flex min-h-[48px] w-full items-center justify-center gap-3 rounded-md border border-navy/20 bg-background px-4 font-medium text-navy transition hover:border-navy disabled:opacity-60">
+        <svg viewBox="0 0 48 48" className="h-5 w-5" aria-hidden><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z"/><path fill="#FF3D00" d="m6.3 14.7 6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-8l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.4-.4-3.5z"/></svg>
+        {busy ? "Connecting…" : label}
+      </button>
+      {err && <p role="alert" className="mt-2 text-sm text-brand-red">{err}</p>}
+    </div>
   );
 }

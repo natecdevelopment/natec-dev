@@ -279,7 +279,7 @@ function ClientEditor() {
         </Card>
       )}
 
-      <div className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-card/95 px-4 py-3 shadow-lg backdrop-blur">
+      <div className="fixed inset-x-0 bottom-0 z-40 lg:left-60 border-t border-border bg-card/95 px-4 py-3 shadow-lg backdrop-blur">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-end gap-2">
           <span className="mr-auto text-sm text-muted-foreground">{hasErr && anyDirty ? <span className="text-brand-red">Fix errors on the tabs marked red.</span> : anyDirty ? "Unsaved changes" : "No changes"}</span>
           <button type="button" disabled={!anyDirty || saving} onClick={() => setF(init)} className={`${btnSm} disabled:opacity-40`}>Discard changes</button>

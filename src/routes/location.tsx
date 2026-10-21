@@ -174,7 +174,7 @@ function LocationPage() {
       <section className="section-pad bg-white">
         <div className="container-x">
           <Reveal><h2 className="text-primary">Nearby</h2></Reveal>
-          <ul className="mt-10 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
+          <div className="mt-10 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
             {NEARBY.map((n, i) => (
               <Reveal key={n.name} delay={(i % 5) * 70} className="rounded-2xl border border-border bg-ivory p-5">
                 <n.icon className="h-6 w-6 text-brand-red" aria-hidden />
@@ -182,7 +182,7 @@ function LocationPage() {
                 <p className="mt-1 text-sm text-muted-foreground">{n.distance}</p>
               </Reveal>
             ))}
-          </ul>
+          </div>
         </div>
       </section>
 

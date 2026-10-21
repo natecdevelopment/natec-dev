@@ -18,3 +18,7 @@
 - Admin access = signed-in email listed in public.admins, checked by public.is_admin() in RLS; the /admin layout (ssr:false) renders login/not-authorised inline and hides the public header/footer.
 - The "media" storage bucket is private (workspace blocks public buckets), so uploads store a 10-year signed URL in media.public_url; seeded files point at /public paths.
 - Construction Status data (construction_items/updates/update_media/subscribers) is read via src/lib/construction-data.ts; item status follows % in a DB trigger and projects.status_updated_at is touched by triggers, so the UI never sets either directly.
+- Customer accounts: public.profiles (auto-created by auth trigger; a guard trigger stops non-admin users changing account_type/status) and client finance tables (clients, payments, instalments, client_documents) readable by the owner only via public.is_my_client(); balances and Overdue come from the client_balances / instalments_live views, never stored by hand.
+- Admin-only client notes live in public.client_notes, not on clients, so clients can never read them through RLS.
+- Portal invites run in a requireSupabaseAuth server function (src/lib/admin-accounts.functions.ts) that checks is_admin() before loading the service-role client; logins link to clients by email only after email confirmation.
+- /login and /register are children of the _authpage pathless layout so the animated screen persists across the switch.

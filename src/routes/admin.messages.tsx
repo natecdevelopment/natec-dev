@@ -68,11 +68,16 @@ function MessagesPage() {
                   <time className="text-xs text-muted-foreground">{new Date(m.created_at).toLocaleString("en-GB", { dateStyle: "medium", timeStyle: "short" })}</time>
                 </div>
                 <div className="mt-3 flex flex-wrap gap-2 text-xs">
+                  {m.subject && <span className="rounded-full bg-navy px-3 py-1 text-white">{m.subject}</span>}
+                  {m.user_id && <span className="rounded-full bg-ivory px-3 py-1 text-navy">Signed-in user</span>}
                   {m.service && <span className="rounded-full bg-ivory px-3 py-1 text-navy">{m.service}</span>}
                   {m.visit_date && <span className="rounded-full bg-ivory px-3 py-1 text-navy">Visit: {m.visit_date}</span>}
                 </div>
                 <p className="mt-3 whitespace-pre-wrap text-sm text-foreground/85">{m.message}</p>
                 <div className="mt-4 flex flex-wrap gap-2">
+                  <select aria-label="Inquiry status" value={m.status} onChange={async (e) => { const { error } = await supabase.from("contact_submissions").update({ status: e.target.value }).eq("id", m.id); if (error) toast.error(error.message); else qc.invalidateQueries({ queryKey: KEY }); }} className="rounded-full border border-navy/20 px-3 py-1.5 text-xs text-navy">
+                    <option>New</option><option>In progress</option><option>Answered</option>
+                  </select>
                   <button onClick={() => toggleRead(m.id, !m.read_at)} className={btnSm}>{m.read_at ? <><Mail className="h-4 w-4" /> Mark unread</> : <><MailOpen className="h-4 w-4" /> Mark as read</>}</button>
                   <Confirm title="Delete this message?" description="This permanently removes the message." onConfirm={() => remove(m.id)}>
                     {(ask) => <button onClick={ask} className={btnDanger}><Trash2 className="h-4 w-4" /> Delete</button>}

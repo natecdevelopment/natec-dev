@@ -1,7 +1,7 @@
 import { createFileRoute, Outlet, useLocation } from "@tanstack/react-router";
 import { AuthScreen } from "@/components/auth/AuthScreen";
 
-export const Route = createFileRoute("/_auth")({
+export const Route = createFileRoute("/_authpage")({
   validateSearch: (s: Record<string, unknown>): { redirect?: string } => (typeof s["redirect"] === "string" ? { redirect: s["redirect"] } : {}),
   component: AuthLayout,
 });

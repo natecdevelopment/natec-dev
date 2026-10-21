@@ -201,3 +201,9 @@
   .scroll-hint-line { animation: none; }
   .cloud-layer { animation: none; }
 }
+
+@utility admin-input {
+  width: 100%; border-radius: 0.75rem; border: 1px solid var(--color-input); background: var(--color-card);
+  padding: 0.65rem 0.9rem; font-size: 15px; color: var(--color-foreground); outline: none;
+  &:focus { border-color: var(--navy); box-shadow: 0 0 0 3px color-mix(in oklab, var(--navy) 15%, transparent); }
+}

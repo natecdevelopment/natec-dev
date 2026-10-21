@@ -62,3 +62,50 @@ export function passwordScore(pw: string) {
   if (/[^A-Za-z0-9]/.test(pw) || pw.length >= 12) s++;
   return s;
 }
+
+/* ---------- Payment plan builder (admin "Payment plan" step / "Edit schedule") ---------- */
+export type PlanForm = {
+  total: number; booking: number; count: number; freqMonths: 1 | 2 | 3 | 6 | 12; firstDue: string;
+  instAmount: number | null; downManual: number | null; downDue: string; round: 0 | 100 | 500 | 1000;
+};
+export type PlanResult = { remainingAfterBooking: number; down: number; each: number; last: number; rows: ScheduleRow[]; errors: Partial<Record<keyof PlanForm | "plan", string>> };
+
+export const addDays = (iso: string, d: number) => { const t = new Date(iso + "T00:00:00Z"); t.setUTCDate(t.getUTCDate() + d); return t.toISOString().slice(0, 10); };
+export { addMonths as addMonthsClamped };
+
+/** Works out down payment / instalment amount from the plan fields and builds the full schedule (booking + down + instalments). */
+export function computePlan(p: PlanForm, bookingDate: string): PlanResult {
+  const errors: PlanResult["errors"] = {};
+  const n = Math.floor(p.count);
+  const rem = p.total - p.booking;
+  if (!(p.total > 0)) errors.total = "Enter the total price.";
+  if (p.booking < 0) errors.booking = "Cannot be negative.";
+  else if (p.booking > p.total) errors.booking = "Booking money cannot be more than the total price.";
+  if (!(n >= 1 && n <= 120)) errors.count = "Enter between 1 and 120.";
+  if (!p.firstDue) errors.firstDue = "Choose the first instalment date.";
+  const roundDown = (v: number) => (p.round > 0 ? Math.floor(v / p.round) * p.round : Math.floor(v));
+  let down = 0, each = 0, last = 0;
+  const nn = Math.max(1, n || 1);
+  if (p.downManual != null) {
+    down = p.downManual;
+    if (down < 0) errors.downManual = "Cannot be negative.";
+    else if (down > p.total) errors.downManual = "Down payment cannot be more than the total price.";
+    else if (down > rem) errors.downManual = "Down payment is more than what is left after booking.";
+    const rest = Math.max(0, rem - down);
+    each = roundDown(rest / nn); last = rest - each * (nn - 1);
+  } else if (p.instAmount != null && p.instAmount > 0) {
+    each = p.instAmount; last = each; down = rem - nn * each;
+    if (down < 0) errors.instAmount = "Instalments add up to more than the price. Lower the instalment amount or the number of instalments.";
+    else if (down > p.total) errors.instAmount = "Down payment cannot be more than the total price.";
+  } else {
+    const rest = Math.max(0, rem);
+    each = roundDown(rest / nn); last = rest - each * (nn - 1);
+  }
+  const rows: ScheduleRow[] = [];
+  if (p.booking > 0) rows.push({ due_date: bookingDate || p.firstDue, amount: p.booking, label: "Booking money" });
+  if (down > 0) rows.push({ due_date: p.downDue || addDays(bookingDate || p.firstDue, 30), amount: down, label: "Down payment" });
+  if (!errors.count && p.firstDue && !errors.instAmount) {
+    for (let i = 0; i < n; i++) rows.push({ due_date: addMonths(p.firstDue, i * p.freqMonths), amount: i === n - 1 ? last : each, label: `Instalment ${i + 1} of ${n}` });
+  }
+  return { remainingAfterBooking: rem, down, each, last, rows, errors };
+}

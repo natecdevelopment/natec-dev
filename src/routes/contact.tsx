@@ -8,7 +8,7 @@ import { mapEmbed } from "@/components/ProjectsGrid";
 import { company } from "@/lib/site";
 
 const SITE = "https://natec-dev.lovable.app";
-const TITLE = "Contact Natec Development Ltd. | Sreepur, Gazipur";
+const TITLE = "Contact Natec Development Ltd. | Rajendrapur, Sreepur, Gazipur";
 const DESC = "Call, WhatsApp or visit Natec Development at Rajendrapur Bazar, Sreepur, Gazipur. Send an inquiry about our projects or book a site visit.";
 const OFFICE_Q = "Vai Vai Market, Rajendrapur Bazar, Sreepur, Gazipur";
 const DIRECTIONS = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(OFFICE_Q)}`;
@@ -83,7 +83,7 @@ function ContactPage() {
     <>
       <PageHero
         image="/hero-natec/d/0197.webp"
-        imageAlt="Natec residential building at dusk in Sreepur, Gazipur"
+        imageAlt="Natec residential building at dusk in Rajendrapur, Sreepur, Gazipur"
         imagePosition="center 50%"
         heightClass="min-h-[64svh] md:min-h-[56svh]"
         crumbs={[{ label: "Home", to: "/" }, { label: "Contact" }]}

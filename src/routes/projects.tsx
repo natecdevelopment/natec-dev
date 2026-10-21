@@ -10,7 +10,7 @@ const SITE = "https://natec-dev.lovable.app";
 const TABS = ["all", "completed", "ongoing", "upcoming"] as const;
 type Tab = (typeof TABS)[number];
 const TITLE = "Residential Projects in Gazipur | Natec Development Ltd.";
-const DESC = "Natec residential projects in Sreepur, Gazipur: 75 homes at Rajendrapur Bazar delivered or under construction, all sold, plus upcoming projects.";
+const DESC = "Natec residential projects in Rajendrapur, Sreepur, Gazipur: 75 homes at Rajendrapur Bazar delivered or under construction, all sold, plus upcoming projects.";
 const WA_VISIT = waMessage("Hi Natec, I'd like to book a site visit at Rajendrapur Bazar.");
 
 function matchesTab(p: Pick<ProjectWithMedia, "kind" | "status">, tab: Tab) {
@@ -81,7 +81,7 @@ function ProjectsPage() {
     <>
       <PageHero
         image="/projects/shobuj-digonto/aerial.webp"
-        imageAlt="Aerial view of Shobuj Digonto, a Natec residential building in Sreepur, Gazipur"
+        imageAlt="Aerial view of Shobuj Digonto, a Natec residential building in Rajendrapur, Sreepur, Gazipur"
         imagePosition="center 40%"
         crumbs={[{ label: "Home", to: "/" }, { label: "Projects" }]}
         eyebrow="Our projects"

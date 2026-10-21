@@ -58,7 +58,7 @@ export function Intro() {
         <Reveal className="grid gap-10 md:grid-cols-[1.2fr_1fr] md:gap-16">
           <div>
             <h2 className="text-navy">
-              A real estate developer <em className="accent-light">rooted in Sreepur, Gazipur.</em>
+              A real estate developer <em className="accent-light">rooted in Rajendrapur, Sreepur, Gazipur.</em>
             </h2>
             <div className="mt-9 flex flex-wrap items-center gap-x-6 gap-y-5 md:mt-11">
               <img src={homeSketch} alt="Hand-drawn sketch of a modern family home surrounded by trees" loading="lazy" width={973} height={509} className="w-[168px] shrink-0 md:w-[232px]" />
@@ -74,7 +74,7 @@ export function Intro() {
             <Eyebrow>About Natec</Eyebrow>
             <p>Natec Development Ltd. is a real estate developer in Gazipur and a young apartment developer in Bangladesh, established in 2023 and based at Rajendrapur Bazar, Sreepur. Our three residential buildings — Shobuj Angon, Shobuj Aloy and Shobuj Digonto — add up to 75 flats in Sreepur, and every one of them is sold.</p>
             <p>We handle the whole journey: land acquisition, project planning, financing guidance, permits and approvals, building design, construction management, marketing and sales, and property management. Two upcoming projects in Gazipur are next.</p>
-            <p lang="bn" className="font-display text-lg text-navy">গাজীপুরের শ্রীপুরে পরিকল্পিত আবাসন</p>
+            <p lang="bn" className="font-display text-lg text-navy">রাজেন্দ্রপুর, শ্রীপুর, গাজীপুরে পরিকল্পিত আবাসন</p>
             <Link to="/about" className="inline-flex items-center gap-2 font-semibold text-navy hover:text-brand-red">More about us <ArrowRight className="h-4 w-4" /></Link>
           </div>
         </Reveal>
@@ -181,7 +181,7 @@ export function FloorPlan() {
 
 /* ---------- 4. Why Natec ---------- */
 const WHY = [
-  { i: MapPin, t: "Prime Rajendrapur location", b: "Our buildings sit close to Rajendrapur Bazar in Sreepur, Gazipur." },
+  { i: MapPin, t: "Prime Rajendrapur location", b: "Our buildings sit close to Rajendrapur Bazar, Sreepur, Gazipur." },
   { i: Building2, t: "Planned RCC buildings", b: "Each residential building is planned as a reinforced-concrete structure." },
   { i: ArrowUpDown, t: "Lift and generator backup", b: "[confirm: which projects have a lift and generator backup]" },
   { i: Trees, t: "Rooftop spaces", b: "Open rooftops for fresh air and family time." },
@@ -207,7 +207,7 @@ export function WhyNatec() {
         </Reveal>
         <div className="grid gap-5 md:grid-cols-3">
           <Reveal className="relative min-h-[420px] overflow-hidden rounded-2xl md:row-span-2">
-            <img src={frameSrc("d", 53)} alt="Open rooftop space on a Natec residential building in Sreepur, Gazipur" loading="lazy" width={1920} height={1080} className="absolute inset-0 h-full w-full object-cover" />
+            <img src={frameSrc("d", 53)} alt="Open rooftop space on a Natec residential building in Rajendrapur, Sreepur, Gazipur" loading="lazy" width={1920} height={1080} className="absolute inset-0 h-full w-full object-cover" />
             <div className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(4,26,56,0.85), transparent 60%)" }} />
             <div className="absolute inset-x-0 bottom-0 p-7 text-white">
               <span className="mb-4 block h-2 w-2 rounded-full bg-brand-red" />
@@ -535,7 +535,7 @@ export function BuyingSteps() {
       <div className="container-x">
         <Reveal className="mb-12 max-w-2xl">
           <Eyebrow>Buying with Natec</Eyebrow>
-          <h2 className="mt-3 text-navy">Buying your flat in Sreepur, <em className="accent-light">in four steps.</em></h2>
+          <h2 className="mt-3 text-navy">Buying your flat in Rajendrapur, <em className="accent-light">in four steps.</em></h2>
         </Reveal>
         <ol className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {BUY.map((s, n) => (
@@ -574,7 +574,7 @@ export function Faq() {
         <Reveal>
           <Eyebrow>FAQ</Eyebrow>
           <h2 className="mt-3 text-navy">Frequently asked <em className="accent-light">questions.</em></h2>
-          <p lang="bn" className="mt-4 font-display text-lg text-navy">শ্রীপুর, গাজীপুরে ফ্ল্যাট ও অ্যাপার্টমেন্ট</p>
+          <p lang="bn" className="mt-4 font-display text-lg text-navy">রাজেন্দ্রপুর, শ্রীপুর, গাজীপুরে ফ্ল্যাট ও অ্যাপার্টমেন্ট</p>
         </Reveal>
         <Reveal>
           <Accordion type="single" collapsible className="border-t border-border">

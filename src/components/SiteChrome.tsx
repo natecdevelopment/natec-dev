@@ -67,7 +67,7 @@ export function Header() {
             </span>
             <span className="sr-only">Natec Development Ltd. — home</span>
           </Link>
-          <nav className="hidden items-center gap-5 lg:flex xl:gap-7">
+          <nav className="hidden items-center gap-6 xl:flex">
             {nav.map((n) => (
               <Link
                 key={n.to}
@@ -88,14 +88,14 @@ export function Header() {
             <a href={company.whatsappLink} target="_blank" rel="noreferrer" aria-label="WhatsApp" className="flex h-10 w-10 items-center justify-center rounded-full bg-brand-red text-white sm:hidden">
               <WhatsAppIcon />
             </a>
-            <button className="rounded-full p-2 text-navy hover:bg-navy/5 lg:hidden" onClick={() => setOpen(!open)} aria-label={open ? "Close menu" : "Open menu"}>
+            <button className="rounded-full p-2 text-navy hover:bg-navy/5 xl:hidden" onClick={() => setOpen(!open)} aria-label={open ? "Close menu" : "Open menu"}>
               {open ? <X /> : <Menu />}
             </button>
           </div>
         </div>
       </div>
       {open && (
-        <nav className="fixed inset-0 -z-10 flex flex-col gap-1 overflow-y-auto bg-white px-6 pb-8 pt-24 text-navy md:pt-28 lg:hidden">
+        <nav className="fixed inset-0 -z-10 flex flex-col gap-1 overflow-y-auto bg-white px-6 pb-8 pt-24 text-navy md:pt-28 xl:hidden">
           {nav.map((n) => (
             <Link key={n.to} to={n.to} onClick={() => setOpen(false)} className="border-b border-navy/10 py-4 font-display text-3xl hover:text-brand-red" activeProps={{ className: "!text-brand-red" }} activeOptions={{ exact: true }}>
               {n.label}

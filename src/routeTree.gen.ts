@@ -27,6 +27,7 @@ import { Route as AdminMediaRouteImport } from './routes/admin.media'
 import { Route as AdminMessagesRouteImport } from './routes/admin.messages'
 import { Route as AdminUpcomingRouteImport } from './routes/admin.upcoming'
 import { Route as AdminVideosRouteImport } from './routes/admin.videos'
+import { Route as ConstructionStatusSlugRouteImport } from './routes/construction-status_.$slug'
 import { Route as ProjectsSlugRouteImport } from './routes/projects_.$slug'
 import { Route as AdminProjectsIndexRouteImport } from './routes/admin.projects.index'
 import { Route as AdminProjectsIdRouteImport } from './routes/admin.projects.$id'
@@ -121,6 +122,11 @@ const AdminVideosRoute = AdminVideosRouteImport.update({
   path: '/videos',
   getParentRoute: () => AdminRoute,
 } as any)
+const ConstructionStatusSlugRoute = ConstructionStatusSlugRouteImport.update({
+  id: '/construction-status_/$slug',
+  path: '/construction-status/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ProjectsSlugRoute = ProjectsSlugRouteImport.update({
   id: '/projects_/$slug',
   path: '/projects/$slug',
@@ -159,6 +165,7 @@ export interface FileRoutesByFullPath {
   '/admin/messages': typeof AdminMessagesRoute
   '/admin/upcoming': typeof AdminUpcomingRoute
   '/admin/videos': typeof AdminVideosRoute
+  '/construction-status/$slug': typeof ConstructionStatusSlugRoute
   '/projects/$slug': typeof ProjectsSlugRoute
   '/admin/': typeof AdminIndexRoute
   '/admin/projects/$id': typeof AdminProjectsIdRoute
@@ -181,6 +188,7 @@ export interface FileRoutesByTo {
   '/admin/messages': typeof AdminMessagesRoute
   '/admin/upcoming': typeof AdminUpcomingRoute
   '/admin/videos': typeof AdminVideosRoute
+  '/construction-status/$slug': typeof ConstructionStatusSlugRoute
   '/projects/$slug': typeof ProjectsSlugRoute
   '/admin': typeof AdminIndexRoute
   '/admin/projects/$id': typeof AdminProjectsIdRoute
@@ -206,6 +214,7 @@ export interface FileRoutesById {
   '/admin/messages': typeof AdminMessagesRoute
   '/admin/upcoming': typeof AdminUpcomingRoute
   '/admin/videos': typeof AdminVideosRoute
+  '/construction-status_/$slug': typeof ConstructionStatusSlugRoute
   '/projects_/$slug': typeof ProjectsSlugRoute
   '/admin/': typeof AdminIndexRoute
   '/admin/projects/$id': typeof AdminProjectsIdRoute
@@ -231,6 +240,7 @@ export interface FileRouteTypes {
     | '/admin/messages'
     | '/admin/upcoming'
     | '/admin/videos'
+    | '/construction-status/$slug'
     | '/projects/$slug'
     | '/admin/'
     | '/admin/projects/$id'
@@ -253,6 +263,7 @@ export interface FileRouteTypes {
     | '/admin/messages'
     | '/admin/upcoming'
     | '/admin/videos'
+    | '/construction-status/$slug'
     | '/projects/$slug'
     | '/admin'
     | '/admin/projects/$id'
@@ -277,6 +288,7 @@ export interface FileRouteTypes {
     | '/admin/messages'
     | '/admin/upcoming'
     | '/admin/videos'
+    | '/construction-status_/$slug'
     | '/projects_/$slug'
     | '/admin/'
     | '/admin/projects/$id'
@@ -297,6 +309,7 @@ export interface RootRouteChildren {
   LocationRoute: typeof LocationRoute
   ProjectsRoute: typeof ProjectsRoute
   ServicesRoute: typeof ServicesRoute
+  ConstructionStatusSlugRoute: typeof ConstructionStatusSlugRoute
   ProjectsSlugRoute: typeof ProjectsSlugRoute
 }
 
@@ -428,6 +441,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminVideosRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/construction-status_/$slug': {
+      id: '/construction-status_/$slug'
+      path: '/construction-status/$slug'
+      fullPath: '/construction-status/$slug'
+      preLoaderRoute: typeof ConstructionStatusSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/projects_/$slug': {
       id: '/projects_/$slug'
       path: '/projects/$slug'
@@ -507,6 +527,7 @@ const rootRouteChildren: RootRouteChildren = {
   LocationRoute: LocationRoute,
   ProjectsRoute: ProjectsRoute,
   ServicesRoute: ServicesRoute,
+  ConstructionStatusSlugRoute: ConstructionStatusSlugRoute,
   ProjectsSlugRoute: ProjectsSlugRoute,
 }
 export const routeTree = rootRouteImport

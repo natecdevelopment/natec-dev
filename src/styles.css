@@ -238,3 +238,5 @@
   padding: 0.65rem 0.9rem; font-size: 15px; color: var(--color-foreground); outline: none;
   &:focus { border-color: var(--navy); box-shadow: 0 0 0 3px color-mix(in oklab, var(--navy) 15%, transparent); }
 }
+
+@media (prefers-reduced-motion: reduce) { .cs-anim { transition: none !important; } }

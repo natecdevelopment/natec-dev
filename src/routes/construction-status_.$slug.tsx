@@ -126,9 +126,8 @@ function StatusPage() {
         title={p.name}
         intro={p.address}
         heightClass="min-h-[62svh] md:min-h-[64svh]"
-      >
-        <Link to="/construction-status" className="btn btn-ghost-dark order-first"><ArrowLeft className="h-4 w-4" /> All projects</Link>
-      </PageHero>
+        top={<Link to="/construction-status" className="eyebrow inline-flex min-h-[44px] items-center gap-2 !text-[12px] text-white/85 hover:text-white"><ArrowLeft className="h-4 w-4" /> All projects</Link>}
+      />
 
       <section className="bg-ivory py-8 md:py-10" aria-label="Project summary">
         <dl className="container-x grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-4">

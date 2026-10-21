@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { ArrowRight, MapPin, Building2, ArrowUpDown, Trees, Car, HardHat, Play, MessageCircle, LayoutGrid, FileText, Phone, Mail, BedDouble, Bath, Sofa, UtensilsCrossed, CookingPot, Fence, Ruler } from "lucide-react";
+import { ArrowRight, MapPin, Building2, ArrowUpDown, Trees, Car, HardHat, Play, MessageCircle, LayoutGrid, FileText, Phone, Mail, BedDouble, Bath, Sofa, UtensilsCrossed, CookingPot, Fence, Ruler, Facebook } from "lucide-react";
 import { company, directors } from "@/lib/site";
 import { PersonFemaleIcon, PersonMaleIcon } from "@/components/PersonIcons";
 import { Reveal, WhatsAppIcon } from "@/components/SiteChrome";
@@ -390,7 +390,7 @@ function LiteVideo({ v, autoplay = false }: { v: VideoRow; autoplay?: boolean })
       ) : (
         <button type="button" onClick={() => setOn(true)} className="group absolute inset-0" aria-label={`Play video: ${v.title || "Natec project video"}`}>
           <VideoPoster v={v} />
-          <span className="absolute left-1/2 top-1/2 flex h-16 w-16 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-brand-red text-white shadow-xl transition group-hover:scale-110">
+          <span className="absolute left-1/2 top-1/2 flex h-14 w-14 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-brand-red md:h-16 md:w-16 text-white shadow-xl transition group-hover:scale-110">
             <Play className="ml-1 h-7 w-7 fill-current" />
           </span>
         </button>
@@ -409,17 +409,25 @@ export function VideosSection() {
   const featured = data[Math.min(active, data.length - 1)]!;
   const goto = (i: number) => {
     const el = track.current?.children[i] as HTMLElement | undefined;
-    el?.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "start" });
+    const box = track.current;
+    if (el && box) box.scrollTo({ left: el.offsetLeft - (box.clientWidth - el.offsetWidth) / 2, behavior: "smooth" });
   };
+  const onTrackScroll = (box: HTMLDivElement) => {
+    const mid = box.scrollLeft + box.clientWidth / 2;
+    let best = 0, dist = Infinity;
+    Array.from(box.children).forEach((c, i) => { const el = c as HTMLElement; const d = Math.abs(el.offsetLeft + el.offsetWidth / 2 - mid); if (d < dist) { dist = d; best = i; } });
+    setSlide(best);
+  };
+  const fbBtn = "self-center mt-5 inline-flex h-10 items-center gap-2 rounded-full border-[1.5px] border-navy px-[18px] font-label text-[12px] uppercase tracking-[0.12em] text-navy";
   return (
-    <section className="section-pad bg-white" aria-labelledby="videos-h">
+    <section className="bg-white py-14 md:py-[120px]" aria-labelledby="videos-h">
       <div className="container-x">
-        <Reveal className="mb-10 flex flex-wrap items-end justify-between gap-6">
+        <Reveal className="mb-6 flex flex-col items-center gap-6 text-center md:mb-10 md:flex-row md:flex-wrap md:items-end md:justify-between md:text-left">
           <div>
             <Eyebrow>Site videos</Eyebrow>
-            <h2 id="videos-h" className="mt-3 text-navy">See our projects <em className="accent-light">on video.</em></h2>
+            <h2 id="videos-h" className="mx-auto mt-3 max-w-[320px] text-[clamp(1.75rem,8vw,2.2rem)] leading-[1.15] text-navy md:mx-0 md:max-w-none md:text-[clamp(1.9rem,3.6vw,3.1rem)] md:leading-[1.1]">See our projects <br className="md:hidden" /><em className="accent-light">on video.</em></h2>
           </div>
-          <a href={company.facebook} target="_blank" rel="noreferrer" className="btn btn-ghost-light">More on Facebook</a>
+          <a href={company.facebook} target="_blank" rel="noreferrer" className="btn btn-ghost-light hidden md:inline-flex">More on Facebook</a>
         </Reveal>
 
         {/* Desktop: featured + list */}
@@ -442,29 +450,39 @@ export function VideosSection() {
           )}
         </div>
 
-        {/* Mobile: swipe carousel */}
-        <div className="md:hidden">
-          <div
-            ref={track}
-            onScroll={(e) => { const el = e.currentTarget; setSlide(Math.round(el.scrollLeft / Math.max(1, el.clientWidth * 0.88))); }}
-            className="-mx-5 flex snap-x snap-mandatory gap-4 overflow-x-auto scroll-px-5 px-5 pb-2 [scrollbar-width:none]"
-          >
-            {data.map((v) => (
-              <div key={v.id} className="w-[88%] shrink-0 snap-start">
-                <LiteVideo v={v} />
-                {v.title && <p className="mt-2 text-sm font-medium text-navy">{v.title}</p>}
-              </div>
-            ))}
-          </div>
-          {data.length > 1 && (
-            <div className="mt-2 flex justify-center">
-              {data.map((v, i) => (
-                <button key={v.id} type="button" onClick={() => goto(i)} aria-label={`Show video ${i + 1}`} className="flex h-11 w-11 items-center justify-center">
-                  <span className={`h-2 rounded-full transition-all ${i === slide ? "w-6 bg-brand-red" : "w-2 bg-navy/25"}`} />
-                </button>
-              ))}
+        {/* Mobile: centred swipe carousel */}
+        <div className="flex flex-col md:hidden">
+          {data.length === 1 ? (
+            <div>
+              <LiteVideo v={data[0]!} />
+              {data[0]!.title && <p className="mt-2.5 line-clamp-2 text-center text-[15px] font-medium text-navy">{data[0]!.title}</p>}
             </div>
+          ) : (
+            <>
+              <div
+                ref={track}
+                onScroll={(e) => onTrackScroll(e.currentTarget)}
+                className="-mx-5 flex snap-x snap-mandatory gap-3 overflow-x-auto overscroll-x-contain px-[7vw] [-webkit-overflow-scrolling:touch] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+                aria-roledescription="carousel"
+              >
+                {data.map((v, i) => (
+                  <div key={v.id} className="w-[86vw] max-w-[420px] shrink-0 snap-center" aria-label={`${i + 1} / ${data.length}`}>
+                    <LiteVideo v={v} />
+                    {v.title && <p className="mt-2.5 line-clamp-2 text-center text-[15px] font-medium leading-snug text-navy">{v.title}</p>}
+                  </div>
+                ))}
+              </div>
+              <p className="sr-only" aria-live="polite">{slide + 1} / {data.length}</p>
+              <div className="mt-2 flex justify-center">
+                {data.map((v, i) => (
+                  <button key={v.id} type="button" onClick={() => goto(i)} aria-label={`Show video ${i + 1}`} aria-current={i === slide} className="flex h-11 w-8 items-center justify-center">
+                    <span className={`h-2 rounded-full transition-all ${i === slide ? "w-6 bg-brand-red" : "w-2 bg-navy/25"}`} />
+                  </button>
+                ))}
+              </div>
+            </>
           )}
+          <a href={company.facebook} target="_blank" rel="noreferrer" className={fbBtn}><Facebook className="h-4 w-4" aria-hidden /> More on Facebook</a>
         </div>
       </div>
     </section>

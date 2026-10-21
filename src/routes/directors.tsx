@@ -2,6 +2,7 @@ import { UnderConstruction } from "@/components/UnderConstruction";
 import { createFileRoute } from "@tanstack/react-router";
 import { Mail, Phone } from "lucide-react";
 import { PageHero } from "@/components/SiteChrome";
+import { PersonFemaleIcon, PersonMaleIcon } from "@/components/PersonIcons";
 import { directors } from "@/lib/site";
 
 export const Route = createFileRoute("/directors")({

@@ -33,10 +33,11 @@ export function PaymentPlanForm({ value, onChange, bookingDate }: { value: PlanS
   const { plan, rows, dirty } = value;
   const calc = useMemo(() => computePlan(plan, bookingDate), [plan, bookingDate]);
   const [pending, setPending] = useState<PlanForm | null>(null);
+  const [kept, setKept] = useState(false);
 
   function setPlan(patch: Partial<PlanForm>) {
     const next = { ...plan, ...patch };
-    if (dirty) { onChange({ ...value, plan: next }); setPending(next); return; }
+    if (dirty) { onChange({ ...value, plan: next }); if (!kept) setPending(next); return; }
     onChange({ plan: next, rows: computePlan(next, bookingDate).rows, dirty: false });
   }
   const setRow = (i: number, patch: Partial<ScheduleRow>) => onChange({ ...value, rows: rows.map((r, j) => (j === i ? { ...r, ...patch } : r)), dirty: true });
@@ -101,7 +102,7 @@ export function PaymentPlanForm({ value, onChange, bookingDate }: { value: PlanS
           <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
             <h3 className="!text-lg text-navy">Schedule</h3>
             <div className="flex gap-2">
-              {dirty && <button type="button" onClick={() => onChange({ plan, rows: calc.rows, dirty: false })} className={btnSm}>Regenerate</button>}
+              {dirty && <button type="button" onClick={() => { setKept(false); onChange({ plan, rows: calc.rows, dirty: false }); }} className={btnSm}>Regenerate</button>}
               <button type="button" onClick={() => onChange({ ...value, rows: [...rows, { due_date: plan.firstDue, amount: Math.max(0, remaining), label: "Instalment" }], dirty: true })} className={btnSm}><Plus className="h-4 w-4" /> Add row</button>
             </div>
           </div>
@@ -143,8 +144,8 @@ export function PaymentPlanForm({ value, onChange, bookingDate }: { value: PlanS
           <DialogHeader><DialogTitle>Regenerate the schedule?</DialogTitle></DialogHeader>
           <p className="text-sm text-muted-foreground">Your manual changes will be replaced.</p>
           <div className="mt-4 flex justify-end gap-2">
-            <button type="button" onClick={() => setPending(null)} className={btnSm}>Keep my rows</button>
-            <button type="button" onClick={() => { if (pending) onChange({ plan: pending, rows: computePlan(pending, bookingDate).rows, dirty: false }); setPending(null); }} className="btn btn-primary !py-2">Regenerate</button>
+            <button type="button" onClick={() => { setKept(true); setPending(null); }} className={btnSm}>Keep my rows</button>
+            <button type="button" onClick={() => { setKept(false); if (pending) onChange({ plan: pending, rows: computePlan(pending, bookingDate).rows, dirty: false }); setPending(null); }} className="btn btn-primary !py-2">Regenerate</button>
           </div>
         </DialogContent>
       </Dialog>

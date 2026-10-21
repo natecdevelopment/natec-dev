@@ -25,7 +25,7 @@ function useDesktop() {
   return d;
 }
 
-export function AuthScreen({ mode, next }: { mode: Mode; next?: string }) {
+export function AuthScreen({ mode, next }: { mode: Mode; next?: string | undefined }) {
   const desktop = useDesktop();
   const reduce = useReducedMotion();
   const [leaving, setLeaving] = useState(false);
@@ -124,7 +124,7 @@ function Stagger({ children }: { children: React.ReactNode[] }) {
   );
 }
 
-function LoginForm({ onDone, next }: { onDone: () => void; next?: string }) {
+function LoginForm({ onDone, next }: { onDone: () => void; next?: string | undefined }) {
   const [errs, setErrs] = useState<Record<string, string>>({});
   const [shake, setShake] = useState(0);
   const [state, setState] = useState<SubmitState>("idle");
@@ -168,7 +168,7 @@ function LoginForm({ onDone, next }: { onDone: () => void; next?: string }) {
   );
 }
 
-function RegisterForm({ next }: { next?: string }) {
+function RegisterForm({ next }: { next?: string | undefined }) {
   const [errs, setErrs] = useState<Record<string, string>>({});
   const [shake, setShake] = useState(0);
   const [state, setState] = useState<SubmitState>("idle");

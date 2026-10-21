@@ -6,8 +6,8 @@ export const EASE = [0.22, 1, 0.36, 1] as const;
 
 /** Floating-label input with a red underline that grows from the left and a one-time shake on error. */
 export function Field({ label, name, type = "text", error, shakeKey, autoComplete, inputMode, defaultValue, onChange, children, password }: {
-  label: string; name: string; type?: string; error?: string; shakeKey?: number; autoComplete?: string; inputMode?: "tel" | "email" | "text";
-  defaultValue?: string; onChange?: (v: string) => void; children?: React.ReactNode; password?: boolean;
+  label: string; name: string; type?: string | undefined; error?: string | undefined; shakeKey?: number | undefined; autoComplete?: string | undefined; inputMode?: "tel" | "email" | "text" | undefined;
+  defaultValue?: string | undefined; onChange?: ((v: string) => void) | undefined; children?: React.ReactNode; password?: boolean | undefined;
 }) {
   const id = useId();
   const reduce = useReducedMotion();
@@ -16,7 +16,7 @@ export function Field({ label, name, type = "text", error, shakeKey, autoComplet
   return (
     <motion.div
       key={error ? `e${shakeKey}` : "ok"}
-      animate={error && !reduce ? { x: [0, -8, 7, -5, 3, 0] } : undefined}
+      animate={error && !reduce ? { x: [0, -8, 7, -5, 3, 0] } : { x: 0 }}
       transition={{ duration: 0.4 }}
     >
       <div className="relative">

@@ -19,7 +19,7 @@ export function PaidRing({ pct }: { pct: number }) {
 
 export function SummaryCards({ c, b }: { c: ClientRow; b: BalanceRow | null }) {
   const overdue = Number(b?.overdue_amount ?? 0) > 0;
-  const cards: [string, string, string?, boolean?][] = [
+  const cards: [string, string, (string | undefined)?, (boolean | undefined)?][] = [
     ["Total price", taka(c.total_price)],
     ["Paid so far", taka(b?.total_paid ?? 0)],
     ["Amount due", taka(b?.amount_due ?? c.total_price)],

@@ -95,18 +95,13 @@ function ProjectStatus({ project }: { project: ProjectRow }) {
 
   const timers = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
   function patchItem(id: string, patch: Partial<ItemRow>, delay = 0) {
-    setItems((xs) => xs.map((i) => {
-      if (i.id !== id) return i;
-      const next = { ...i, ...patch };
-      return { ...next, status: statusFor(next.progress_pct, patch.status ?? (i.status === "Not applicable" && patch.progress_pct === undefined ? i.status : patch.status)) };
-    }));
+    const cur = items.find((i) => i.id === id);
+    if (!cur) return;
+    const merged = { ...cur, ...patch };
+    const row: Partial<ItemRow> = { ...patch, status: statusFor(merged.progress_pct, patch.status ?? cur.status) };
+    setItems((xs) => xs.map((i) => (i.id === id ? { ...merged, status: row.status! } : i)));
     clearTimeout(timers.current[id]);
     timers.current[id] = setTimeout(async () => {
-      const row = { ...patch };
-      if (row.progress_pct !== undefined && row.status === undefined) {
-        const cur = items.find((i) => i.id === id);
-        row.status = cur?.status === "Not applicable" ? "Not applicable" : statusFor(row.progress_pct);
-      }
       await saver.run(() => supabase.from("construction_items").update(row).eq("id", id));
       refreshProject();
     }, delay);

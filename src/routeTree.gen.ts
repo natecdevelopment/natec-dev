@@ -23,6 +23,7 @@ import { Route as ProjectsRouteImport } from './routes/projects'
 import { Route as ServicesRouteImport } from './routes/services'
 import { Route as AuthenticatedAccountRouteImport } from './routes/_authenticated/account'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
+import { Route as AdminConstructionRouteImport } from './routes/admin.construction'
 import { Route as AdminMediaRouteImport } from './routes/admin.media'
 import { Route as AdminMessagesRouteImport } from './routes/admin.messages'
 import { Route as AdminUpcomingRouteImport } from './routes/admin.upcoming'
@@ -102,6 +103,11 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminConstructionRoute = AdminConstructionRouteImport.update({
+  id: '/construction',
+  path: '/construction',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminMediaRoute = AdminMediaRouteImport.update({
   id: '/media',
   path: '/media',
@@ -161,6 +167,7 @@ export interface FileRoutesByFullPath {
   '/projects': typeof ProjectsRoute
   '/services': typeof ServicesRoute
   '/account': typeof AuthenticatedAccountRoute
+  '/admin/construction': typeof AdminConstructionRoute
   '/admin/media': typeof AdminMediaRoute
   '/admin/messages': typeof AdminMessagesRoute
   '/admin/upcoming': typeof AdminUpcomingRoute
@@ -184,6 +191,7 @@ export interface FileRoutesByTo {
   '/projects': typeof ProjectsRoute
   '/services': typeof ServicesRoute
   '/account': typeof AuthenticatedAccountRoute
+  '/admin/construction': typeof AdminConstructionRoute
   '/admin/media': typeof AdminMediaRoute
   '/admin/messages': typeof AdminMessagesRoute
   '/admin/upcoming': typeof AdminUpcomingRoute
@@ -210,6 +218,7 @@ export interface FileRoutesById {
   '/projects': typeof ProjectsRoute
   '/services': typeof ServicesRoute
   '/_authenticated/account': typeof AuthenticatedAccountRoute
+  '/admin/construction': typeof AdminConstructionRoute
   '/admin/media': typeof AdminMediaRoute
   '/admin/messages': typeof AdminMessagesRoute
   '/admin/upcoming': typeof AdminUpcomingRoute
@@ -236,6 +245,7 @@ export interface FileRouteTypes {
     | '/projects'
     | '/services'
     | '/account'
+    | '/admin/construction'
     | '/admin/media'
     | '/admin/messages'
     | '/admin/upcoming'
@@ -259,6 +269,7 @@ export interface FileRouteTypes {
     | '/projects'
     | '/services'
     | '/account'
+    | '/admin/construction'
     | '/admin/media'
     | '/admin/messages'
     | '/admin/upcoming'
@@ -284,6 +295,7 @@ export interface FileRouteTypes {
     | '/projects'
     | '/services'
     | '/_authenticated/account'
+    | '/admin/construction'
     | '/admin/media'
     | '/admin/messages'
     | '/admin/upcoming'
@@ -413,6 +425,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminIndexRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/construction': {
+      id: '/admin/construction'
+      path: '/construction'
+      fullPath: '/admin/construction'
+      preLoaderRoute: typeof AdminConstructionRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/media': {
       id: '/admin/media'
       path: '/media'
@@ -491,6 +510,7 @@ const AuthenticatedRouteRouteWithChildren =
   AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
 interface AdminRouteChildren {
+  AdminConstructionRoute: typeof AdminConstructionRoute
   AdminMediaRoute: typeof AdminMediaRoute
   AdminMessagesRoute: typeof AdminMessagesRoute
   AdminUpcomingRoute: typeof AdminUpcomingRoute
@@ -502,6 +522,7 @@ interface AdminRouteChildren {
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
+  AdminConstructionRoute: AdminConstructionRoute,
   AdminMediaRoute: AdminMediaRoute,
   AdminMessagesRoute: AdminMessagesRoute,
   AdminUpcomingRoute: AdminUpcomingRoute,

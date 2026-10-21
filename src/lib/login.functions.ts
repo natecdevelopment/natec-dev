@@ -90,5 +90,9 @@ export const setFirstPassword = createServerFn({ method: "POST" })
     const { error } = await db.auth.admin.updateUserById(context.userId, { password: data.password });
     if (error) return { error: /weak|pwned|known/i.test(error.message) ? "This password is too common. Please choose another." : "Couldn't save your password. Please try again." };
     await db.from("profiles").update({ must_change_password: false }).eq("id", context.userId);
-    return { ok: true };
+    // Password changes end old sessions, so hand back a fresh one.
+    const email = String(context.claims["email"] ?? "");
+    const res = email ? await publicClient().auth.signInWithPassword({ email, password: data.password }) : null;
+    const s = res?.data.session;
+    return s ? { access_token: s.access_token, refresh_token: s.refresh_token } : { access_token: "", refresh_token: "" };
   });

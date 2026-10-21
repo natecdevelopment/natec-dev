@@ -313,6 +313,7 @@ function SetPasswordForm({ onDone }: { onDone: () => void }) {
     setState("loading");
     const r = await setFirstPassword({ data: { password } }).catch(() => ({ error: "Couldn't save your password. Please try again." }));
     if ("error" in r) { setState("idle"); setErrs({ password: r.error }); return; }
+    if (r.access_token) await supabase.auth.setSession({ access_token: r.access_token, refresh_token: r.refresh_token });
     setState("success");
     setTimeout(onDone, 650);
   }

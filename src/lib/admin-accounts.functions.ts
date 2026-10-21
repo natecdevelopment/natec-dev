@@ -102,3 +102,33 @@ export const deleteAccount = createServerFn({ method: "POST" })
     });
     return { ok: true as const };
   });
+
+/** Admin-only: change the login email of the account linked to a client, keeping profiles.email in sync. */
+export const updateLoginEmail = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: { clientId: string; email: string }) => {
+    if (!/^[0-9a-f-]{36}$/i.test(input.clientId)) throw new Error("Invalid client");
+    const email = String(input.email ?? "").trim().toLowerCase();
+    if (!/^\S+@\S+\.\S+$/.test(email) || email.length > 254) throw new Error("Enter a valid email address.");
+    return { clientId: input.clientId, email };
+  })
+  .handler(async ({ data, context }) => {
+    const { data: isAdmin } = await context.supabase.rpc("is_admin");
+    if (!isAdmin) throw new Error("Forbidden");
+    const { data: client } = await context.supabase.from("clients").select("profile_id").eq("id", data.clientId).maybeSingle();
+    if (!client?.profile_id) throw new Error("This client has no linked login.");
+    if (client.profile_id === context.userId) throw new Error("Change your own email from your account page.");
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: adm } = await supabaseAdmin.from("admins").select("email");
+    const { data: u } = await supabaseAdmin.auth.admin.getUserById(client.profile_id);
+    const oldEmail = (u?.user?.email ?? "").toLowerCase();
+    if ((adm ?? []).some((a) => a.email.toLowerCase() === oldEmail)) throw new Error("Admin logins can't be changed here.");
+    const { error } = await supabaseAdmin.auth.admin.updateUserById(client.profile_id, { email: data.email, email_confirm: true });
+    if (error) throw new Error(/already|exists|registered/i.test(error.message) ? "Another account already uses this email." : error.message);
+    await supabaseAdmin.from("profiles").update({ email: data.email }).eq("id", client.profile_id);
+    await supabaseAdmin.from("admin_audit_log").insert({
+      admin_email: String((context.claims as { email?: string }).email ?? ""), action: "update_login_email", target_email: data.email,
+      details: { client_id: data.clientId, old: oldEmail, new: data.email },
+    });
+    return { ok: true as const };
+  });

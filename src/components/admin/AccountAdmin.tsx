@@ -31,7 +31,7 @@ export const muted = <span className="text-muted-foreground/60">—</span>;
 
 export function StatusChip({ status }: { status: string }) {
   const s = status === "suspended";
-  return <span className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-medium capitalize ${s ? "bg-brand-red/10 text-brand-red" : "bg-success/10 text-success"}`} style={s ? undefined : { color: "#1F7A4D", backgroundColor: "rgba(31,122,77,0.1)" }}>{status}</span>;
+  return <span className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-medium capitalize ${s ? "bg-brand-red/10 text-brand-red" : "bg-ok/10 text-ok"}`}>{status}</span>;
 }
 
 /** Square icon button with a native tooltip. */
